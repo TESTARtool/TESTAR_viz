@@ -63,6 +63,7 @@ tab2 =  html.Div([
                                 'border-color':'brown',
                                 'border-style': 'solid'
                                 },
+                        boxSelectionEnabled=True,
                         minZoom=(0.005),
 #                        zoom = 1,
                         zoomingEnabled =True,
