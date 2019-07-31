@@ -23,6 +23,8 @@ This example is partial based on the script from https://dash.plot.ly/cytoscape/
 from appy import app
 
 import dash_core_components
+import sys
+import utils.globals as glob
 
 print('dash version: ', dash_core_components.__version__)
 
@@ -33,11 +35,43 @@ app.config['suppress_callback_exceptions'] = True
 
 # callbacks are connected to layout: Keep/remain despite pythonwarnings !!!
 #import serverroutes
+import servershutdown
 import callbacks.callbacks0
 import callbacks.callbacks0_5
 #import callbacks.callbacks1
 import callbacks.callbacks2
 
+
+if len(sys.argv) == 1 or (len(sys.argv) >1 and sys.argv[1]!='--port'):
+    port = 8050
+    if len(sys.argv) == 3 and sys.argv[1] != '--model':
+            glob.modelfile = sys.argv[2]
+    elif len(sys.argv) == 5 and sys.argv[1] != '--model' and sys.argv[3] != '--oracles':
+        glob.modelfile = sys.argv[2]
+        glob.oraclesfile = sys.argv[4]
+    elif len(sys.argv) == 7 and sys.argv[1] != '--model' and \
+            sys.argv[3] != '--oracles' and sys.argv[5] != '--results':
+        glob.modelfile = sys.argv[2]
+        glob.oraclesfile = sys.argv[4]
+        glob.resultsfile = sys.argv[6]
+    elif (len(sys.argv) >1 and sys.argv[1]=='--port'):
+        port=sys.argv[2]
+        if len(sys.argv) == 5 and sys.argv[3] != '--model':
+            glob.modelfile = sys.argv[4]
+        elif len(sys.argv) == 7 and sys.argv[3] != '--model' and sys.argv[5] != '--oracles':
+            glob.modelfile = sys.argv[4]
+            glob.oraclesfile = sys.argv[6]
+        elif len(sys.argv) == 9 and sys.argv[3] != '--model' \
+                and sys.argv[5] != '--oracles' and sys.argv[7] != '--results':
+            glob.modelfile = sys.argv[4]
+            glob.oraclesfile = sys.argv[6]
+            glob.resultsfile = sys.argv[8]
+
+# if len(sys.argv) == 2: # not a valid scenario
+
+
+
+
 if __name__ == '__main__':
-    app.run_server(debug=False)
+    app.run_server(port=port, debug=False)
     pass

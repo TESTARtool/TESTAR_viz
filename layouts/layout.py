@@ -8,6 +8,7 @@ Created on Tue Apr 2 2019
 
 #######################################################
 import dash_html_components as html
+import dash_core_components as dcc
 from  layouts.layout_tab0 import tab0
 from  layouts.layout_tab0_5 import tab0_5
 from  layouts.layout_tab1 import tab1
@@ -16,7 +17,8 @@ from  layouts.layout_tab3 import tab3
 
 
 #**************************
-testarlayout = html.Div([
+testarlayout = html.Div(id='main',children=[
+                    dcc.Location(id='url', refresh=False),
                     html.Hr(),
                     html.Div('Setup',
                              style={'width':'100%', 

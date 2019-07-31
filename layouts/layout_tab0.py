@@ -24,7 +24,7 @@ import dash_html_components as html
 #**************************
 tab0 =   html.Div([
                 html.Div([
-              
+
                     html.Table(                            html.Tbody([
                             html.Tr( [                                 
                                 html.Td(children='Gremlin-Server-URL:'),

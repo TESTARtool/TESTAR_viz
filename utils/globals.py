@@ -22,6 +22,10 @@ image_element = 'screenshot'
 no_image_file='no_image.png'
 outputfolder = 'assets'+os.sep #20190428 there is a dependency with app.get_asset_url
 
+modelfile = ''
+oraclesfile = ''
+resultsfile = ''
+
 graphmlfile = os.path.join(outputfolder,'graphml.xml')
 subgraphmlfile=os.path.join(outputfolder,'subgraphml.xml')
 default_nodeelement='labelV'
