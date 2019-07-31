@@ -28,21 +28,23 @@ def imagefilename(s =""):
      return glob.imgfiletemplate+s.replace(':','.').replace('#','8')+glob.imgfileextension #do not change!!
  
 def clearassetsfolder():
-    print('deleting  from folder: ',glob.outputfolder)
-    for filename in os.listdir(glob.outputfolder):
+    fldr = glob.scriptfolder+glob.outputfolder
+    print('deleting  from folder: ',fldr)
+    for filename in os.listdir(fldr):
         try:
             if filename.endswith('.png') or filename.endswith('.xml') or filename.endswith('.csv') :
-                os.unlink(glob.outputfolder+filename)
-                print('deleting old: '+glob.outputfolder+filename)
+                os.unlink(fldr+filename)
+                print('deleting old: '+fldr+filename)
         except Exception as e: 
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             print(exc_type, fname, exc_tb.tb_lineno)
             print('*  There was an error processing : '+str(e))   
 def copydefaultimagetoasset():
+
     try:
-        f=open('utils'+'/'+glob.no_image_file,'rb')
-        fnew=open(glob.outputfolder+'/'+glob.no_image_file,'wb')
+        f=open(glob.scriptfolder +'utils'+'/'+glob.no_image_file,'rb')
+        fnew=open(glob.scriptfolder +glob.outputfolder+'/'+glob.no_image_file,'wb')
         contnt=f.read()
         f.close()
         fnew.write(contnt)
@@ -82,7 +84,7 @@ def extractscreenshotfromdict(n,eldict):
             pngintarr=[(int(x)+256)%256  for x in found.split(",")] 
             fname=imagefilename(n)
             print('saving...'+fname+ ' with size of ',len(pngintarr))
-            f = open('assets/'+fname, 'wb')      
+            f = open(glob.scriptfolder +'assets/'+fname, 'wb')
             f.write(bytearray(pngintarr ))
             f.close() 
         else:
@@ -182,11 +184,11 @@ def setgraphattributes(infer=True, contents = None, filename=''):
             decoded = base64.b64decode(content_string)
             try:
                 # data=io.StringIO(decoded.decode('utf-8'))
-                fout = open('assets/' + filename, encoding='utf-8', mode='w', newline='')
+                fout = open(glob.scriptfolder +'assets/' + filename, encoding='utf-8', mode='w', newline='')
                 fout.write(decoded.decode('utf-8'))  # writes the uploaded file to the newly created file.
                 #                   tu.savetofile(decoded.decode('utf-8'),filename )
                 fout.close()  # closes the file, upload complete.
-                glob.dfattributes = pd.read_csv(glob.outputfolder + '/' + filename, sep=';')
+                glob.dfattributes = pd.read_csv(glob.scriptfolder +glob.outputfolder + '/' + filename, sep=';')
             except Exception as e:
                 print('*  There was an error processing file <' + filename + '> :' + str(e))
     else:
@@ -211,12 +213,12 @@ def setvizproperties(loaddefaults=True, contents=None, filename=''):
         decoded = base64.b64decode(content_string)
         try:
             # data=io.StringIO(decoded.decode('utf-8'))
-            fout = open(glob.outputfolder + '/' + filename, encoding='utf-8', mode='w',
+            fout = open(glob.scriptfolder +glob.outputfolder + '/' + filename, encoding='utf-8', mode='w',
                         newline='')  # creates the file where the uploaded file should be stored
             fout.write(decoded.decode('utf-8'))  # writes the uploaded file to the newly created file.
             #                   tu.savetofile(decoded.decode('utf-8'),filename )
             fout.close()  # closes the file, upload complete.
-            glob.dfdisplayprops = pd.read_csv(glob.outputfolder + '/' + filename, sep=';')
+            glob.dfdisplayprops = pd.read_csv(glob.scriptfolder +glob.outputfolder + '/' + filename, sep=';')
         except Exception as e:
             print('*  There was an error processing file <' + filename + '> :' + str(e))
             pass

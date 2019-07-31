@@ -24,10 +24,12 @@ from appy import app
 
 import dash_core_components
 import sys
+import os
 import utils.globals as glob
-
 print('dash version: ', dash_core_components.__version__)
 
+glob.scriptfolder=os.path.realpath(__file__)[:(len(os.path.realpath(__file__))-len(os.path.basename(__file__)))]
+print('scriptfolder : ',glob.scriptfolder)
 from layouts.layout import testarlayout
 
 app.layout = testarlayout

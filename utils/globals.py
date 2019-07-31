@@ -20,6 +20,7 @@ screenshotregex='.*\[(.+?)\].*'
 image_attrib_key='image-source'
 image_element = 'screenshot'
 no_image_file='no_image.png'
+scriptfolder = ''
 outputfolder = 'assets'+os.sep #20190428 there is a dependency with app.get_asset_url
 
 modelfile = ''
