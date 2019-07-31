@@ -23,9 +23,12 @@ This example is partial based on the script from https://dash.plot.ly/cytoscape/
 from appy import app
 
 import dash_core_components
-
+import os
+import utils.globals as glob
 print('dash version: ', dash_core_components.__version__)
 
+glob.scriptfolder=os.path.realpath(__file__)[:(len(os.path.realpath(__file__))-len(os.path.basename(__file__)))]
+print('scriptfolder : ',glob.scriptfolder)
 from layouts.layout import testarlayout
 
 app.layout = testarlayout
@@ -39,5 +42,5 @@ import callbacks.callbacks0_5
 import callbacks.callbacks2
 
 if __name__ == '__main__':
-    app.run_server(debug=False)
+    app.run_server(port=8540,debug=False)
     pass

@@ -8,6 +8,7 @@ testar graph module
 import urllib.request
 import datetime
 import time
+import utils.globals as glob
 from gremlin_python.driver.client import Client
 from gremlin_python.process.anonymous_traversal import traversal
 from gremlin_python.driver.driver_remote_connection import DriverRemoteConnection
@@ -26,6 +27,9 @@ from gremlin_python.process.traversal import Scope
 from gremlin_python.process.traversal import Barrier
 from gremlin_python.process.traversal import Bindings
 from gremlin_python.process.traversal import WithOptions
+
+from utils.utlis import imagefilename
+
 
 class Graph:
     
@@ -128,14 +132,14 @@ class Graph:
         
     def savetofile(data, tofile='graphml.xml'):
         #f=open("graphml.xml",encoding='ISO-8859-1',mode="w+")
-        f=open(tofile,encoding='utf-8',mode="w+")
+        f=open(glob.scriptfolder +tofile,encoding='utf-8',mode="w+")
         for x in data:  f.write(str(x[0]))
         f.close()  
         print('saved to : ',tofile)
         
-    def imagefilename(s =""):
-         return 'testarscreenshot_node_{}.png'.format(s.replace(':','.'))
-     
+    # def imagefilename(s =""):
+    #      return 'testarscreenshot_node_{}.png'.format(s.replace(':','.'))
+    #
     def extractscreenshotsfromnxgraph(grh):
         print('save images')
     # testar db in graphml export from orientdb has a screenshot attrbute 
