@@ -43,7 +43,7 @@ import callbacks.callbacks0_5
 #import callbacks.callbacks1
 import callbacks.callbacks2
 
-
+port=8050;
 if len(sys.argv) == 1 or (len(sys.argv) >1 and sys.argv[1]!='--port'):
     port = 8050
     if len(sys.argv) == 3 and sys.argv[1] != '--model':
@@ -56,18 +56,18 @@ if len(sys.argv) == 1 or (len(sys.argv) >1 and sys.argv[1]!='--port'):
         glob.modelfile = sys.argv[2]
         glob.oraclesfile = sys.argv[4]
         glob.resultsfile = sys.argv[6]
-    elif (len(sys.argv) >1 and sys.argv[1]=='--port'):
-        port=sys.argv[2]
-        if len(sys.argv) == 5 and sys.argv[3] != '--model':
-            glob.modelfile = sys.argv[4]
-        elif len(sys.argv) == 7 and sys.argv[3] != '--model' and sys.argv[5] != '--oracles':
-            glob.modelfile = sys.argv[4]
-            glob.oraclesfile = sys.argv[6]
-        elif len(sys.argv) == 9 and sys.argv[3] != '--model' \
-                and sys.argv[5] != '--oracles' and sys.argv[7] != '--results':
-            glob.modelfile = sys.argv[4]
-            glob.oraclesfile = sys.argv[6]
-            glob.resultsfile = sys.argv[8]
+elif (len(sys.argv) >1 and sys.argv[1]=='--port'):
+    port=int(sys.argv[2])
+    if len(sys.argv) == 5 and sys.argv[3] != '--model':
+        glob.modelfile = sys.argv[4]
+    elif len(sys.argv) == 7 and sys.argv[3] != '--model' and sys.argv[5] != '--oracles':
+        glob.modelfile = sys.argv[4]
+        glob.oraclesfile = sys.argv[6]
+    elif len(sys.argv) == 9 and sys.argv[3] != '--model' \
+            and sys.argv[5] != '--oracles' and sys.argv[7] != '--results':
+        glob.modelfile = sys.argv[4]
+        glob.oraclesfile = sys.argv[6]
+        glob.resultsfile = sys.argv[8]
 
 # if len(sys.argv) == 2: # not a valid scenario
 

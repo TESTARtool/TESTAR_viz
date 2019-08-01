@@ -28,7 +28,16 @@ def imagefilename(s =""):
      return glob.imgfiletemplate+s.replace(':','.').replace('#','8')+glob.imgfileextension #do not change!!
  
 def clearassetsfolder():
-    fldr = glob.scriptfolder+glob.outputfolder
+
+    fldr = glob.scriptfolder+glob.assetfolder+glob.outputfolder
+
+    try:
+        # Create target Directory
+        os.mkdir(fldr)
+        print("Directory ", fldr, " Created ")
+    except FileExistsError:
+        print("Directory ", fldr, " exists")
+
     print('deleting  from folder: ',fldr)
     for filename in os.listdir(fldr):
         try:
@@ -44,7 +53,7 @@ def copydefaultimagetoasset():
 
     try:
         f=open(glob.scriptfolder +'utils'+'/'+glob.no_image_file,'rb')
-        fnew=open(glob.scriptfolder +glob.outputfolder+'/'+glob.no_image_file,'wb')
+        fnew=open(glob.scriptfolder +glob.assetfolder+glob.outputfolder+'/'+glob.no_image_file,'wb')
         contnt=f.read()
         f.close()
         fnew.write(contnt)
@@ -84,7 +93,7 @@ def extractscreenshotfromdict(n,eldict):
             pngintarr=[(int(x)+256)%256  for x in found.split(",")] 
             fname=imagefilename(n)
             print('saving...'+fname+ ' with size of ',len(pngintarr))
-            f = open(glob.scriptfolder +'assets/'+fname, 'wb')
+            f = open(glob.scriptfolder +glob.assetfolder+glob.outputfolder+fname, 'wb')
             f.write(bytearray(pngintarr ))
             f.close() 
         else:
@@ -114,8 +123,10 @@ def setCytoElements(grh):
             tempdict=dict(ndict)
             tempdict.update({'label': ndict[glob.label_nodeelement]})  #copy as cyto wants the 'label' tag
             tempdict.update({'id': n})
-            fname= extractscreenshotfromdict(str(n),tempdict)
+            fname= glob.outputfolder+extractscreenshotfromdict(str(n),tempdict)
             tempdict.update({glob.elementimgurl:app.get_asset_url(fname)}) #pointer to the image
+
+
             nodes.append({'data':  tempdict ,'position': {'x': 0, 'y': 0}})
 
         for source, target, edict in grh.edges(data=True):
@@ -123,7 +134,7 @@ def setCytoElements(grh):
             tempdict.update({'label': edict[glob.label_edgeelement]})  #copy as cyto wants the label tag
             tempdict.update({'source': source})     
             tempdict.update({'target': target})
-            fname=extractscreenshotfromdict(''+source+target,tempdict)
+            fname=glob.outputfolder+extractscreenshotfromdict(''+source+target,tempdict)
             tempdict.update({glob.elementimgurl:app.get_asset_url(fname)})
             edges.append({'data':  tempdict })
     except Exception as e:
@@ -184,7 +195,7 @@ def setgraphattributes(infer=True, contents = None, filename=''):
             decoded = base64.b64decode(content_string)
             try:
                 # data=io.StringIO(decoded.decode('utf-8'))
-                fout = open(glob.scriptfolder +'assets/' + filename, encoding='utf-8', mode='w', newline='')
+                fout = open(glob.scriptfolder +glob.outputfolder + filename, encoding='utf-8', mode='w', newline='')
                 fout.write(decoded.decode('utf-8'))  # writes the uploaded file to the newly created file.
                 #                   tu.savetofile(decoded.decode('utf-8'),filename )
                 fout.close()  # closes the file, upload complete.

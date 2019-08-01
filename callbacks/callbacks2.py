@@ -139,12 +139,14 @@ def update_selectednodestabletest(selnodes):
     col=set()
     screens=[]
     for c in selnodes:
-       fname=tu.imagefilename(c['id'])
+       fname=glob.outputfolder+tu.imagefilename(c['id'])
        try:
 #            encoded_image = base64.b64encode(open('assets/'+fname, 'rb').read())
 #            baseimage = 'data:image/png;base64,{}'.format(encoded_image.decode())
             screens.append(html.P( children='Screenprint of node: '+c['id']))
             screens.append(html.Img(id='screenimage'+c['id'],style={'max-height':'550px'},src= app.get_asset_url(fname))) #baseimage))
+         #   screens.append(html.Img(id='screenimage' + c['id'], style={'max-height': '550px'},src= "/"+glob.outputfolder+fname))  # baseimage))
+
        except (RuntimeError, TypeError, NameError, OSError):
             screens.append(html.P( children='No Screenprint of node: '+c['id']))
        for d in c.keys():
