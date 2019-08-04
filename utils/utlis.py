@@ -129,11 +129,12 @@ def setCytoElements(grh):
 
             nodes.append({'data':  tempdict ,'position': {'x': 0, 'y': 0}})
 
-        for source, target, edict in grh.edges(data=True):
+        for source, target, n,edict in grh.edges(data=True,keys=True):
             tempdict=dict(edict)
             tempdict.update({'label': edict[glob.label_edgeelement]})  #copy as cyto wants the label tag
             tempdict.update({'source': source})     
             tempdict.update({'target': target})
+            tempdict.update({'id': n})
             fname=glob.outputfolder+extractscreenshotfromdict(''+source+target,tempdict)
             tempdict.update({glob.elementimgurl:app.get_asset_url(fname)})
             edges.append({'data':  tempdict })
