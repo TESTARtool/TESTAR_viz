@@ -20,16 +20,18 @@ tab3 = html.Div([
                 style_table={'overflowX': 'scroll','width' : 1200},
                 columns=[{'id': 'dummy', 'name': 'dummy'},{'id': 'dummy1', 'name': 'dummy1'}],
                 data=[],
-                n_fixed_rows=1,
+                fixed_rows={'headers': True, 'data': 0},
 #                n_fixed_columns=2,
+                row_selectable='single',
+                column_selectable='single',
                 style_cell={
                            'minWidth': '15px',  'width': '150px','maxWidth': '150px',
                            'whiteSpace': 'normal'
                            },
                 editable=False,
-                filtering=True,
-                sorting=True,
-                sorting_type="multi",
+                filter_action='native',
+                sort_action='native',
+                sort_mode="multi",
                 ),
                      
                      
@@ -40,16 +42,18 @@ tab3 = html.Div([
                        style_table={'overflowX': 'scroll','width' : 1200},
                         columns=[{'id': 'dummy', 'name': 'dummy'},{'id': 'dummy1', 'name': 'dummy1'}],
                         data=[],
-                        n_fixed_rows=1,
+                        fixed_rows={'headers': True, 'data': 0},
 #                        n_fixed_columns=2,
+                        row_selectable='single',
+                        column_selectable='single',
                         style_cell={
                                    'minWidth': '15px',  'width': '150px','maxWidth': '150px',
                                    'whiteSpace': 'normal'
                                    },
                         editable=False,
-                        filtering=True,
-                        sorting=True,
-                        sorting_type="multi",
+                        filter_action='native',
+                        sort_action='native',
+                        sort_mode="multi",
                         )
                 ])   
            ],style={'font-size': 12}),
