@@ -25,21 +25,28 @@ import networkx as nx
     [Output('attributetable', 'columns'),
     Output('attributetable', 'data')],
     [Input( 'infer-attrib-from-source-button', 'n_clicks'),
-    Input( 'upload-button-attrib-file','n_clicks'),
-    Input('upload-attrib-from-file', 'contents'),],
+    Input('upload-attrib-from-file', 'contents')],
     [State('upload-attrib-from-file', 'filename'),
-    State('upload-attrib-from-file', 'last_modified'),])
-def getattributes(hitsb0,hitsb1,contents,filename, date):
+    State('upload-attrib-from-file', 'last_modified')])
+
+
+def getattributes(hitsb0,  contents, filename, date):
+
     print('update attrib table start')
     ctx = dash.callback_context
-#    print('ctx: ', 'states', ctx.states,'triggered', ctx.triggered,'inputs', ctx.inputs)
-#    print('attrib ctx: ', 'triggered', ctx.triggered)
+    print('ctx: ', 'states', ctx.states,'triggered', ctx.triggered,'inputs', ctx.inputs)
+    print('attrib ctx: ', 'triggered', ctx.triggered)
     trigger = ctx.triggered[0]['prop_id'].split('.')[0]
+    print("trigger :"+trigger);
     if ctx.triggered:
         if  trigger=='infer-attrib-from-source-button'  : #infer from graph
             utils.setgraphattributes(True, None, '')
-        else: #load attributes from file trigger=='upload-button-attrib-file': #
+            print("ok");
+        elif contents is not None:  # load file  trigger=='upload-button-viz-file':
             utils.setgraphattributes(False, contents, filename)
+        else:
+            return None  # [{'id': '', 'name': ''}],{}
+
         columns=[{'id': c, 'name': c} for c in  glob.dfattributes.columns]
         data= glob.dfattributes.to_dict("rows")
         return columns, data
@@ -67,13 +74,10 @@ def save_att_table(data,cols):
     [Output('viz-settings-table', 'columns'),
     Output('viz-settings-table', 'data')],
     [Input( 'load-visual-defaults-button', 'n_clicks'),
-    Input( 'upload-button-viz-file','n_clicks'),
-    Input('upload-visual-from-file', 'contents'),
-#    Input('attributetable', 'columns')
-     ],    #depends on attrib table
+    Input('upload-visual-from-file', 'contents')],
     [State('upload-visual-from-file', 'filename'),
     State('upload-visual-from-file', 'last_modified')])
-def update_viz_table(hitsb0,hitsb1,contents,filename, date):
+def update_viz_table(hitsb0,contents,filename, date):
     print('update viz table start')
 
     infer=False

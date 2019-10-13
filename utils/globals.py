@@ -21,13 +21,13 @@ image_attrib_key='image-source'
 image_element = 'screenshot'
 no_image_file='no_image.png'
 scriptfolder = ''
-#outputfolder = 'assets'+os.sep #20190428 there is a dependency with app.get_asset_url
 assetfolder = 'assets'+os.sep #20190428 there is a dependency with app.get_asset_url
 outputfolder = 'content'+os.sep
 
 modelfile = ''
 oraclesfile = ''
 resultsfile = ''
+visualstylefile= ''
 
 graphmlfile = os.path.join(assetfolder+outputfolder,'graphml.xml')
 subgraphmlfile=os.path.join(assetfolder+outputfolder,'subgraphml.xml')
@@ -51,11 +51,11 @@ nodedisplayprop={
                 'hide':0,
                 'toggle_children' : 0,
                 'toggle_decendants' :0,
-                'label':'labelV',
+                'label':'nodeid',
                 'label_fontsize' : 14,
-                'shape' :'circle',
-                'width' : 15,
-                'height' : 15,
+                'shape' :'rectangle',
+                'width' : 30,
+                'height' : 30,
                 'image-source': 'screenshot',
                 'border-width' : 1,
                 'border-color' : 'black',

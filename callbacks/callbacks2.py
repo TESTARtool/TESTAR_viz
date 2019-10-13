@@ -14,11 +14,6 @@ import utils.utlis as tu
 
 ##############################################
 
-
-
- 
-
-####################
 #tab2
 #cyto
 @app.callback(
@@ -27,110 +22,128 @@ import utils.utlis as tu
          Output('cytoscape-update-layout', 'stylesheet')],
         [Input('submit-button', 'n_clicks')],
         [State('dropdown-update-layout', 'value'),
-        State( 'viz-settings-table','data'),
         State('dropdown-subgraph-options','value')])
-def update_layout(hits,layout,data,subgraph):
-    if hits>=1 :
- 
-        stylesheet=[]
-        for row in data:
-            styledict=dict()
-            stylepropdict=dict()
-            selectordict=dict()
-            if row[glob.elementtype]=='node':
-                '''                if row[glob.elementsubtype] == glob.default_subtypeelement:
-                    selectorfilter=''
-                else:'''
-                selectorfilter = '['+glob.label_nodeelement+ ' = ' +'\''+row[glob.elementsubtype]+'\''+']'
-                selectordict.update({'selector' : 'node'+selectorfilter})
-                dsp='element'
-                if not row.get('hide') is None:
-                    if int(row['hide'])==1:  dsp='none'
-                if not row[glob.image_attrib_key] is None:
-                    if row[glob.image_attrib_key]!='':
-                        stylepropdict.update( {'background-image':'data('+glob.elementimgurl+')'} ) #unstable?
-                stylepropdict.update(
-                    {'display': dsp,#  non deterministic syntax
-                    'font-size' : row['label_fontsize'],  
-                    'shape': row['shape'],                    
-                    'width': row['width'],                    
-                    'height': row['height'],                    
-                    'label': ('data('+row['label']+')' if row['label']!='' else ''),
-                    'border-width': row['border-width'],
-                    'border-color': row['border-color'],
-                    'background-color': row['color'],
-                    'background-fit' : 'contain',
-          #          'background-image':'data('+glob.elementimgurl+')',  #unstable?
-          #          'background-width' :'95%'              #unstable?
-                    }
-                    )
-               
-            elif row[glob.elementtype]=='edge':
-                '''              if row[glob.elementsubtype] == glob.default_subtypeelement:
-                    selectorfilter=''
-                else:'''
-                selectorfilter = "["+glob.label_edgeelement+ " = " +"'"+row[glob.elementsubtype]+"'"+"]"
-                selectordict.update({'selector' : 'edge'+selectorfilter})
-                dsp='element'
-                if not row.get('hide') is None:
-                    if int(row['hide'])==1:  dsp='none'
-                dsplabel={ 'label': '' }
-                if not row['label'] is None:
-                    if row['label']!='':
-                        dsplabel = {'label': 'data('+dsplabel+')' }
-
-                stylepropdict.update(dsplabel) ,  
-                stylepropdict.update(
-                    {'display': dsp,
-                    'font-size' : row['label_fontsize'],
-                    'mid-target-arrow-shape': row['arrow-shape'],
-                    'mid-target-arrow-color': row['arrow-color'],
-                    'arrow-scale': row['arrow-scale'],                    
-                    'width': row['line-width'],                                       
-            
-                    'line-color': row['color'],
-                    'curve-style': row['edgestyle'],
-                    'line-fill': row['edgefill'],
-                    }
-                    )
-                    
-            else:
-                selectorfilter = "" # should not happen
-            styledict.update({'style' : stylepropdict})
-            tmpstyle=dict()
-            tmpstyle.update(selectordict)
-            tmpstyle.update(styledict)     # blunder  tmpstyle=tmpstyle.update(styledict)
-            stylesheet.append(tmpstyle)
-            
-#############################
-        tmpgrh=glob.grh.copy()
-        if subgraph=='no widgets': 
-            removenodelist = [n for n,v in glob.grh.nodes(data=True) if v['labelV']=='Widget']
+def update_layout(hits, layout, subgraph):
+    if hits >= 1:
+        cytostylesheet = updateCytoStyleSheet()
+        tmpgrh = glob.grh.copy()
+        removenodelist = []
+        if subgraph == 'no widgets':
+            removenodelist = [n for n, v in glob.grh.nodes(data=True) if v['labelV'] == 'Widget']
             tmpgrh.remove_nodes_from(removenodelist)
-            print('no widgets graph')
-        elif subgraph== 'only abstract states': pass
-        elif subgraph== 'only concrete states':pass
-        elif subgraph=='concrete+sequence':pass
+
+        elif subgraph == 'only abstract states':
+            removenodelist = [n for n, v in glob.grh.nodes(data=True) if v['labelV'] != 'AbstractState']
+            tmpgrh.remove_nodes_from(removenodelist)
+
+        elif subgraph == 'only concrete states':
+            removenodelist = [n for n, v in glob.grh.nodes(data=True) if v['labelV'] != 'ConcreteState']
+            tmpgrh.remove_nodes_from(removenodelist)
+        elif subgraph == 'concrete+sequence':
+            removenodelist = [n for n, v in glob.grh.nodes(data=True) if (
+                     v['labelV'] != 'ConcreteState' and v['labelV'] != 'SequenceNode' and v[
+                    'labelV'] != 'TestSequence')]
+            tmpgrh.remove_nodes_from(removenodelist)
         else:
-            subgraph='all'
-            #tmpgrh=glob.grh.copy
-                
-        subelements=tu.setCytoElements(tmpgrh)       
+            subgraph = 'all'
+            # tmpgrh=glob.grh.copy
+        if removenodelist != []:    tmpgrh.remove_nodes_from(removenodelist)
+        print(subgraph, ' graph')
+        subelements = tu.setCytoElements(tmpgrh)
         return subelements, {
-        'name': layout,
-        'animate': False
-        },stylesheet
-#    else:
-#        return [],{},[]
+            'name': layout,
+            'animate': False
+            }, cytostylesheet
+
+
+ #    else:
+ #        return [],{},[]
 #part2 cyto
+
+
+def updateCytoStyleSheet():
+    stylesheet = []
+    data = glob.dfdisplayprops.to_dict('records');
+    for row in data:
+        styledict = dict()
+        stylepropdict = dict()
+        selectordict = dict()
+        if row[glob.elementtype] == 'node':
+            '''                if row[glob.elementsubtype] == glob.default_subtypeelement:
+                selectorfilter=''
+            else:'''
+            selectorfilter = '[' + glob.label_nodeelement + ' = ' + '\'' + row[glob.elementsubtype] + '\'' + ']'
+            selectordict.update({'selector': 'node' + selectorfilter})
+            dsp = 'element'
+            if not row.get('hide') is None:
+                if int(row['hide']) == 1:  dsp = 'none'
+            if not row[glob.image_attrib_key] is None:
+                if row[glob.image_attrib_key] != '':
+                    stylepropdict.update({'background-image': 'data(' + glob.elementimgurl + ')'})  # unstable?
+            stylepropdict.update(
+                {'display': dsp,  # non deterministic syntax
+                 'font-size': row['label_fontsize'],
+                 'shape': row['shape'],
+                 'width': row['width'],
+                 'height': row['height'],
+                 'label': ('data(' + row['label'] + ')' if row['label'] != '' else ''),
+                 'border-width': row['border-width'],
+                 'border-color': row['border-color'],
+                 'background-color': row['color'],
+                 'background-fit': 'contain',
+                 #          'background-image':'data('+glob.elementimgurl+')',  #unstable?
+                 #          'background-width' :'95%'              #unstable?
+                 }
+            )
+
+        elif row[glob.elementtype] == 'edge':
+            '''              if row[glob.elementsubtype] == glob.default_subtypeelement:
+                selectorfilter=''
+            else:'''
+            selectorfilter = "[" + glob.label_edgeelement + " = " + "'" + row[glob.elementsubtype] + "'" + "]"
+            selectordict.update({'selector': 'edge' + selectorfilter})
+            dsp = 'element'
+            if not row.get('hide') is None:
+                if int(row['hide']) == 1:  dsp = 'none'
+            dsplabel = {'label': ''}
+            if not row['label'] is None:
+                if row['label'] != '':
+                    dsplabel = {'label': 'data(' + dsplabel + ')'}
+
+            stylepropdict.update(dsplabel),
+            stylepropdict.update(
+                {'display': dsp,
+                 'font-size': row['label_fontsize'],
+                 'mid-target-arrow-shape': row['arrow-shape'],
+                 'mid-target-arrow-color': row['arrow-color'],
+                 'arrow-scale': row['arrow-scale'],
+                 'width': row['line-width'],
+
+                 'line-color': row['color'],
+                 'curve-style': row['edgestyle'],
+                 'line-fill': row['edgefill'],
+                 }
+            )
+
+        else:
+            selectorfilter = ""  # should not happen
+        styledict.update({'style': stylepropdict})
+        tmpstyle = dict()
+        tmpstyle.update(selectordict)
+        tmpstyle.update(styledict)  # blunder  tmpstyle=tmpstyle.update(styledict)
+        stylesheet.append(tmpstyle)
+    return  stylesheet
+
+ #############################
+
+
 
 
 #what is clicked in the graph?
 @app.callback(
-    [Output('mijntabletoo', "columns"),
-     Output('mijntabletoo', 'data'),
-    Output('screenimage-coll', 'children')
-     ], #,Output('screenimage', 'src')], 
+    [Output('selectednodetable', "columns"),
+     Output('selectednodetable', 'data'),
+    Output('screenimage-coll', 'children')],
     [Input('cytoscape-update-layout', 'selectedNodeData')])   
 def update_selectednodestabletest(selnodes):
     
@@ -150,15 +163,18 @@ def update_selectednodestabletest(selnodes):
        except (RuntimeError, TypeError, NameError, OSError):
             screens.append(html.P( children='No Screenprint of node: '+c['id']))
        for d in c.keys():
-            col.add(d) 
-    columns=[{'id': d, 'name': d} for d in col if d !=glob.image_element]
+            col.add(d)
+    columns=[];
+    #columns.append({"id": 'nodeid', "name": 'nodeid'});
+    columns=[{"id": d, "name": d} for d in col if (d !=glob.image_element)];
 
-    return columns, selnodes  ,screens
+    return columns, selnodes, screens
+
 
     
 @app.callback(   
-    [Output('mijntabletoo2', "columns"),
-    Output('mijntabletoo2', "data")],
+    [Output('selectededgetable', "columns"),
+    Output('selectededgetable', "data")],
     [Input('cytoscape-update-layout', "selectedEdgeData")])   
 def update_selectededgetabletest(seledges):
    
@@ -167,9 +183,13 @@ def update_selectededgetabletest(seledges):
    # edgesdt = [ n['data'].update(n['position']) for n in seledges]
     col=set()
     for c in seledges:
+        print(c);
         for d in c.keys():
-            col.add(d) 
-    columns=[{'id': d, 'name': d} for d in col]
+            col.add(d)
+        print(col);
+        columns = [];
+       # columns.append({"id": 'edgeid', "name": 'edgeid'});
+    columns=[{'id': d, 'name': d} for d in col ]
     return columns, seledges
 
 

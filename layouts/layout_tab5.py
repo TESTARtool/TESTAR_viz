@@ -21,16 +21,17 @@ import dash_core_components as dcc
 import dash_html_components as html
 
 #**************************
-tab0_5 = html.Div([ 
+tab5 = html.Div([
             html.Div([
-            html.A(id='collapse-attribute-link',children='Show/Hide attributes:', n_clicks=0,n_clicks_timestamp=0, href="", target="_blank"),
+            html.A(id='collapse-attribute-link',children='Collapse/Expand Attributes table:', n_clicks=0,n_clicks_timestamp=0, href="javascript:toggle1(document.getElementById('attribute-area'))" ),
             html.Div(id='attribute-area',children=[
             html.P(),
-            html.Button(id='infer-attrib-from-source-button', n_clicks=0,n_clicks_timestamp=0, children='Infer attributes from source', style={'display': 'inline-block'}),
+            html.Button(id='infer-attrib-from-source-button', n_clicks=0,n_clicks_timestamp=0, children='Infer Attributes', style={'display': 'inline-block'}),
             html.A(dcc.Upload(id='upload-attrib-from-file',
                        children=html.Button(id='upload-button-attrib-file',n_clicks=0, 
                                     children='Load Attributes File'),
                        #accept='text/csv',
+                       contents=None,
                        multiple=False
                        ),
                     style={'display': 'inline-block'}),
@@ -70,15 +71,17 @@ tab0_5 = html.Div([
                 ], style={'border-width': '1','border-color':'grey','border-style': 'dashed','width': '100%'}),
 
             html.Div([  
-            html.A(id='collapse-vizsettings-link',children='Visual settings of Nodes and Edges:', n_clicks=0,n_clicks_timestamp=0, href="", target="_blank"),
-
+            html.A(id='collapse-vizsettings-link',children='Collapse/Expand Appearances table:', n_clicks=0,n_clicks_timestamp=0, href= "javascript:toggle1(document.getElementById('vizsettings-area'))" ),
+                html.Div(id='vizsettings-area', children=[
             html.P(),
             html.Button(id='load-visual-defaults-button', n_clicks=0,n_clicks_timestamp=0, children='Load visual defaults', style={'display': 'inline-block'}),
             html.A(dcc.Upload(id='upload-visual-from-file',
                        children=html.Button(id='upload-button-viz-file', n_clicks=0,  
                                             children='Load Viz settings File'), 
                        #accept='text/csv',
-                       multiple=False), style={'display': 'inline-block'}),
+                       contents=None,
+                       multiple=False),
+                   style={'display': 'inline-block'}),
             html.A(html.Button(id='save-visual-to-file-button', n_clicks=0, n_clicks_timestamp=0,children='Save to File'),   id='save-visual-settings',
                 download="testar-graph-viz-settings-nodes-edges.csv",
                 href="",
@@ -109,7 +112,7 @@ tab0_5 = html.Div([
                                             ],
                     type="circle", 
                     style={ 'font-size': '12'},
-            ),                 
+            ),         ])
             ], style={'width': '500', 'border-width': '1','border-color':'grey','border-style': 'dashed'}),
 
                        

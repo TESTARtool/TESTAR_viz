@@ -26,7 +26,7 @@ import dash_core_components
 import sys
 import os
 import utils.globals as glob
-print('dash version: ', dash_core_components.__version__)
+print('dash componenets version: ', dash_core_components.__version__)
 
 glob.scriptfolder=os.path.realpath(__file__)[:(len(os.path.realpath(__file__))-len(os.path.basename(__file__)))]
 print('scriptfolder : ',glob.scriptfolder)
@@ -40,7 +40,7 @@ app.config['suppress_callback_exceptions'] = True
 #import serverroutes
 import servershutdown
 import callbacks.callbacks0
-import callbacks.callbacks0_5
+import callbacks.callbacks5
 #import callbacks.callbacks1
 import callbacks.callbacks2
 

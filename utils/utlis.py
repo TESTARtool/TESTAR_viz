@@ -65,15 +65,11 @@ def copydefaultimagetoasset():
             print(exc_type, fname, exc_tb.tb_lineno)
             print('*  There was an error processing : '+str(e))
 
-    
- 
 def prettytime(timestamp=None): 
     if timestamp != None:
         return datetime.datetime.fromtimestamp(timestamp).isoformat()
     else:
         return datetime.datetime.fromtimestamp(time.time()).isoformat()
-        
-
 
 def extractscreenshotfromdict(n,eldict):
 
@@ -117,12 +113,13 @@ def setCytoElements(grh):
     nodes=[]
     edges=[]
     try:
-#        clearassetsfolder()
+
         copydefaultimagetoasset()   #optimize: do only once:-)
         for n, ndict in grh.nodes(data=True):
             tempdict=dict(ndict)
             tempdict.update({'label': ndict[glob.label_nodeelement]})  #copy as cyto wants the 'label' tag
-            tempdict.update({'id': n})
+            tempdict.update({'id': n});
+            tempdict.update({'nodeid': n})
             fname= glob.outputfolder+extractscreenshotfromdict(str(n),tempdict)
             tempdict.update({glob.elementimgurl:app.get_asset_url(fname)}) #pointer to the image
 
@@ -134,7 +131,8 @@ def setCytoElements(grh):
             tempdict.update({'label': edict[glob.label_edgeelement]})  #copy as cyto wants the label tag
             tempdict.update({'source': source})     
             tempdict.update({'target': target})
-            tempdict.update({'id': n})
+            tempdict.update({'id': n});
+            tempdict.update({'edgeid': n})
             fname=glob.outputfolder+extractscreenshotfromdict(''+source+target,tempdict)
             tempdict.update({glob.elementimgurl:app.get_asset_url(fname)})
             edges.append({'data':  tempdict })
@@ -148,7 +146,7 @@ def setCytoElements(grh):
 
 
 def setgraphattributes(infer=True, contents = None, filename=''):
-    print('update attrib table start')
+    print('set data for  attrib table')
 
     if infer :  # infer from graph
             nodelabels = set()
@@ -196,18 +194,19 @@ def setgraphattributes(infer=True, contents = None, filename=''):
             decoded = base64.b64decode(content_string)
             try:
                 # data=io.StringIO(decoded.decode('utf-8'))
-                fout = open(glob.scriptfolder +glob.outputfolder + filename, encoding='utf-8', mode='w', newline='')
+                directory = (glob.scriptfolder + glob.assetfolder+glob.outputfolder);
+                fout = open(directory+ filename, encoding='utf-8', mode='w', newline='')
                 fout.write(decoded.decode('utf-8'))  # writes the uploaded file to the newly created file.
                 #                   tu.savetofile(decoded.decode('utf-8'),filename )
                 fout.close()  # closes the file, upload complete.
-                glob.dfattributes = pd.read_csv(glob.scriptfolder +glob.outputfolder + '/' + filename, sep=';')
+                glob.dfattributes = pd.read_csv(directory +  filename, sep=';')
             except Exception as e:
                 print('*  There was an error processing file <' + filename + '> :' + str(e))
     else:
-            pass
+        pass
 
 def setvizproperties(loaddefaults=True, contents=None, filename=''):
-    print('update viz table start')
+    print('set data viz table')
     if loaddefaults:  # load defaults
         displaydict = dict()
         glob.dfdisplayprops = pd.DataFrame()
@@ -225,14 +224,17 @@ def setvizproperties(loaddefaults=True, contents=None, filename=''):
         decoded = base64.b64decode(content_string)
         try:
             # data=io.StringIO(decoded.decode('utf-8'))
-            fout = open(glob.scriptfolder +glob.outputfolder + '/' + filename, encoding='utf-8', mode='w',
+            directory = (glob.scriptfolder + glob.assetfolder + glob.outputfolder);
+            fout = open(directory +  filename, encoding='utf-8', mode='w',
                         newline='')  # creates the file where the uploaded file should be stored
             fout.write(decoded.decode('utf-8'))  # writes the uploaded file to the newly created file.
             #                   tu.savetofile(decoded.decode('utf-8'),filename )
             fout.close()  # closes the file, upload complete.
-            glob.dfdisplayprops = pd.read_csv(glob.scriptfolder +glob.outputfolder + '/' + filename, sep=';')
+            glob.dfdisplayprops = pd.read_csv(directory +  filename, sep=';')
         except Exception as e:
             print('*  There was an error processing file <' + filename + '> :' + str(e))
             pass
+    else:
+        pass
 
 ########################################

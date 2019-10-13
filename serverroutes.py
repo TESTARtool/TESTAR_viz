@@ -7,7 +7,7 @@ Created on Wed Apr  3 18:27:03 2019
 """
 
 import flask
-from utils.appy import app
+from appy import app
 import utils.globals as glob
 import os
 ##############################################
