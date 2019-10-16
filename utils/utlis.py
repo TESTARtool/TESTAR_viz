@@ -144,7 +144,28 @@ def setCytoElements(grh):
   
     return nodes + edges
 
+#############
 
+def loadoracles( contents = None, filename=''):
+    print('set data for  oracle table')
+
+    if contents is not None:  # load oracless from file trigger=='upload-button-oracle-file': #
+            content_type, content_string = contents.split(',')
+            decoded = base64.b64decode(content_string)
+            try:
+                # data=io.StringIO(decoded.decode('utf-8'))
+                directory = (glob.scriptfolder + glob.assetfolder+glob.outputfolder);
+                fout = open(directory+ filename, encoding='utf-8', mode='w', newline='')
+                fout.write(decoded.decode('utf-8'))  # writes the uploaded file to the newly created file.
+                #                   tu.savetofile(decoded.decode('utf-8'),filename )
+                fout.close()  # closes the file, upload complete.
+                glob.dforacles = pd.read_csv(directory +  filename, sep=';')
+            except Exception as e:
+                print('*  There was an error processing file <' + filename + '> :' + str(e))
+    else:
+        pass
+
+#############
 def setgraphattributes(infer=True, contents = None, filename=''):
     print('set data for  attrib table')
 

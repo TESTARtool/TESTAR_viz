@@ -41,7 +41,7 @@ app.config['suppress_callback_exceptions'] = True
 import servershutdown
 import callbacks.callbacks0
 import callbacks.callbacks5
-#import callbacks.callbacks1
+import callbacks.callbacks1
 import callbacks.callbacks2
 
 port=8050;

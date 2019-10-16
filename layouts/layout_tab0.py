@@ -40,20 +40,7 @@ tab0 = html.Div([
                     style={'display': 'inline-block'}),
                 ),
             ]),
-            html.Tr([
-                html.Td(children=
-                dcc.Upload(
-                    id='upload-oraclefile',
-                    children=html.Button(
-                        id='load-button-oraclefile',
-                        n_clicks=0,
-                        children='Load Oracle File',
-                        style={'display': 'inline-block'}),
-                    accept='.csv', contents=None,
-                    multiple=False,
-                    style={'display': 'inline-block'}),
-                ),
-            ]),
+
             html.Tr([
                 html.Td(children=
                 dcc.Upload(
@@ -74,6 +61,7 @@ tab0 = html.Div([
                     style={'display': 'inline-block'}),
                 ),
             ]),
+
         ])
             , style={'display': 'flex', 'flex-direction': 'row', 'display': 'inline-block'}),
 

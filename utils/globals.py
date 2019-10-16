@@ -46,6 +46,7 @@ label_edgeelement=default_edgeelement
 default_subtypeelement ='-Default-'
 referencezoom=-1
 dfattributes=pd.DataFrame()
+dforacles=pd.DataFrame()
 dfdisplayprops=pd.DataFrame()
 nodedisplayprop={
                 'hide':0,
