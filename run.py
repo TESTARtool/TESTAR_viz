@@ -26,7 +26,7 @@ import dash_core_components
 import sys
 import os
 import utils.globals as glob
-print('dash componenets version: ', dash_core_components.__version__)
+print('dash components version: ', dash_core_components.__version__)
 
 glob.scriptfolder=os.path.realpath(__file__)[:(len(os.path.realpath(__file__))-len(os.path.basename(__file__)))]
 print('scriptfolder : ',glob.scriptfolder)
@@ -76,5 +76,6 @@ elif (len(sys.argv) >1 and sys.argv[1]=='--port'):
 
 
 if __name__ == '__main__':
+    app.title = 'TESTAR Temporal Visualizer'
     app.run_server(port=port, debug=False)
     pass

@@ -31,17 +31,12 @@ import networkx as nx
 
 
 def loadoracles( contents, filename, date):
-    print('update oracle table start')
     ctx = dash.callback_context
-    print('ctx: ', 'states', ctx.states,'triggered', ctx.triggered,'inputs', ctx.inputs)
-    print('oracle ctx: ', 'triggered', ctx.triggered)
-    trigger = ctx.triggered[0]['prop_id'].split('.')[0]
-    print("trigger :"+trigger);
     if ctx.triggered:
        if contents is not None:  # load file  trigger=='upload-button-viz-file':
           utils.loadoracles( contents, filename)
        else:
-          return None  # [{'id': '', 'name': ''}],{}
+          return [],[]
 
        columns=[{'id': c, 'name': c} for c in  glob.dforacles.columns]
        data= glob.dforacles.to_dict("rows")

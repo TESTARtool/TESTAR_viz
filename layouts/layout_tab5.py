@@ -67,7 +67,7 @@ tab5 = html.Div([
                                                ],
                     type="circle", 
                     style={ 'font-size': '12'},
-            ), ])
+            ), ],style={'display': 'none'}) #'inline-block'})
                 ], style={'border-width': '1','border-color':'grey','border-style': 'dashed','width': '100%'}),
 
             html.Div([  
@@ -112,7 +112,7 @@ tab5 = html.Div([
                                             ],
                     type="circle", 
                     style={ 'font-size': '12'},
-            ),         ])
+            ),         ],style={'display': 'none'}) #'inline-block'})
             ], style={'width': '500', 'border-width': '1','border-color':'grey','border-style': 'dashed'}),
 
                        

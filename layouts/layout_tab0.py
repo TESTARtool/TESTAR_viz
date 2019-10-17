@@ -54,7 +54,7 @@ tab0 = html.Div([
                                     style={'display': 'inline-block'}
                                     ),
                     ], style={'max-width': '900px', 'border-width': '1', 'border-color': 'teal',
-                              'border-style': 'dashed', 'display': 'inline-block'})
+                              'border-style': 'dashed'})
                     ,
                     accept='text/csv', contents=None,
                     multiple=False,

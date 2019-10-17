@@ -11,6 +11,7 @@ import dash_html_components as html
 from appy import app
 import utils.globals as glob
 import utils.utlis as tu
+import pandas as pd
 
 ##############################################
 
@@ -19,13 +20,14 @@ import utils.utlis as tu
 @app.callback(
         [Output('cytoscape-update-layout', 'elements'),
          Output('cytoscape-update-layout', 'layout'),
-         Output('cytoscape-update-layout', 'stylesheet')],
+         #Output('cytoscape-update-layout', 'stylesheet')
+         ],
         [Input('submit-button', 'n_clicks')],
         [State('dropdown-update-layout', 'value'),
         State('dropdown-subgraph-options','value')])
 def update_layout(hits, layout, subgraph):
     if hits >= 1:
-        cytostylesheet = updateCytoStyleSheet()
+        #cytostylesheet = updateCytoStyleSheet()
         tmpgrh = glob.grh.copy()
         removenodelist = []
         if subgraph == 'no widgets':
@@ -53,16 +55,28 @@ def update_layout(hits, layout, subgraph):
         return subelements, {
             'name': layout,
             'animate': False
-            }, cytostylesheet
+            }, #cytostylesheet
 
 
  #    else:
  #        return [],{},[]
 #part2 cyto
 
+#id='show-selected-oracle-button'
 
-def updateCytoStyleSheet():
+@app.callback(
+    Output('cytoscape-update-layout', 'stylesheet'),
+    [Input('cytoscape-update-layout', 'elements'),
+     Input('cytoscape-update-layout', 'layout'),
+     Input('show-selected-oracle-button', 'n_clicks'),
+    Input('oracletable', "derived_virtual_data"),
+     Input('oracletable', "derived_virtual_selected_rows") ]
+
+ )
+def updateCytoStyleSheet(element,layout,button,rows,selectedrows):
     stylesheet = []
+
+
     data = glob.dfdisplayprops.to_dict('records');
     for row in data:
         styledict = dict()
@@ -132,6 +146,111 @@ def updateCytoStyleSheet():
         tmpstyle.update(selectordict)
         tmpstyle.update(styledict)  # blunder  tmpstyle=tmpstyle.update(styledict)
         stylesheet.append(tmpstyle)
+
+    if selectedrows is None:
+        selectedrows = []
+    if not (rows is None) and len(rows)>0 and len(selectedrows)>0:
+        print('selecting rows for styling')
+        rowsdata = [rows[i]  for i in range(len(rows)) if i in selectedrows]
+        print(rowsdata)
+        prefixcolor = ''
+        cyclecolor = ''
+
+        for r in rowsdata:
+            if r['ORACLE_VERDICT']== 'FAIL' :
+                prefixcolor = 'brown'
+                cyclecolor = 'red'
+
+            elif r['ORACLE_VERDICT']== 'PASS' :
+                prefixcolor = 'lightgreen'
+                cyclecolor = 'green'
+
+            elementlist=[]
+            elementlist.extend(r['EXAMPLERUN_CYCLE_STATES'].split(';'))
+
+            for graphid in elementlist:
+                styledict = dict()
+                stylepropdict = dict()
+                selectordict = dict()
+                # selectordict.update({'selector': 'node[' + graphid+']'})
+                selectorfilter = "[" + 'nodeid' + " = " + "'" + graphid + "'" + "]"
+                selectordict.update({'selector': 'node' + selectorfilter})
+                stylepropdict.update(
+                    {'border-width': 2,
+                     'border-color': cyclecolor,
+                    'background-color': cyclecolor,
+                     })
+                styledict.update({'style': stylepropdict})
+                tmpstyle = dict()
+                tmpstyle.update(selectordict)
+                tmpstyle.update(styledict)  # blunder  tmpstyle=tmpstyle.update(styledict)
+                stylesheet.append(tmpstyle)
+            elementlist = []
+            elementlist.extend(r['EXAMPLERUN_PREFIX_STATES'].split(';'))
+            for graphid in elementlist:
+                styledict = dict()
+                stylepropdict = dict()
+                selectordict = dict()
+                # selectordict.update({'selector': 'node[' + graphid+']'})
+                selectorfilter = "[" + 'nodeid' + " = " + "'" + graphid + "'" + "]"
+                selectordict.update({'selector': 'node' + selectorfilter})
+                stylepropdict.update(
+                    {'border-width': 2,
+                     'border-color': prefixcolor,
+                     'background-color': prefixcolor,
+                     })
+                styledict.update({'style': stylepropdict})
+                tmpstyle = dict()
+                tmpstyle.update(selectordict)
+                tmpstyle.update(styledict)  # blunder  tmpstyle=tmpstyle.update(styledict)
+                stylesheet.append(tmpstyle)
+
+
+
+            elementlist = []
+            elementlist.extend(r['EXAMPLERUN_CYCLE_TRANSITIONS'].split(';'))
+            for graphid in elementlist:
+                styledict = dict()
+                stylepropdict = dict()
+                selectordict = dict()
+                # selectordict.update({'selector': 'node[' + graphid+']'})
+                selectorfilter = "[" + 'edgeid' + " = " + "'" + graphid + "'" + "]"
+                selectordict.update({'selector': 'edge' + selectorfilter})
+                stylepropdict.update(
+                    { 'width': 2,
+                      'line-color': cyclecolor,
+                      'background-color': cyclecolor,
+                     'mid-target-arrow-color': cyclecolor,
+                     })
+                styledict.update({'style': stylepropdict})
+                tmpstyle = dict()
+                tmpstyle.update(selectordict)
+                tmpstyle.update(styledict)  # blunder  tmpstyle=tmpstyle.update(styledict)
+                stylesheet.append(tmpstyle)
+            elementlist = []
+            elementlist.extend(r['EXAMPLERUN_PREFIX_TRANSITIONS'].split(';'))
+            for graphid in elementlist:
+                styledict = dict()
+                stylepropdict = dict()
+                selectordict = dict()
+                # selectordict.update({'selector': 'node[' + graphid+']'})
+                selectorfilter = "[" + 'edgeid' + " = " + "'" + graphid + "'" + "]"
+                selectordict.update({'selector': 'edge' + selectorfilter})
+                stylepropdict.update(
+                    {'width': 2,
+                     'line-color': prefixcolor,
+                     'background-color': prefixcolor,
+                     'mid-target-arrow-color': prefixcolor,
+                     })
+                styledict.update({'style': stylepropdict})
+                tmpstyle = dict()
+                tmpstyle.update(selectordict)
+                tmpstyle.update(styledict)  # blunder  tmpstyle=tmpstyle.update(styledict)
+                stylesheet.append(tmpstyle)
+
+
+
+    # no special handling for display oracles
     return  stylesheet
 
  #############################
