@@ -24,32 +24,48 @@ import dash_cytoscape as cyto
 #**************************
 tab2 =  html.Div([
             html.Div([
-                html.Button(id='submit-button', n_clicks=0, children='Update layout'),
-
-                dcc.Dropdown(
-                    id='dropdown-update-layout',
-                    value='random',
-                    clearable=False,
-                    style= {'width' : '100','color': 'black', 'fontSize': 12},
-                    options=[
-                        {'label': name.capitalize(), 'value': name}
-                        for name in ['random', 'grid',  'circle', 'cose', 'concentric','breadthfirst']
-                    ]),
                 html.Div([
+                    html.Button(id='submit-button', n_clicks=0, children='Update layout', style={'width': '250'}),
 
-                html.Div(children='Select Subgraph'),
+                    dcc.Dropdown(
+                        id='dropdown-update-layout',
+                        value='random',
+                        clearable=False,
+                        style= {'width' : '250','color': 'black', 'fontSize': 12},
+                        options=[
+                            {'label': name.capitalize(), 'value': name}
+                            for name in ['random', 'grid',  'circle', 'cose', 'concentric','breadthfirst']
+                        ]),
+                    html.Div([
 
-                dcc.Dropdown(
-                    id='dropdown-subgraph-options',
-                    value='all',
-                    clearable=False,
-                    style= {'width' : '100','color': 'black', 'fontSize': 12},
-                    options=[
-                        {'label': name.capitalize(), 'value': name}
-                        for name in ['all','no widgets', 'only abstract states', 'only concrete states',  'concrete+sequence']
-                    ])
-               ])
-            ], style={'width': '400', 'display': 'inline-block', 'border-width': '1','border-color':'grey','border-style': 'dashed'}),
+                    html.Div(children='Filter:',style={'width' : '250'}),
+
+                    dcc.Dropdown(
+                        id='dropdown-subgraph-options',
+                        value='only concrete states',
+                        clearable=False,
+                        style= {'width' : '250','color': 'black', 'fontSize': 12},
+                        options=[
+                            {'label': name.capitalize(), 'value': name}
+                            for name in ['all','no widgets', 'only abstract states', 'only concrete states',  'concrete+sequence']
+                        ])
+                   ])
+                ], style={'width': '400', 'display': 'inline-block', 'border-width': '1','border-color':'grey','border-style': 'dashed'}),
+
+                html.Div(
+                    children=[
+                        html.Div('Zoom Multiplier: (overrides mouse wheel!)', ),#style={'display': 'inline-block'},),
+                        dcc.Slider(
+                            id='canvas_zoom',
+                            min=-3,
+                            max=3,
+                            marks={i: '{}'.format(2**i) if i>=0 else '1/{}'.format(2**-i) for i in range(-3, 3+1)},
+
+                            value=0,
+                        )],
+                    style={'max-width': '300px', 'height': '40px', 'margin': '5px', 'border-style': 'solid', 'padding': '10px','display': 'inline-block'})
+            ],style={'width': '900px','display': 'inline-block'}),
+
              dcc.Loading(
                     id="loading-2",
                     children=[
@@ -58,14 +74,14 @@ tab2 =  html.Div([
                       #  layout={},
                         layout={'name': 'grid', 'animate':False, 'fit' : True},
                         style={'width': '100%', 
-                               'height': '950px', 
+                               'height': '600px',
                                 'border-width': '2',
                                 'border-color':'brown',
                                 'border-style': 'solid'
                                 },
                         boxSelectionEnabled=True,
-                        minZoom=(0.005),
-#                        zoom = 1,
+                        minZoom=0.005,
+                        zoom = 1,
                         zoomingEnabled =True,
                         elements=[], #glob.elements,
                         stylesheet=[],  #adding a default stylesheet--->new styles seems to be not applied always

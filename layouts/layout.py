@@ -51,10 +51,21 @@ testarlayout = html.Div(id='main',children=[
                                     'border-style': 'solid'
                                     }),
                     html.Hr(),
-
-
-
-
+                    html.Div('Visual tuning',
+                             style={'width': '100%',
+                                    'padding': '2',
+                                    'border-width': '2',
+                                    'border-color': 'teal',
+                                    'border-style': 'solid'
+                                    }),
+                    html.Hr(),
+                    html.Div(tab5,
+                             style={'width': '100%',
+                                    'padding': '2',
+                                    'border-width': '2',
+                                    'border-color': 'yellow',
+                                    'border-style': 'solid'
+                                    }),
                     html.Div('Graph',
                              style={'width':'100%',
                                     'padding' : '2',
@@ -84,21 +95,6 @@ testarlayout = html.Div(id='main',children=[
                                     'padding' : '2',
                                     'border-width': '2',
                                     'border-color':'yellow',
-                                    'border-style': 'solid'
-                                    }),
-                    html.Div('Visual tuning',
-                             style={'width': '100%',
-                                    'padding': '2',
-                                    'border-width': '2',
-                                    'border-color': 'teal',
-                                    'border-style': 'solid'
-                                    }),
-                    html.Hr(),
-                    html.Div(tab5,
-                            style={'width': '100%',
-                                    'padding': '2',
-                                    'border-width': '2',
-                                    'border-color': 'yellow',
                                     'border-style': 'solid'
                                     }),
 

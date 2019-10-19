@@ -22,53 +22,55 @@ import dash_html_components as html
 
 #**************************
 tab5 = html.Div([
-            html.Div([
-            html.A(id='collapse-attribute-link',children='Collapse/Expand Attributes table:', n_clicks=0,n_clicks_timestamp=0, href="javascript:toggle1(document.getElementById('attribute-area'))" ),
-            html.Div(id='attribute-area',children=[
-            html.P(),
-            html.Button(id='infer-attrib-from-source-button', n_clicks=0,n_clicks_timestamp=0, children='Infer Attributes', style={'display': 'inline-block'}),
-            html.A(dcc.Upload(id='upload-attrib-from-file',
-                       children=html.Button(id='upload-button-attrib-file',n_clicks=0, 
-                                    children='Load Attributes File'),
-                       #accept='text/csv',
-                       contents=None,
-                       multiple=False
-                       ),
-                    style={'display': 'inline-block'}),
-            html.A(html.Button(id='save-attrib-to-file-button', n_clicks=0, n_clicks_timestamp=0,children='Save to File'),   id='save-attributes',
-                download="testar-graph-show-hide-attributes.csv",
-                href="",
-                target="_blank", style={'display': 'inline-block'}
-            ),
+            # html.Div([
+            # html.A(id='collapse-attribute-link',children='Collapse/Expand Attributes table:', n_clicks=0,n_clicks_timestamp=0, href="javascript:toggle1(document.getElementById('attribute-area'))" ),
+            # html.Div(id='attribute-area',children=[
+            # html.P(),
+            # html.Button(id='infer-attrib-from-source-button', n_clicks=0,n_clicks_timestamp=0, children='Infer Attributes', style={'display': 'inline-block'}),
+            # html.A(dcc.Upload(id='upload-attrib-from-file',
+            #            children=html.Button(id='upload-button-attrib-file',n_clicks=0,
+            #                         children='Load Attributes File'),
+            #            #accept='text/csv',
+            #            contents=None,
+            #            multiple=False
+            #            ),
+            #         style={'display': 'inline-block'}),
+            # html.A(html.Button(id='save-attrib-to-file-button', n_clicks=0, n_clicks_timestamp=0,children='Save to File'),   id='save-attributes',
+            #     download="testar-graph-show-hide-attributes.csv",
+            #     href="",
+            #     target="_blank", style={'display': 'inline-block'}
+            # ),
+            #
+            # dcc.Loading(
+            #         id="loading-atttable",
+            #         children=[
+            #         dt.DataTable(
+            #                 #fixed columns conflicts in width of of table
+            #             id='attributetable',
+            #             style_table={'overflowX': 'scroll','width' : '1100','minWidth': '100%','maxHeight': '150'},
+            #             columns=[],
+            #             data=[],
+            #             fixed_rows={ 'headers': True, 'data': 0 },
+            #             fixed_columns={'headers': True, 'data': 2},# n_fixed_columns=2,
+            #             #row_selectable='single',
+            #             column_selectable='single',
+            #              style_cell={
+            #                        'minWidth': '30px',  'width': '170px','maxWidth': '170px',
+            #                        'whiteSpace': 'normal'
+            #                        },
+            #             editable=True,
+            #             filter_action='native',
+            #             sort_action='native',
+            #             sort_mode="multi",
+            #             #sorting_type="multi",
+            #             ),
+            #                                    ],
+            #         type="circle",
+            #         style={ 'font-size': '12'},
+            # ), ],style={'display': 'none'}) #'inline-block'})
+            #     ], style={'border-width': '1','border-color':'grey','border-style': 'dashed','width': '100%'}),
 
-            dcc.Loading(
-                    id="loading-atttable",
-                    children=[
-                    dt.DataTable(
-                            #fixed columns conflicts in width of of table
-                        id='attributetable',
-                        style_table={'overflowX': 'scroll','width' : '1100','minWidth': '100%','maxHeight': '150'},
-                        columns=[],
-                        data=[],
-                        fixed_rows={ 'headers': True, 'data': 0 },
-                        fixed_columns={'headers': True, 'data': 2},# n_fixed_columns=2,
-                        #row_selectable='single',
-                        column_selectable='single',
-                         style_cell={
-                                   'minWidth': '30px',  'width': '170px','maxWidth': '170px',
-                                   'whiteSpace': 'normal'
-                                   },
-                        editable=True,
-                        filter_action='native',
-                        sort_action='native',
-                        sort_mode="multi",
-                        #sorting_type="multi",
-                        ),
-                                               ],
-                    type="circle", 
-                    style={ 'font-size': '12'},
-            ), ],style={'display': 'none'}) #'inline-block'})
-                ], style={'border-width': '1','border-color':'grey','border-style': 'dashed','width': '100%'}),
+###################################
 
             html.Div([  
             html.A(id='collapse-vizsettings-link',children='Collapse/Expand Appearances table:', n_clicks=0,n_clicks_timestamp=0, href= "javascript:toggle1(document.getElementById('vizsettings-area'))" ),
@@ -85,8 +87,33 @@ tab5 = html.Div([
             html.A(html.Button(id='save-visual-to-file-button', n_clicks=0, n_clicks_timestamp=0,children='Save to File'),   id='save-visual-settings',
                 download="testar-graph-viz-settings-nodes-edges.csv",
                 href="",
-                target="_blank", style={'display': 'inline-block'}
-            ),                 
+                target="_blank",
+                style={'display': 'inline-block'}
+            ),
+            html.Button(id='apply-viz_style-button', n_clicks=0, n_clicks_timestamp=0, children='Apply Style', style={'display': 'inline-block'}),
+            html.Div(
+                children=[
+               dcc.Checklist(
+                   id='fittocanvas',
+                    options=[
+                        {'label': 'Fit to Canvas', 'value': '1'},],
+                    value=['1']
+                )
+                ],
+                style={'max-width': '300px','margin': '5px','border-style': 'solid' }),
+
+            html.Div(
+                children=[
+                    html.Div('Canvas height:',style={'display': 'inline-block'}),
+                    dcc.Slider(
+                        id= 'canvas_height',
+                        min=1,
+                        max=10,
+                        marks={i: 'x{}'.format(i) for i in range(1,11)},
+                        value=1,
+                    )],
+                style={'max-width': '300px','height':'40px','margin': '5px','border-style': 'solid', 'padding': '10px'}),
+
             dcc.Loading(
                     id="loading-viztable",
                     children=[       
@@ -112,8 +139,8 @@ tab5 = html.Div([
                                             ],
                     type="circle", 
                     style={ 'font-size': '12'},
-            ),         ],style={'display': 'none'}) #'inline-block'})
-            ], style={'width': '500', 'border-width': '1','border-color':'grey','border-style': 'dashed'}),
+                ),],style={'display': 'none','margin': '5px'})
+            ], style={'width': '900px', 'border-width': '1','border-color':'grey','border-style': 'dashed'}),
 
                        
             ], style={ 'font-size': '12'})

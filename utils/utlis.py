@@ -81,9 +81,7 @@ def extractscreenshotfromdict(n,eldict):
 		#alternative found=(grh.nodes[n][image_element].split("["))[1].split("]")[0] 
     fname='_no_image_for_'+n
     try:
-#        if eldict[glob.image_element]!=None :
-#           print('eldict[glob.image_element]!=None')
-        
+
         if not (eldict.get(glob.image_element) is None) :
             found = re.search(glob.screenshotregex, eldict[glob.image_element]).group(1)
             pngintarr=[(int(x)+256)%256  for x in found.split(",")] 
@@ -102,7 +100,7 @@ def extractscreenshotfromdict(n,eldict):
             return glob.no_image_file
     return fname
     
-def setCytoElements(grh):
+def setCytoElements(grh,usecache=False):
 
 #    tu.extractscreenshotsfromnxgraph(glob.grh,glob.image_element,glob.screenshotregex)
    
@@ -120,10 +118,11 @@ def setCytoElements(grh):
             tempdict.update({'label': ndict[glob.label_nodeelement]})  #copy as cyto wants the 'label' tag
             tempdict.update({'id': n});
             tempdict.update({'nodeid': n})
-            fname= glob.outputfolder+extractscreenshotfromdict(str(n),tempdict)
+            if usecache :
+                fname = glob.outputfolder+imagefilename(str(n))
+            else:
+                fname= glob.outputfolder+extractscreenshotfromdict(str(n),tempdict)
             tempdict.update({glob.elementimgurl:app.get_asset_url(fname)}) #pointer to the image
-
-
             nodes.append({'data':  tempdict ,'position': {'x': 0, 'y': 0}})
 
         for source, target, n,edict in grh.edges(data=True,keys=True):
@@ -133,7 +132,10 @@ def setCytoElements(grh):
             tempdict.update({'target': target})
             tempdict.update({'id': n});
             tempdict.update({'edgeid': n})
-            fname=glob.outputfolder+extractscreenshotfromdict(''+source+target,tempdict)
+            if usecache :
+                fname = glob.outputfolder+imagefilename(n)
+            else:
+                fname=glob.outputfolder+extractscreenshotfromdict(str(n),tempdict) # n was ''+source+target
             tempdict.update({glob.elementimgurl:app.get_asset_url(fname)})
             edges.append({'data':  tempdict })
     except Exception as e:

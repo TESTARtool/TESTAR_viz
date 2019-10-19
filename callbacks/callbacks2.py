@@ -5,7 +5,7 @@ Created on Wed Apr  3 18:27:03 2019
 
 @author: cseng
 """
-
+import dash
 from dash.dependencies import Input, Output,State
 import dash_html_components as html
 from appy import app
@@ -20,55 +20,52 @@ import pandas as pd
 @app.callback(
         [Output('cytoscape-update-layout', 'elements'),
          Output('cytoscape-update-layout', 'layout'),
-         #Output('cytoscape-update-layout', 'stylesheet')
-         ],
-        [Input('submit-button', 'n_clicks')],
+         Output('cytoscape-update-layout', 'style'), ],
+        [Input('submit-button', 'n_clicks'),Input('fittocanvas','value'),Input('canvas_height','value')],
         [State('dropdown-update-layout', 'value'),
         State('dropdown-subgraph-options','value')])
-def update_layout(hits, layout, subgraph):
-    if hits >= 1:
-        #cytostylesheet = updateCytoStyleSheet()
-        tmpgrh = glob.grh.copy()
-        removenodelist = []
-        if subgraph == 'no widgets':
-            removenodelist = [n for n, v in glob.grh.nodes(data=True) if v['labelV'] == 'Widget']
-            tmpgrh.remove_nodes_from(removenodelist)
-
-        elif subgraph == 'only abstract states':
-            removenodelist = [n for n, v in glob.grh.nodes(data=True) if v['labelV'] != 'AbstractState']
-            tmpgrh.remove_nodes_from(removenodelist)
-
-        elif subgraph == 'only concrete states':
-            removenodelist = [n for n, v in glob.grh.nodes(data=True) if v['labelV'] != 'ConcreteState']
-            tmpgrh.remove_nodes_from(removenodelist)
-        elif subgraph == 'concrete+sequence':
-            removenodelist = [n for n, v in glob.grh.nodes(data=True) if (
-                     v['labelV'] != 'ConcreteState' and v['labelV'] != 'SequenceNode' and v[
-                    'labelV'] != 'TestSequence')]
-            tmpgrh.remove_nodes_from(removenodelist)
-        else:
-            subgraph = 'all'
-            # tmpgrh=glob.grh.copy
-        if removenodelist != []:    tmpgrh.remove_nodes_from(removenodelist)
-        print(subgraph, ' graph')
-        subelements = tu.setCytoElements(tmpgrh)
-        return subelements, {
-            'name': layout,
-            'animate': False
-            }, #cytostylesheet
+def update_layout(hit0, fitting,canvasheight,layout, subgraph):
 
 
- #    else:
- #        return [],{},[]
-#part2 cyto
+    ctx = dash.callback_context
+    trigger = ctx.triggered[0]['prop_id'].split('.')[0]
+    if ctx.triggered:
+        if  (trigger=='submit-button' and  hit0 >= 1) or trigger=='fittocanvas' or trigger=='canvas_height':
+            #cytostylesheet = updateCytoStyleSheet()
+            tmpgrh = glob.grh.copy()
+            removenodelist = []
+            if subgraph == 'no widgets':
+                removenodelist = [n for n, v in glob.grh.nodes(data=True) if v['labelV'] == 'Widget']
+                tmpgrh.remove_nodes_from(removenodelist)
+            elif subgraph == 'only abstract states':
+                removenodelist = [n for n, v in glob.grh.nodes(data=True) if v['labelV'] != 'AbstractState']
+                tmpgrh.remove_nodes_from(removenodelist)
+            elif subgraph == 'only concrete states':
+                removenodelist = [n for n, v in glob.grh.nodes(data=True) if v['labelV'] != 'ConcreteState']
+                tmpgrh.remove_nodes_from(removenodelist)
+            elif subgraph == 'concrete+sequence':
+                removenodelist = [n for n, v in glob.grh.nodes(data=True) if (
+                         v['labelV'] != 'ConcreteState' and v['labelV'] != 'SequenceNode' and v[
+                        'labelV'] != 'TestSequence')]
+                tmpgrh.remove_nodes_from(removenodelist)
+            else:
+                pass #subgraph = 'all' # tmpgrh=glob.grh.copy
+            if removenodelist != []:    tmpgrh.remove_nodes_from(removenodelist)
+            subelements = tu.setCytoElements(tmpgrh,True)
 
-#id='show-selected-oracle-button'
+            h=600*canvasheight
+            fit=True if len(fitting)==0 or fitting[0] == '1' else False
+            return subelements, {
+                    'name': layout,
+                    'animate': False,
+                    'fit' : fit
+                    },{'height': ''+str(h)+'px'},
 
 @app.callback(
     Output('cytoscape-update-layout', 'stylesheet'),
     [Input('cytoscape-update-layout', 'elements'),
      Input('cytoscape-update-layout', 'layout'),
-     Input('show-selected-oracle-button', 'n_clicks'),
+    Input('apply-viz_style-button', 'n_clicks'),
     Input('oracletable', "derived_virtual_data"),
      Input('oracletable', "derived_virtual_selected_rows") ]
 
@@ -147,12 +144,10 @@ def updateCytoStyleSheet(element,layout,button,rows,selectedrows):
         tmpstyle.update(styledict)  # blunder  tmpstyle=tmpstyle.update(styledict)
         stylesheet.append(tmpstyle)
 
-    if selectedrows is None:
-        selectedrows = []
+    if selectedrows is None:   selectedrows = []
     if not (rows is None) and len(rows)>0 and len(selectedrows)>0:
-        print('selecting rows for styling')
+        print('selecting node/edges for trace styling')
         rowsdata = [rows[i]  for i in range(len(rows)) if i in selectedrows]
-        print(rowsdata)
         prefixcolor = ''
         cyclecolor = ''
 
@@ -164,97 +159,76 @@ def updateCytoStyleSheet(element,layout,button,rows,selectedrows):
             elif r['ORACLE_VERDICT']== 'PASS' :
                 prefixcolor = 'lightgreen'
                 cyclecolor = 'green'
+            stylepropdict = dict()
+            stylepropdict.update(
+                {'border-width': 2,
+                 'border-color': cyclecolor,
+                 'background-color': cyclecolor,
+                 })
+            stylesheet.extend(updatestyleoftrace(r['EXAMPLERUN_CYCLE_STATES'], 'node', stylepropdict))
+            stylepropdict = dict()
+            stylepropdict.update(
+                {'border-width': 2,
+                 'border-color': prefixcolor,
+                 'background-color': prefixcolor,
+                 })
+            stylesheet.extend(updatestyleoftrace(r['EXAMPLERUN_PREFIX_STATES'], 'node', stylepropdict))
+            stylepropdict = dict()
+            stylepropdict.update(
+                {'width': 2,
+                 'line-color': cyclecolor,
+                 'background-color': cyclecolor,
+                 'mid-target-arrow-color': cyclecolor,
+                 })
+            stylesheet.extend(updatestyleoftrace(r['EXAMPLERUN_CYCLE_TRANSITIONS'], 'edge', stylepropdict))
+            stylepropdict = dict()
+            stylepropdict.update(
+                {'width': 2,
+                 'line-color': prefixcolor,
+                 'background-color': prefixcolor,
+                 'mid-target-arrow-color': prefixcolor,
+                 })
+            stylesheet.extend(updatestyleoftrace(r['EXAMPLERUN_PREFIX_TRANSITIONS'], 'edge', stylepropdict))
 
-            elementlist=[]
-            elementlist.extend(r['EXAMPLERUN_CYCLE_STATES'].split(';'))
-
-            for graphid in elementlist:
-                styledict = dict()
-                stylepropdict = dict()
-                selectordict = dict()
-                # selectordict.update({'selector': 'node[' + graphid+']'})
-                selectorfilter = "[" + 'nodeid' + " = " + "'" + graphid + "'" + "]"
-                selectordict.update({'selector': 'node' + selectorfilter})
-                stylepropdict.update(
-                    {'border-width': 2,
-                     'border-color': cyclecolor,
-                    'background-color': cyclecolor,
-                     })
-                styledict.update({'style': stylepropdict})
-                tmpstyle = dict()
-                tmpstyle.update(selectordict)
-                tmpstyle.update(styledict)  # blunder  tmpstyle=tmpstyle.update(styledict)
-                stylesheet.append(tmpstyle)
-            elementlist = []
-            elementlist.extend(r['EXAMPLERUN_PREFIX_STATES'].split(';'))
-            for graphid in elementlist:
-                styledict = dict()
-                stylepropdict = dict()
-                selectordict = dict()
-                # selectordict.update({'selector': 'node[' + graphid+']'})
-                selectorfilter = "[" + 'nodeid' + " = " + "'" + graphid + "'" + "]"
-                selectordict.update({'selector': 'node' + selectorfilter})
-                stylepropdict.update(
-                    {'border-width': 2,
-                     'border-color': prefixcolor,
-                     'background-color': prefixcolor,
-                     })
-                styledict.update({'style': stylepropdict})
-                tmpstyle = dict()
-                tmpstyle.update(selectordict)
-                tmpstyle.update(styledict)  # blunder  tmpstyle=tmpstyle.update(styledict)
-                stylesheet.append(tmpstyle)
-
-
-
-            elementlist = []
-            elementlist.extend(r['EXAMPLERUN_CYCLE_TRANSITIONS'].split(';'))
-            for graphid in elementlist:
-                styledict = dict()
-                stylepropdict = dict()
-                selectordict = dict()
-                # selectordict.update({'selector': 'node[' + graphid+']'})
-                selectorfilter = "[" + 'edgeid' + " = " + "'" + graphid + "'" + "]"
-                selectordict.update({'selector': 'edge' + selectorfilter})
-                stylepropdict.update(
-                    { 'width': 2,
-                      'line-color': cyclecolor,
-                      'background-color': cyclecolor,
-                     'mid-target-arrow-color': cyclecolor,
-                     })
-                styledict.update({'style': stylepropdict})
-                tmpstyle = dict()
-                tmpstyle.update(selectordict)
-                tmpstyle.update(styledict)  # blunder  tmpstyle=tmpstyle.update(styledict)
-                stylesheet.append(tmpstyle)
-            elementlist = []
-            elementlist.extend(r['EXAMPLERUN_PREFIX_TRANSITIONS'].split(';'))
-            for graphid in elementlist:
-                styledict = dict()
-                stylepropdict = dict()
-                selectordict = dict()
-                # selectordict.update({'selector': 'node[' + graphid+']'})
-                selectorfilter = "[" + 'edgeid' + " = " + "'" + graphid + "'" + "]"
-                selectordict.update({'selector': 'edge' + selectorfilter})
-                stylepropdict.update(
-                    {'width': 2,
-                     'line-color': prefixcolor,
-                     'background-color': prefixcolor,
-                     'mid-target-arrow-color': prefixcolor,
-                     })
-                styledict.update({'style': stylepropdict})
-                tmpstyle = dict()
-                tmpstyle.update(selectordict)
-                tmpstyle.update(styledict)  # blunder  tmpstyle=tmpstyle.update(styledict)
-                stylesheet.append(tmpstyle)
-
-
-
-    # no special handling for display oracles
+    # else: no special handling for display oracles
     return  stylesheet
+
+@app.callback(
+    Output('cytoscape-update-layout', 'zoom'),
+    [Input('canvas_zoom', 'value')],
+    [State('cytoscape-update-layout', 'zoom')]
+ )
+def updatezoom(factor,currentzoom):
+   # if factor==0: factor=1
+   factoring = 2**factor * (currentzoom*1.01) #discard fraction
+   newzoom = factoring
+   if factor==0: newzoom=newzoom
+   return newzoom
+
+
 
  #############################
 
+#helper method:
+def updatestyleoftrace(csvlistofelements,elementype,stylepropdict):
+    tmpstylesheet= []
+    elementlist = []
+    elementlist.extend(csvlistofelements.split(';'))
+    for graphid in elementlist:
+        styledict = dict()
+        selectordict = dict()
+        selectorfilter = "[" + elementype+"id" + " = " + "'" + graphid + "'" + "]"
+        selectordict.update({'selector': elementype + selectorfilter}) # {'selector': "node[nodeid='#143:9']"})
+        styledict.update({'style': stylepropdict})
+        tmpstyle = dict()
+        tmpstyle.update(selectordict)
+        tmpstyle.update(styledict)
+        tmpstylesheet.append(tmpstyle)
+    return tmpstylesheet
+
+
+
+ #############################
 
 
 
@@ -273,18 +247,12 @@ def update_selectednodestabletest(selnodes):
     for c in selnodes:
        fname=glob.outputfolder+tu.imagefilename(c['id'])
        try:
-#            encoded_image = base64.b64encode(open('assets/'+fname, 'rb').read())
-#            baseimage = 'data:image/png;base64,{}'.format(encoded_image.decode())
             screens.append(html.P( children='Screenprint of node: '+c['id']))
             screens.append(html.Img(id='screenimage'+c['id'],style={'max-height':'550px'},src= app.get_asset_url(fname))) #baseimage))
-         #   screens.append(html.Img(id='screenimage' + c['id'], style={'max-height': '550px'},src= "/"+glob.outputfolder+fname))  # baseimage))
-
        except (RuntimeError, TypeError, NameError, OSError):
             screens.append(html.P( children='No Screenprint of node: '+c['id']))
        for d in c.keys():
             col.add(d)
-    columns=[];
-    #columns.append({"id": 'nodeid', "name": 'nodeid'});
     columns=[{"id": d, "name": d} for d in col if (d !=glob.image_element)];
 
     return columns, selnodes, screens
@@ -297,17 +265,12 @@ def update_selectednodestabletest(selnodes):
     [Input('cytoscape-update-layout', "selectedEdgeData")])   
 def update_selectededgetabletest(seledges):
    
-    if seledges is None:  # at nitial rendering this is None
+    if seledges is None:  # at initial rendering this is None
         seledges = []
-   # edgesdt = [ n['data'].update(n['position']) for n in seledges]
     col=set()
     for c in seledges:
-        print(c);
         for d in c.keys():
             col.add(d)
-        print(col);
-        columns = [];
-       # columns.append({"id": 'edgeid', "name": 'edgeid'});
     columns=[{'id': d, 'name': d} for d in col ]
     return columns, seledges
 
