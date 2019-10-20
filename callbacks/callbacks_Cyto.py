@@ -11,11 +11,8 @@ import dash_html_components as html
 from appy import app
 import utils.globals as glob
 import utils.utlis as tu
-import pandas as pd
 
 ##############################################
-
-#tab2
 #cyto
 @app.callback(
         [Output('cytoscape-update-layout', 'elements'),
@@ -60,6 +57,9 @@ def update_layout(hit0, fitting,canvasheight,layout, subgraph):
                     'animate': False,
                     'fit' : fit
                     },{'height': ''+str(h)+'px'},
+
+
+ #############################
 
 @app.callback(
     Output('cytoscape-update-layout', 'stylesheet'),
@@ -161,51 +161,68 @@ def updateCytoStyleSheet(element,layout,button,rows,selectedrows):
                 cyclecolor = 'green'
             stylepropdict = dict()
             stylepropdict.update(
-                {'border-width': 2,
-                 'border-color': cyclecolor,
-                 'background-color': cyclecolor,
-                 })
+                {'border-width': 2,'border-color': cyclecolor,'background-color': cyclecolor})
             stylesheet.extend(updatestyleoftrace(r['EXAMPLERUN_CYCLE_STATES'], 'node', stylepropdict))
             stylepropdict = dict()
             stylepropdict.update(
-                {'border-width': 2,
-                 'border-color': prefixcolor,
-                 'background-color': prefixcolor,
-                 })
+                {'border-width': 2,'border-color': prefixcolor,'background-color': prefixcolor})
             stylesheet.extend(updatestyleoftrace(r['EXAMPLERUN_PREFIX_STATES'], 'node', stylepropdict))
             stylepropdict = dict()
             stylepropdict.update(
-                {'width': 2,
-                 'line-color': cyclecolor,
-                 'background-color': cyclecolor,
-                 'mid-target-arrow-color': cyclecolor,
-                 })
+                {'width': 2, 'line-color': cyclecolor,
+                 'background-color': cyclecolor,'mid-target-arrow-color': cyclecolor})
             stylesheet.extend(updatestyleoftrace(r['EXAMPLERUN_CYCLE_TRANSITIONS'], 'edge', stylepropdict))
             stylepropdict = dict()
             stylepropdict.update(
-                {'width': 2,
-                 'line-color': prefixcolor,
-                 'background-color': prefixcolor,
-                 'mid-target-arrow-color': prefixcolor,
-                 })
+                {'width': 2,'line-color': prefixcolor,
+                 'background-color': prefixcolor, 'mid-target-arrow-color': prefixcolor})
             stylesheet.extend(updatestyleoftrace(r['EXAMPLERUN_PREFIX_TRANSITIONS'], 'edge', stylepropdict))
 
     # else: no special handling for display oracles
+
+    tmpgrh = glob.grh.copy()
+    print('directed?: ',tmpgrh.is_directed())
+
+
+    removenodelist = [n for n, v in glob.grh.nodes(data=True) if v['labelV'] != 'AbstractState']
+    removeedgelist = [n for s,t,n, v in glob.grh.edges(data=True,keys=True) if v['labelE'] != 'AbstractAction']
+    tmpgrh.remove_nodes_from(removenodelist)
+    tmpgrh.remove_edges_from(removeedgelist)
+    properties = [ r for r in data if r[glob.elementtype] == 'node' and r[glob.elementsubtype] == 'AbstractState']
+    stylepropdict = dict()
+    if len(properties) > 0: #take first row
+        stylepropdict.update({'background-color': properties[0]['color_if_deadstate'] })
+        stylepropdict.update({'shape':properties[0]['shape_if_deadstate'] })
+    deadstates = (node for node, out_degree in tmpgrh.out_degree() if out_degree == 0)
+    for stateid in deadstates: stylesheet.extend(updatestyleoftrace(stateid, 'node', stylepropdict))
+
+
+    tmpgrh = glob.grh.copy()
+    removenodelist = [n for n, v in glob.grh.nodes(data=True) if v['labelV'] != 'ConcreteState']
+    removeedgelist = [n for s,t,n, v in glob.grh.edges(data=True,keys=True) if v['labelE'] != 'ConcreteAction']
+    tmpgrh.remove_nodes_from(removenodelist)
+    tmpgrh.remove_edges_from(removeedgelist)
+    properties = [ r for r in data if r[glob.elementtype] == 'node' and r[glob.elementsubtype] == 'ConcreteState']
+    stylepropdict = dict()
+    if len(properties) > 0: #take first row
+        stylepropdict.update({'background-color': properties[0]['color_if_deadstate'] })
+        stylepropdict.update({'shape':properties[0]['shape_if_deadstate'] })
+    deadstates = (node for node, out_degree in tmpgrh.out_degree() if out_degree == 0)
+    for stateid in deadstates: stylesheet.extend(updatestyleoftrace(stateid, 'node', stylepropdict))
+
     return  stylesheet
 
+ #############################
 @app.callback(
     Output('cytoscape-update-layout', 'zoom'),
     [Input('canvas_zoom', 'value')],
     [State('cytoscape-update-layout', 'zoom')]
  )
 def updatezoom(factor,currentzoom):
-   # if factor==0: factor=1
    factoring = 2**factor * (currentzoom*1.01) #discard fraction
    newzoom = factoring
    if factor==0: newzoom=newzoom
    return newzoom
-
-
 
  #############################
 
@@ -226,13 +243,8 @@ def updatestyleoftrace(csvlistofelements,elementype,stylepropdict):
         tmpstylesheet.append(tmpstyle)
     return tmpstylesheet
 
-
-
  #############################
 
-
-
-#what is clicked in the graph?
 @app.callback(
     [Output('selectednodetable', "columns"),
      Output('selectednodetable', 'data'),
@@ -240,7 +252,7 @@ def updatestyleoftrace(csvlistofelements,elementype,stylepropdict):
     [Input('cytoscape-update-layout', 'selectedNodeData')])   
 def update_selectednodestabletest(selnodes):
     
-    if selnodes is None:  # at nitial rendering this is None
+    if selnodes is None:  # at initial rendering this is None
         selnodes = []          
     col=set()
     screens=[]
@@ -248,16 +260,16 @@ def update_selectednodestabletest(selnodes):
        fname=glob.outputfolder+tu.imagefilename(c['id'])
        try:
             screens.append(html.P( children='Screenprint of node: '+c['id']))
-            screens.append(html.Img(id='screenimage'+c['id'],style={'max-height':'550px'},src= app.get_asset_url(fname))) #baseimage))
+            screens.append(html.Img(id='screenimage'+c['id'],style={'max-height':'550px'},src= app.get_asset_url(fname)))
        except (RuntimeError, TypeError, NameError, OSError):
             screens.append(html.P( children='No Screenprint of node: '+c['id']))
        for d in c.keys():
             col.add(d)
     columns=[{"id": d, "name": d} for d in col if (d !=glob.image_element)];
-
     return columns, selnodes, screens
 
 
+########################################
     
 @app.callback(   
     [Output('selectededgetable', "columns"),
@@ -273,7 +285,6 @@ def update_selectededgetabletest(seledges):
             col.add(d)
     columns=[{'id': d, 'name': d} for d in col ]
     return columns, seledges
-
 
 ########################################
 

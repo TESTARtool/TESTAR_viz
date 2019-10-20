@@ -67,9 +67,9 @@ def copydefaultimagetoasset():
 
 def prettytime(timestamp=None): 
     if timestamp != None:
-        return datetime.datetime.fromtimestamp(timestamp).isoformat()
+        return datetime.datetime.fromtimestamp(timestamp).isoformat("_","milliseconds")
     else:
-        return datetime.datetime.fromtimestamp(time.time()).isoformat()
+        return datetime.datetime.fromtimestamp(time.time()).isoformat("_","milliseconds")
 
 def extractscreenshotfromdict(n,eldict):
 

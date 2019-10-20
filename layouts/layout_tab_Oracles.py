@@ -21,7 +21,7 @@ import dash_core_components as dcc
 import dash_html_components as html
 
 #**************************
-tab1 = html.Div([
+oracles = html.Div([
             html.Div([
             html.A(id='collapse-oracle-link',children='Collapse/Expand Oracle table:', n_clicks=0,n_clicks_timestamp=0, href="javascript:toggle1(document.getElementById('oracle-area'))" ),
             html.Div(id='oracle-area',children=[
@@ -47,7 +47,7 @@ tab1 = html.Div([
                         dt.DataTable(
                              #fixed columns conflicts in width of of table
                             id='oracletable',
-                            style_table={'overflowX': 'scroll','minWidth' : '1100','maxHeight': '150'},
+                            style_table={'overflowX': 'scroll','width':'100%','maxHeight': '150'},
                             columns=[],
                             data=[],
                             fixed_rows={ 'headers': True, 'data': 0 },
@@ -55,22 +55,24 @@ tab1 = html.Div([
                             row_selectable='multi',
                             selected_rows=[],
                             style_cell={ 'overflow': 'hidden','textOverflow': 'ellipsis',
-                                         'overflowY': 'hidden',
-
-                                       'minWidth': '30px',  'width': '125px','maxWidth': '170px','height': '35px','minHeight': '30px',#'maxHeight': '100px',
-                                       'whiteSpace': 'normal'
+                                        'minWidth': '30px',  'width': '125px','maxWidth': '170px',
+                                       'whiteSpace': 'nowrap'
                                        },
-                            editable=False,
+                            style_data_conditional=[
+                                {
+                                    'if': {'row_index': 'odd'},
+                                    'backgroundColor': 'AliceBlue'
+                                }],
+                            editable=True,
                             filter_action='native',
                             sort_action='native',
                             sort_mode="multi",
                             virtualization=True,
                             page_action='none'
-                            #sorting_type="multi",
                             ),
                         ],
                     type="circle", 
-                    style={ 'font-size': '12'},
+                    style={ 'font-size': '12','width':'100%'},
             ),
 
             ])

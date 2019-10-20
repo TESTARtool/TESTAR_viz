@@ -39,10 +39,10 @@ app.config['suppress_callback_exceptions'] = True
 # callbacks are connected to layout: Keep/remain despite pythonwarnings !!!
 #import serverroutes
 import servershutdown
-import callbacks.callbacks0
-import callbacks.callbacks5
-import callbacks.callbacks1
-import callbacks.callbacks2
+import callbacks.callbacks_LoadGraph
+import callbacks.callbacks_VisualTuning
+import callbacks.callbacks_Oracles
+import callbacks.callbacks_Cyto
 
 port=8050;
 if len(sys.argv) == 1 or (len(sys.argv) >1 and sys.argv[1]!='--port'):

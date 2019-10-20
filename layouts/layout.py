@@ -9,11 +9,11 @@ Created on Tue Apr 2 2019
 #######################################################
 import dash_html_components as html
 import dash_core_components as dcc
-from  layouts.layout_tab0 import tab0
-from  layouts.layout_tab5 import tab5
-from  layouts.layout_tab2 import tab2
-from  layouts.layout_tab3 import tab3
-from  layouts.layout_tab1 import tab1
+from  layouts.layout_tab_LoadGraph import loadGraph
+from  layouts.layout_tab_VisualTuning import visualTuning
+from  layouts.layout_tab_Cyto import cytolayout
+from  layouts.layout_tab_SelectedData import selectedData
+from  layouts.layout_tab_Oracles import oracles
 
 #**************************
 testarlayout = html.Div(id='main',children=[
@@ -27,7 +27,7 @@ testarlayout = html.Div(id='main',children=[
                                     'border-style': 'solid'
                                     }),
                     html.Hr(),
-                    html.Div(tab0,
+                    html.Div(loadGraph,
                              style={'width':'100%', 
                                     'padding' : '2',
                                     'border-width': '2',
@@ -43,7 +43,7 @@ testarlayout = html.Div(id='main',children=[
                                     'border-style': 'solid'
                                     }),
                     html.Hr(),
-                    html.Div(tab1,
+                    html.Div(oracles,
                              style={'width': '100%',
                                     'padding': '2',
                                     'border-width': '2',
@@ -59,13 +59,14 @@ testarlayout = html.Div(id='main',children=[
                                     'border-style': 'solid'
                                     }),
                     html.Hr(),
-                    html.Div(tab5,
+                    html.Div(visualTuning,
                              style={'width': '100%',
                                     'padding': '2',
                                     'border-width': '2',
                                     'border-color': 'yellow',
                                     'border-style': 'solid'
                                     }),
+                    html.Hr(),
                     html.Div('Graph',
                              style={'width':'100%',
                                     'padding' : '2',
@@ -74,7 +75,7 @@ testarlayout = html.Div(id='main',children=[
                                     'border-style': 'solid'
                                     }),
                     html.Hr(),
-                    html.Div(tab2,
+                    html.Div(cytolayout,
                              style={'width':'100%',
                                     'padding' : '2',
                                     'border-width': '2',
@@ -90,7 +91,7 @@ testarlayout = html.Div(id='main',children=[
                                     'border-style': 'solid'
                                     }),
                     html.Hr(),
-                    html.Div(tab3,
+                    html.Div(selectedData,
                              style={'width':'100%', 
                                     'padding' : '2',
                                     'border-width': '2',

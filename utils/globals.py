@@ -8,8 +8,8 @@ Created on Tue Apr 2 2019
 import pandas as pd
 import networkx as nx
 import os
-grh = nx.Graph() 
-grhsub = nx.Graph() 
+grh = nx.DiGraph()
+grhsub = nx.DiGraph()
 elements = []
 dfmijn = pd.DataFrame()
 dfmijne = pd.DataFrame()
@@ -61,8 +61,8 @@ nodedisplayprop={
                 'border-width' : 1,
                 'border-color' : 'black',
                 'color' : 'grey',
-                'NA_color_if_deadstate' : 'black',
-                'NA_shape_if_deadstate': 'circle',
+                'color_if_deadstate' : 'purple',
+                'shape_if_deadstate': 'octagon',
                 'NA_color_if_partoftrace': 'yellow',
                 'NA_on_hover_color' : 'teal',
                 'NA_on_hover_color_neighbor' : 0,

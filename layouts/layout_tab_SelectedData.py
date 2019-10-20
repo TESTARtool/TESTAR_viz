@@ -11,7 +11,7 @@ import dash_table as dt
 # import dash_core_components as dcc
 import dash_html_components as html
 
-tab3 = html.Div([
+selectedData = html.Div([
     html.Div([
         html.P(id='selectednodes', children='selected nodes:'),
         dt.DataTable(
@@ -26,8 +26,13 @@ tab3 = html.Div([
             column_selectable='single',
             style_cell={
                 'minWidth': '15px', 'width': '75px', 'maxWidth': '150px',
-                'whiteSpace': 'normal'
+                'whiteSpace': 'nowrap'
             },
+            style_data_conditional=[
+                {
+                    'if': {'row_index': 'odd'},
+                    'backgroundColor': 'AliceBlue'
+                }],
             editable=False,
             filter_action='native',
             sort_action='native',
@@ -48,8 +53,13 @@ tab3 = html.Div([
                 column_selectable='single',
                 style_cell={
                     'minWidth': '15px', 'width': '100px', 'maxWidth': '150px',
-                    'whiteSpace': 'normal'
+                    'whiteSpace': 'nowrap'
                 },
+                style_data_conditional=[
+                    {
+                        'if': {'row_index': 'odd'},
+                        'backgroundColor': 'AliceBlue'
+                    }],
                 editable=False,
                 filter_action='native',
                 sort_action='native',

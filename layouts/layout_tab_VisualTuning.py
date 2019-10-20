@@ -21,7 +21,7 @@ import dash_core_components as dcc
 import dash_html_components as html
 
 #**************************
-tab5 = html.Div([
+visualTuning = html.Div([
             # html.Div([
             # html.A(id='collapse-attribute-link',children='Collapse/Expand Attributes table:', n_clicks=0,n_clicks_timestamp=0, href="javascript:toggle1(document.getElementById('attribute-area'))" ),
             # html.Div(id='attribute-area',children=[
@@ -91,28 +91,6 @@ tab5 = html.Div([
                 style={'display': 'inline-block'}
             ),
             html.Button(id='apply-viz_style-button', n_clicks=0, n_clicks_timestamp=0, children='Apply Style', style={'display': 'inline-block'}),
-            html.Div(
-                children=[
-               dcc.Checklist(
-                   id='fittocanvas',
-                    options=[
-                        {'label': 'Fit to Canvas', 'value': '1'},],
-                    value=['1']
-                )
-                ],
-                style={'max-width': '300px','margin': '5px','border-style': 'solid' }),
-
-            html.Div(
-                children=[
-                    html.Div('Canvas height:',style={'display': 'inline-block'}),
-                    dcc.Slider(
-                        id= 'canvas_height',
-                        min=1,
-                        max=10,
-                        marks={i: 'x{}'.format(i) for i in range(1,11)},
-                        value=1,
-                    )],
-                style={'max-width': '300px','height':'40px','margin': '5px','border-style': 'solid', 'padding': '10px'}),
 
             dcc.Loading(
                     id="loading-viztable",
@@ -130,6 +108,11 @@ tab5 = html.Div([
                                    'minWidth': '30px',  'width': '170px','maxWidth': '170px',
                                    'whiteSpace': 'normal'
                                    },
+                        style_data_conditional=[
+                            {
+                                'if': {'row_index': 'odd'},
+                                'backgroundColor': 'AliceBlue'
+                            }],
                         editable=True,
                         filter_action='native',
                         sort_action='native',
@@ -140,7 +123,7 @@ tab5 = html.Div([
                     type="circle", 
                     style={ 'font-size': '12'},
                 ),],style={'display': 'none','margin': '5px'})
-            ], style={'width': '900px', 'border-width': '1','border-color':'grey','border-style': 'dashed'}),
+            ], style={'border-width': '1','border-color':'grey','border-style': 'dashed'}),
 
                        
             ], style={ 'font-size': '12'})

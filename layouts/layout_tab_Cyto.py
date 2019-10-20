@@ -22,7 +22,7 @@ import dash_html_components as html
 import dash_cytoscape as cyto
 
 #**************************
-tab2 =  html.Div([
+cytolayout =  html.Div([
             html.Div([
                 html.Div([
                     html.Button(id='submit-button', n_clicks=0, children='Update layout', style={'width': '250'}),
@@ -54,7 +54,7 @@ tab2 =  html.Div([
 
                 html.Div(
                     children=[
-                        html.Div('Zoom Multiplier: (overrides mouse wheel!)', ),#style={'display': 'inline-block'},),
+                        html.Div('Relative Zoom : (overrides mouse wheel!)', ),#style={'display': 'inline-block'},),
                         dcc.Slider(
                             id='canvas_zoom',
                             min=-3,
@@ -63,8 +63,31 @@ tab2 =  html.Div([
 
                             value=0,
                         )],
-                    style={'max-width': '300px', 'height': '40px', 'margin': '5px', 'border-style': 'solid', 'padding': '10px','display': 'inline-block'})
-            ],style={'width': '900px','display': 'inline-block'}),
+                    style={'max-width': '300px', 'height': '40px', 'margin': '5px', 'border-style': 'solid', 'padding': '10px','display': 'inline-block'}),
+                html.Div(
+                    children=[
+                        dcc.Checklist(
+                            id='fittocanvas',
+                            options=[
+                                {'label': 'Fit to Canvas', 'value': '1'}, ],
+                            value=['1']
+                        )
+                    ],
+                    style={'max-width': '300px', 'height': '40px','margin': '5px', 'border-style': 'solid','padding': '10px','display': 'inline-block'}),
+
+                html.Div(
+                    children=[
+                        html.Div('Canvas height Multiplier:', style={'display': 'inline-block'}),
+                        dcc.Slider(
+                            id='canvas_height',
+                            min=1,
+                            max=10,
+                            marks={i: '{}'.format(i) for i in range(1, 11)},
+                            value=1,
+                        )],
+                    style={'max-width': '300px', 'width': '300px','height': '40px', 'margin': '5px', 'border-style': 'solid','padding': '10px','display': 'inline-block'}),
+
+            ],style={'display': 'inline-block'}),
 
              dcc.Loading(
                     id="loading-2",

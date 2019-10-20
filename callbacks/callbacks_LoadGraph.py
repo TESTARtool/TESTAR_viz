@@ -31,7 +31,7 @@ import utils.utlis as tu
 def loadgraph( contents,filename, date):
 
     log=[]
-    log.append('*  script  started at:'+tu.prettytime())
+    log.append('*  Loading started at:'+tu.prettytime())
     ctx = dash.callback_context
 
 #    print('ctx: ', 'states', ctx.states,'triggered', ctx.triggered,'inputs', ctx.inputs)
@@ -50,8 +50,8 @@ def loadgraph( contents,filename, date):
                       
                     glob.grh = nx.read_graphml(glob.graphmlfile)
                     glob.elements =tu.setCytoElements(glob.grh) 
-                    log.append('*  node count in file: '+glob.graphmlfile+str(glob.grh.number_of_nodes())+',')
-                    log.append('*  edge count in file: '+glob.graphmlfile+str(glob.grh.number_of_edges())+',')
+                    log.append('*  node count in file: '+glob.graphmlfile+" is: "+str(glob.grh.number_of_nodes()))
+                    log.append('*  edge count in file: '+glob.graphmlfile+" is: "+str(glob.grh.number_of_edges()))
                     utils.setgraphattributes(True, None, '')
                     utils.setvizproperties(True, None, '')
                 except Exception as e:
@@ -61,8 +61,8 @@ def loadgraph( contents,filename, date):
                     print(exc_type, fname, exc_tb.tb_lineno,str(e))
         else:
             return ''
-        log.append('*  script  completed at:'+tu.prettytime())
-        return dcc.Markdown(children = log) #, glob.elements# ''.join(log)
+        log.append('*  Loading completed at:'+tu.prettytime())
+        return log
 
 ########################################
 
