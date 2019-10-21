@@ -34,8 +34,9 @@ cytolayout =  html.Div([
                         style= {'width' : '250','color': 'black', 'fontSize': 12},
                         options=[
                             {'label': name.capitalize(), 'value': name}
-                            for name in ['random', 'grid',  'circle', 'cose', 'concentric','breadthfirst']
-                        ]),
+                            for name in ['random', 'grid',  'circle', 'cose', 'concentric','breadthfirst','cose-bilkent',
+                                'dagre','cola','klay','spread','euler']
+                            ]),
                     html.Div([
 
                     html.Div(children='Filter:',style={'width' : '250'}),

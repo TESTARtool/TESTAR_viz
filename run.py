@@ -23,6 +23,7 @@ This example is partial based on the script from https://dash.plot.ly/cytoscape/
 from appy import app
 
 import dash_core_components
+import dash_cytoscape as cyto
 import sys
 import os
 import utils.globals as glob
@@ -35,6 +36,9 @@ from layouts.layout import testarlayout
 
 app.layout = testarlayout
 app.config['suppress_callback_exceptions'] = True
+
+# Load extra layouts
+cyto.load_extra_layouts()
 
 # callbacks are connected to layout: Keep/remain despite pythonwarnings !!!
 #import serverroutes

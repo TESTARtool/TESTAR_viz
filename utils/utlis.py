@@ -118,6 +118,7 @@ def setCytoElements(grh,usecache=False):
             tempdict.update({'label': ndict[glob.label_nodeelement]})  #copy as cyto wants the 'label' tag
             tempdict.update({'id': n});
             tempdict.update({'nodeid': n})
+
             if usecache :
                 fname = glob.outputfolder+imagefilename(str(n))
             else:

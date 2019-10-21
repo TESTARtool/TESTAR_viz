@@ -41,13 +41,15 @@ def update_layout(hit0, fitting,canvasheight,layout, subgraph):
                 removenodelist = [n for n, v in glob.grh.nodes(data=True) if v['labelV'] != 'ConcreteState']
                 tmpgrh.remove_nodes_from(removenodelist)
             elif subgraph == 'concrete+sequence':
+                removeedgelist = [n for s,t,n, v in glob.grh.edges(data=True,keys=True) if v['labelE'] == 'Accessed']
+                tmpgrh.remove_edges_from(removeedgelist)
                 removenodelist = [n for n, v in glob.grh.nodes(data=True) if (
                          v['labelV'] != 'ConcreteState' and v['labelV'] != 'SequenceNode' and v[
                         'labelV'] != 'TestSequence')]
                 tmpgrh.remove_nodes_from(removenodelist)
             else:
                 pass #subgraph = 'all' # tmpgrh=glob.grh.copy
-            if removenodelist != []:    tmpgrh.remove_nodes_from(removenodelist)
+            #if removenodelist != []:    tmpgrh.remove_nodes_from(removenodelist)
             subelements = tu.setCytoElements(tmpgrh,True)
 
             h=600*canvasheight
@@ -62,18 +64,23 @@ def update_layout(hit0, fitting,canvasheight,layout, subgraph):
  #############################
 
 @app.callback(
-    Output('cytoscape-update-layout', 'stylesheet'),
+    [Output('cytoscape-update-layout', 'stylesheet'),Output('oracletable', 'style_data_conditional')],
     [Input('cytoscape-update-layout', 'elements'),
      Input('cytoscape-update-layout', 'layout'),
     Input('apply-viz_style-button', 'n_clicks'),
-    Input('oracletable', "derived_virtual_data"),
-     Input('oracletable', "derived_virtual_selected_rows") ]
+Input('oracletable',"selected_cells"),
+    #Input('oracletable',"selected_rows"), #"derived_virtual_selected_rows"),
+    Input('oracletable', "data") ],[State('oracletable', 'style_data_conditional')]
+
+
+ #Input('oracletable', "derived_virtual_data")]
 
  )
-def updateCytoStyleSheet(element,layout,button,rows,selectedrows):
+def updateCytoStyleSheet(element,layout,button,selectedcells,rows,currentcondstyle):
     stylesheet = []
-
-
+    oracleconditionalstyle = [{
+          'if': {'row_index': 'odd'},
+          'backgroundColor': 'AliceBlue'}]  # a comma <,> at the end of this line cost me a day
     data = glob.dfdisplayprops.to_dict('records');
     for row in data:
         styledict = dict()
@@ -144,73 +151,84 @@ def updateCytoStyleSheet(element,layout,button,rows,selectedrows):
         tmpstyle.update(styledict)  # blunder  tmpstyle=tmpstyle.update(styledict)
         stylesheet.append(tmpstyle)
 
-    if selectedrows is None:   selectedrows = []
+  #  if selectedrows is None:   selectedrows = []
+    if selectedcells is None:   selectedcells = []
+    selectedrows=[i['row'] for i in selectedcells]
+    selectedrows=list(set(selectedrows))  #ascending order?
+
+
     if not (rows is None) and len(rows)>0 and len(selectedrows)>0:
-        print('selecting node/edges for trace styling')
         rowsdata = [rows[i]  for i in range(len(rows)) if i in selectedrows]
         prefixcolor = ''
         cyclecolor = ''
+        i=-1
+        for r in rows:
+            i=i+1
+            if i in selectedrows:
+                #piggyback the oracle table stylesheet
 
-        for r in rowsdata:
-            if r['ORACLE_VERDICT']== 'FAIL' :
-                prefixcolor = 'brown'
-                cyclecolor = 'red'
+                if r['ORACLE_VERDICT']== 'FAIL' :
+                    prefixcolor = 'brown'
+                    cyclecolor = 'red'
+                    oracleconditionalstyle.append({
+                         "if": {"row_index": i},
+                         "backgroundColor": "red",
+                         'color': 'white'})
 
-            elif r['ORACLE_VERDICT']== 'PASS' :
-                prefixcolor = 'lightgreen'
-                cyclecolor = 'green'
-            stylepropdict = dict()
-            stylepropdict.update(
-                {'border-width': 2,'border-color': cyclecolor,'background-color': cyclecolor})
-            stylesheet.extend(updatestyleoftrace(r['EXAMPLERUN_CYCLE_STATES'], 'node', stylepropdict))
-            stylepropdict = dict()
-            stylepropdict.update(
-                {'border-width': 2,'border-color': prefixcolor,'background-color': prefixcolor})
-            stylesheet.extend(updatestyleoftrace(r['EXAMPLERUN_PREFIX_STATES'], 'node', stylepropdict))
-            stylepropdict = dict()
-            stylepropdict.update(
-                {'width': 2, 'line-color': cyclecolor,
-                 'background-color': cyclecolor,'mid-target-arrow-color': cyclecolor})
-            stylesheet.extend(updatestyleoftrace(r['EXAMPLERUN_CYCLE_TRANSITIONS'], 'edge', stylepropdict))
-            stylepropdict = dict()
-            stylepropdict.update(
-                {'width': 2,'line-color': prefixcolor,
-                 'background-color': prefixcolor, 'mid-target-arrow-color': prefixcolor})
-            stylesheet.extend(updatestyleoftrace(r['EXAMPLERUN_PREFIX_TRANSITIONS'], 'edge', stylepropdict))
+                elif r['ORACLE_VERDICT']== 'PASS' :
+                    prefixcolor = 'lightgreen'
+                    cyclecolor = 'green'
+                    oracleconditionalstyle.append({
+                         "if": {"row_index": i},
+                         "backgroundColor": "green",
+                         'color': 'white'})
+                stylepropdict = dict()
+                stylepropdict.update(
+                    {'border-width': 2,'border-color': cyclecolor,'background-color': cyclecolor})
+                stylesheet.extend(updatestyleoftrace(r['EXAMPLERUN_CYCLE_STATES'], 'node', stylepropdict))
+                stylepropdict = dict()
+                stylepropdict.update(
+                    {'border-width': 2,'border-color': prefixcolor,'background-color': prefixcolor})
+                stylesheet.extend(updatestyleoftrace(r['EXAMPLERUN_PREFIX_STATES'], 'node', stylepropdict))
+                stylepropdict = dict()
+                stylepropdict.update(
+                    {'width': 2, 'line-color': cyclecolor,
+                     'background-color': cyclecolor,'mid-target-arrow-color': cyclecolor})
+                stylesheet.extend(updatestyleoftrace(r['EXAMPLERUN_CYCLE_TRANSITIONS'], 'edge', stylepropdict))
+                stylepropdict = dict()
+                stylepropdict.update(
+                    {'width': 2,'line-color': prefixcolor,
+                     'background-color': prefixcolor, 'mid-target-arrow-color': prefixcolor})
+                stylesheet.extend(updatestyleoftrace(r['EXAMPLERUN_PREFIX_TRANSITIONS'], 'edge', stylepropdict))
 
     # else: no special handling for display oracles
+        if glob.grh.size()!= 0:
+            tmpgrh = glob.grh.copy()
+            removenodelist = [n for n, v in glob.grh.nodes(data=True) if v['labelV'] != 'AbstractState']
+            removeedgelist = [n for s,t,n, v in glob.grh.edges(data=True,keys=True) if v['labelE'] != 'AbstractAction']
+            tmpgrh.remove_nodes_from(removenodelist)
+            tmpgrh.remove_edges_from(removeedgelist)
+            properties = [ r for r in data if r[glob.elementtype] == 'node' and r[glob.elementsubtype] == 'AbstractState']
+            stylepropdict = dict()
+            if len(properties) > 0: #take first row
+                stylepropdict.update({'background-color': properties[0]['color_if_deadstate'] })
+                stylepropdict.update({'shape':properties[0]['shape_if_deadstate'] })
+            deadstates = (node for node, out_degree in tmpgrh.out_degree() if out_degree == 0)
+            for stateid in deadstates: stylesheet.extend(updatestyleoftrace(stateid, 'node', stylepropdict))
 
-    tmpgrh = glob.grh.copy()
-    print('directed?: ',tmpgrh.is_directed())
-
-
-    removenodelist = [n for n, v in glob.grh.nodes(data=True) if v['labelV'] != 'AbstractState']
-    removeedgelist = [n for s,t,n, v in glob.grh.edges(data=True,keys=True) if v['labelE'] != 'AbstractAction']
-    tmpgrh.remove_nodes_from(removenodelist)
-    tmpgrh.remove_edges_from(removeedgelist)
-    properties = [ r for r in data if r[glob.elementtype] == 'node' and r[glob.elementsubtype] == 'AbstractState']
-    stylepropdict = dict()
-    if len(properties) > 0: #take first row
-        stylepropdict.update({'background-color': properties[0]['color_if_deadstate'] })
-        stylepropdict.update({'shape':properties[0]['shape_if_deadstate'] })
-    deadstates = (node for node, out_degree in tmpgrh.out_degree() if out_degree == 0)
-    for stateid in deadstates: stylesheet.extend(updatestyleoftrace(stateid, 'node', stylepropdict))
-
-
-    tmpgrh = glob.grh.copy()
-    removenodelist = [n for n, v in glob.grh.nodes(data=True) if v['labelV'] != 'ConcreteState']
-    removeedgelist = [n for s,t,n, v in glob.grh.edges(data=True,keys=True) if v['labelE'] != 'ConcreteAction']
-    tmpgrh.remove_nodes_from(removenodelist)
-    tmpgrh.remove_edges_from(removeedgelist)
-    properties = [ r for r in data if r[glob.elementtype] == 'node' and r[glob.elementsubtype] == 'ConcreteState']
-    stylepropdict = dict()
-    if len(properties) > 0: #take first row
-        stylepropdict.update({'background-color': properties[0]['color_if_deadstate'] })
-        stylepropdict.update({'shape':properties[0]['shape_if_deadstate'] })
-    deadstates = (node for node, out_degree in tmpgrh.out_degree() if out_degree == 0)
-    for stateid in deadstates: stylesheet.extend(updatestyleoftrace(stateid, 'node', stylepropdict))
-
-    return  stylesheet
+            tmpgrh = glob.grh.copy()
+            removenodelist = [n for n, v in glob.grh.nodes(data=True) if v['labelV'] != 'ConcreteState']
+            removeedgelist = [n for s,t,n, v in glob.grh.edges(data=True,keys=True) if v['labelE'] != 'ConcreteAction']
+            tmpgrh.remove_nodes_from(removenodelist)
+            tmpgrh.remove_edges_from(removeedgelist)
+            properties = [ r for r in data if r[glob.elementtype] == 'node' and r[glob.elementsubtype] == 'ConcreteState']
+            stylepropdict = dict()
+            if len(properties) > 0: #take first row
+                stylepropdict.update({'background-color': properties[0]['color_if_deadstate'] })
+                stylepropdict.update({'shape':properties[0]['shape_if_deadstate'] })
+            deadstates = (node for node, out_degree in tmpgrh.out_degree() if out_degree == 0)
+            for stateid in deadstates: stylesheet.extend(updatestyleoftrace(stateid, 'node', stylepropdict))
+    return  stylesheet ,oracleconditionalstyle
 
  #############################
 @app.callback(

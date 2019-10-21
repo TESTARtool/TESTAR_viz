@@ -52,10 +52,10 @@ oracles = html.Div([
                             data=[],
                             fixed_rows={ 'headers': True, 'data': 0 },
                             #fixed_columns={'headers': True, 'data': 2},# n_fixed_columns=2,
-                            row_selectable='multi',
+                            #row_selectable='multi',
                             selected_rows=[],
                             style_cell={ 'overflow': 'hidden','textOverflow': 'ellipsis',
-                                        'minWidth': '30px',  'width': '125px','maxWidth': '170px',
+                                        'minWidth': '30px',  #'width': '125px','maxWidth': '170px',
                                        'whiteSpace': 'nowrap'
                                        },
                             style_data_conditional=[

@@ -59,6 +59,9 @@ def save_oracle_table(data,cols):
         return  csvstr  
 #    else:
 #        return ''
+
+
+
 ########################################
 
 
