@@ -21,12 +21,12 @@ def savetofile(data, tofile='graphml.xml'):
     #f=open("graphml.xml",encoding='ISO-8859-1',mode="w+")
     f=open(tofile,encoding='utf-8',mode="w+")
     for x in data:  f.write(str(x[0]))
-    f.close()  
+    f.close()
     print('saved to : ',tofile, ' size: ', os.path.getsize(tofile))
-    
+
 def imagefilename(s =""):
      return glob.imgfiletemplate+s.replace(':','.').replace('#','8')+glob.imgfileextension #do not change!!
- 
+
 def clearassetsfolder():
 
     fldr = glob.scriptfolder+glob.assetfolder+glob.outputfolder
@@ -44,11 +44,11 @@ def clearassetsfolder():
             if filename.endswith('.png') or filename.endswith('.xml') or filename.endswith('.csv') :
                 os.unlink(fldr+filename)
                 print('deleting old: '+fldr+filename)
-        except Exception as e: 
+        except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             print(exc_type, fname, exc_tb.tb_lineno)
-            print('*  There was an error processing : '+str(e))   
+            print('*  There was an error processing : '+str(e))
 def copydefaultimagetoasset():
 
     try:
@@ -59,37 +59,43 @@ def copydefaultimagetoasset():
         fnew.write(contnt)
         fnew.close()
         #copyfile(glob.no_image_file,'assets/'+glob.no_image_file)
-    except Exception as e: 
+    except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             print(exc_type, fname, exc_tb.tb_lineno)
             print('*  There was an error processing : '+str(e))
 
-def prettytime(timestamp=None): 
+def prettytime(timestamp=None):
     if timestamp != None:
         return datetime.datetime.fromtimestamp(timestamp).isoformat("_","milliseconds")
     else:
         return datetime.datetime.fromtimestamp(time.time()).isoformat("_","milliseconds")
 
-def extractscreenshotfromdict(n,eldict):
+def savescreenshottodisk(n, eldict, usecache=False):
 
-# testar db in graphml export from orientdb has a screenshot attrbute 
-# with format <#00:00><[<byte>,<byte>,...]><v1> 
+# testar db in graphml export from orientdb has a screenshot attrbute
+# with format <#00:00><[<byte>,<byte>,...]><v1>
 #action: extract the substring [...], split at the separator, convert the list to a bytelist
 # save the bytelist as bytearray and voila, there is the deserialized png
 
-		#alternative found=(grh.nodes[n][image_element].split("["))[1].split("]")[0] 
+		#alternative found=(grh.nodes[n][image_element].split("["))[1].split("]")[0]
     fname='_no_image_for_'+n
     try:
 
         if not (eldict.get(glob.image_element) is None) :
-            found = re.search(glob.screenshotregex, eldict[glob.image_element]).group(1)
-            pngintarr=[(int(x)+256)%256  for x in found.split(",")] 
-            fname=imagefilename(n)
-            print('saving...'+fname+ ' with size of ',len(pngintarr))
-            f = open(glob.scriptfolder +glob.assetfolder+glob.outputfolder+fname, 'wb')
-            f.write(bytearray(pngintarr ))
-            f.close() 
+            param = eldict.get(glob.image_element)
+
+            if param.split('|')[0]!= 'inferin' and param.split('|')[0]!= 'inferout':
+                fname=imagefilename(n)
+                if usecache:
+                    return fname
+                found = re.search(glob.screenshotregex, eldict[glob.image_element]).group(1)
+                pngintarr=[(int(x)+256)%256  for x in found.split(",")]
+
+                print('saving...'+fname+ ' with size of ',len(pngintarr))
+                f = open(glob.scriptfolder +glob.assetfolder+glob.outputfolder+fname, 'wb')
+                f.write(bytearray(pngintarr ))
+                f.close()
         else:
             return glob.no_image_file
     except Exception as e: # AttributeError:	# [ ] not found in the original string
@@ -99,17 +105,32 @@ def extractscreenshotfromdict(n,eldict):
             print('*  There was an error processing : '+str(e))
             return glob.no_image_file
     return fname
-    
+
+def updateinferrablecreenshots(n, eldict, usecache=False):
+
+    # G.in_edges(node)
+    # G.out_edges(node)
+    return True
+
+
+
 def setCytoElements(grh,usecache=False):
 
 #    tu.extractscreenshotsfromnxgraph(glob.grh,glob.image_element,glob.screenshotregex)
-   
+
 #initialize nodes,edges in cyto format
 #    nodes = [{'data': {'id': n, 'label': ndict['labelV']},
 #              'position': {'x': 0, 'y': 0}
-#            } for n, ndict in glob.grh.nodes(data=True)]   
+#            } for n, ndict in glob.grh.nodes(data=True)]
     nodes=[]
     edges=[]
+    parentnodes={}
+    grantparentnodes={}
+    allnodes=[]
+    Cparentnode={}
+    Wparentnode={}
+    Aparentnode={}
+    Tparentnode={}
     try:
 
         copydefaultimagetoasset()   #optimize: do only once:-)
@@ -118,34 +139,71 @@ def setCytoElements(grh,usecache=False):
             tempdict.update({'label': ndict[glob.label_nodeelement]})  #copy as cyto wants the 'label' tag
             tempdict.update({'id': n});
             tempdict.update({'nodeid': n})
+            if ndict[glob.default_nodeelement]=='ConcreteState':
+                tempdict.update({'parent': 'ConcreteLayer'})
+                Cparentnode = {'data': {'id': 'ConcreteLayer', 'label': 'ConcreteLayer'}}
+            # if ndict[glob.default_nodeelement] == 'Widget':
+            #     tempdict.update({'parent': 'WidgetLayer'})
+            #     Cparentnode = {'data': {'id': 'WidgetLayer', 'label': 'WidgetLayer'}}
+            if ndict[glob.default_nodeelement] == 'AbstractState':
+                tempdict.update({'parent': 'AbstractLayer'})
+                Aparentnode = {'data': {'id': 'AbstractLayer', 'label': 'AbstractLayer'}}
+            if ndict[glob.default_nodeelement] == 'SequenceNode' or ndict[glob.default_nodeelement] == 'TestSequence':
+                tempdict.update({'parent': 'TestTraceLayer'})
+                Tparentnode = {'data': {'id': 'TestTraceLayer', 'label': 'TestTraceLayer'}}
 
-            if usecache :
-                fname = glob.outputfolder+imagefilename(str(n))
-            else:
-                fname= glob.outputfolder+extractscreenshotfromdict(str(n),tempdict)
+            #'improvement : parentnode needs to be read from viz table'
+            # par=ndict['parentnode']
+            # if par!='':
+            #     tempdict.update({'parent': par})
+            #     # Parent Nodes
+            #     parentdict = dict()
+            #     parentdict.update({'id': ndict['parentnode'], 'label': ndict['parentnode']})
+            #     par = ndict['grantparentnode']
+            #     if par != '':
+            #         parentdict.update({'parent': par})
+            #     parentnode = {'data': parentdict}
+            #     parentnodes.update(parentnode)
+            #     # GrantParent Nodes
+            #     if par != '':
+            #         grantparentdict = dict()
+            #         grantparentdict.update({'id': ndict['grantparentnode'], 'label': ndict['grantparentnode']})
+            #         grantparentnode = {'data': grantparentdict}
+            #         grantparentnodes.update(grantparentnode)
+
+
+            fname= glob.outputfolder + savescreenshottodisk(str(n), tempdict, usecache)
             tempdict.update({glob.elementimgurl:app.get_asset_url(fname)}) #pointer to the image
             nodes.append({'data':  tempdict ,'position': {'x': 0, 'y': 0}})
+
+        allnodes.append(Cparentnode)
+        # allnodes.append(Wparentnode)
+        allnodes.append(Aparentnode)
+        allnodes.append(Tparentnode)
+        # allnodes.extend(list(grantparentnodes))
+        # allnodes.extend(list(parentnodes))
+        allnodes.extend(nodes)
 
         for source, target, n,edict in grh.edges(data=True,keys=True):
             tempdict=dict(edict)
             tempdict.update({'label': edict[glob.label_edgeelement]})  #copy as cyto wants the label tag
-            tempdict.update({'source': source})     
+            tempdict.update({'source': source})
             tempdict.update({'target': target})
             tempdict.update({'id': n});
             tempdict.update({'edgeid': n})
             if usecache :
                 fname = glob.outputfolder+imagefilename(n)
             else:
-                fname=glob.outputfolder+extractscreenshotfromdict(str(n),tempdict) # n was ''+source+target
+                fname= glob.outputfolder + savescreenshottodisk(str(n), tempdict) # n was ''+source+target
             tempdict.update({glob.elementimgurl:app.get_asset_url(fname)})
             edges.append({'data':  tempdict })
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         fname1 = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
         print(exc_type, fname1, exc_tb.tb_lineno)
-        print('*  There was an error processing : '+str(e)) 
-  
-    return nodes + edges
+        print('*  There was an error processing : '+str(e))
+
+    return allnodes + edges
 
 #############
 

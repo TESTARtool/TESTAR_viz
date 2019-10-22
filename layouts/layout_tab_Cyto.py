@@ -55,7 +55,7 @@ cytolayout =  html.Div([
 
                 html.Div(
                     children=[
-                        html.Div('Relative Zoom : (overrides mouse wheel!)', ),#style={'display': 'inline-block'},),
+                        html.Div('Zoom : (overrides mouse wheel!)', ),#style={'display': 'inline-block'},),
                         dcc.Slider(
                             id='canvas_zoom',
                             min=-3,
@@ -65,20 +65,20 @@ cytolayout =  html.Div([
                             value=0,
                         )],
                     style={'max-width': '300px', 'height': '40px', 'margin': '5px', 'border-style': 'solid', 'padding': '10px','display': 'inline-block'}),
-                html.Div(
-                    children=[
-                        dcc.Checklist(
-                            id='fittocanvas',
-                            options=[
-                                {'label': 'Fit to Canvas', 'value': '1'}, ],
-                            value=['1']
-                        )
-                    ],
-                    style={'max-width': '300px', 'height': '40px','margin': '5px', 'border-style': 'solid','padding': '10px','display': 'inline-block'}),
+                # html.Div(
+                #     children=[
+                #         dcc.Checklist(
+                #             id='fittocanvas',
+                #             options=[
+                #                 {'label': 'Fit to Canvas', 'value': '1'}, ],
+                #             value=['1']
+                #         )
+                #     ],
+                #     style={'max-width': '300px', 'height': '40px','margin': '5px', 'border-style': 'solid','padding': '10px','display': 'inline-block'}),
 
                 html.Div(
                     children=[
-                        html.Div('Canvas height Multiplier:', style={'display': 'inline-block'}),
+                        html.Div('Canvas height:', style={'display': 'inline-block'}),
                         dcc.Slider(
                             id='canvas_height',
                             min=1,
