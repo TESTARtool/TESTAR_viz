@@ -56,15 +56,16 @@ cytolayout =  html.Div([
                         value=['Concrete'],
                         style={'width': '250', 'color': 'black', 'fontSize': 12},
                         options=[{'label': name.capitalize(), 'value': name}
-                                 for name in ['Abstract', 'Concrete', 'Widgets', 'Test Executions']])
+                                 for name in ['Abstract', 'Concrete', 'Widget', 'Test Executions']])
                 ], style={'max-width': '300px', 'height': '40px', 'margin': '5px', 'border-style': 'solid',
                           'padding': '10px', 'display': 'inline-block'}),
                 html.Div(
                     children=[
+                        html.Div(children='Fenced:', style={'width': '2'}),
                         dcc.Checklist(
                             id='fenced',
                             options=[
-                                {'label': 'Fenced (Slow)', 'value': 'Fenced'}, ],
+                                {'label': 'Yes (Slower)', 'value': 'Fenced'}, ],
                             value=['Fenced']
                         )
                     ],

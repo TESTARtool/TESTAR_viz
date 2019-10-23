@@ -22,53 +22,61 @@ import dash_html_components as html
 
 #**************************
 visualTuning = html.Div([
-            # html.Div([
-            # html.A(id='collapse-attribute-link',children='Collapse/Expand Attributes table:', n_clicks=0,n_clicks_timestamp=0, href="javascript:toggle1(document.getElementById('attribute-area'))" ),
-            # html.Div(id='attribute-area',children=[
-            # html.P(),
-            # html.Button(id='infer-attrib-from-source-button', n_clicks=0,n_clicks_timestamp=0, children='Infer Attributes', style={'display': 'inline-block'}),
-            # html.A(dcc.Upload(id='upload-attrib-from-file',
-            #            children=html.Button(id='upload-button-attrib-file',n_clicks=0,
-            #                         children='Load Attributes File'),
-            #            #accept='text/csv',
-            #            contents=None,
-            #            multiple=False
-            #            ),
-            #         style={'display': 'inline-block'}),
-            # html.A(html.Button(id='save-attrib-to-file-button', n_clicks=0, n_clicks_timestamp=0,children='Save to File'),   id='save-attributes',
-            #     download="testar-graph-show-hide-attributes.csv",
-            #     href="",
-            #     target="_blank", style={'display': 'inline-block'}
-            # ),
-            #
-            # dcc.Loading(
-            #         id="loading-atttable",
-            #         children=[
-            #         dt.DataTable(
-            #                 #fixed columns conflicts in width of of table
-            #             id='attributetable',
-            #             style_table={'overflowX': 'scroll','width' : '1100','minWidth': '100%','maxHeight': '150'},
-            #             columns=[],
-            #             data=[],
-            #             fixed_rows={ 'headers': True, 'data': 0 },
-            #             fixed_columns={'headers': True, 'data': 2},# n_fixed_columns=2,
-            #             #row_selectable='single',
-            #             column_selectable='single',
-            #              style_cell={
-            #                        'minWidth': '30px',  'width': '170px','maxWidth': '170px',
-            #                        'whiteSpace': 'normal'
-            #                        },
-            #             editable=True,
-            #             filter_action='native',
-            #             sort_action='native',
-            #             sort_mode="multi",
-            #             #sorting_type="multi",
-            #             ),
-            #                                    ],
-            #         type="circle",
-            #         style={ 'font-size': '12'},
-            # ), ],style={'display': 'none'}) #'inline-block'})
-            #     ], style={'border-width': '1','border-color':'grey','border-style': 'dashed','width': '100%'}),
+            html.Div([
+            html.A(id='collapse-attribute-link',children='Collapse/Expand Attributes table:', n_clicks=0,n_clicks_timestamp=0, href="javascript:toggle1(document.getElementById('attribute-area'))" ),
+            html.Div(id='attribute-area',children=[
+            html.P(),
+            html.Button(id='infer-attrib-from-source-button', n_clicks=0,n_clicks_timestamp=0, children='Infer Attributes', style={'display': 'inline-block'}),
+            html.A(dcc.Upload(id='upload-attrib-from-file',
+                       children=html.Button(id='upload-button-attrib-file',n_clicks=0,
+                                    children='Load Attributes File'),
+                       #accept='text/csv',
+                       contents=None,
+                       multiple=False
+                       ),
+                    style={'display': 'inline-block'}),
+            html.A(html.Button(id='save-attrib-to-file-button', n_clicks=0, n_clicks_timestamp=0,children='Save to File'),   id='save-attributes',
+                download="testar-graph-show-hide-attributes.csv",
+                href="",
+                target="_blank", style={'display': 'inline-block'}
+            ),
+            html.Span(id='advance tip', children='(Only For Advanced Users)', style={'color': 'red','display': 'inline-block'}),
+            dcc.Loading(
+                    id="loading-atttable",
+                    children=[
+                    dt.DataTable(
+                            #fixed columns conflicts in width of of table
+                        id='attributetable',
+
+                        style_table={'overflowX': 'scroll', 'width': '1100', 'minWidth': '100%', 'maxHeight': '150'},
+                        columns=[],
+                        data=[],
+                        fixed_rows={'headers': True, 'data': 0},
+                        fixed_columns={'headers': True, 'data': 2},  # n_fixed_columns=2,
+                        # row_selectable='single',
+                        column_selectable='single',
+                        style_cell={
+                            'minWidth': '30px', 'width': '170px', 'maxWidth': '170px',
+                            'whiteSpace': 'normal'
+                        },
+                        style_data_conditional=[
+                            {
+                                'if': {'row_index': 'odd'},
+                                'backgroundColor': 'AliceBlue'
+                            }],
+                        editable=True,
+                        filter_action='native',
+                        sort_action='native',
+                        sort_mode="multi",
+                        # sorting_type="multi",
+                    ),
+                                               ],
+                    type="circle",
+                    style={ 'font-size': '12'},
+            ),
+
+            ],style={'display': 'none'}) #'inline-block'})
+                ], style={'border-width': '1','border-color':'grey','border-style': 'dashed','width': '100%'}),
 
 ###################################
 

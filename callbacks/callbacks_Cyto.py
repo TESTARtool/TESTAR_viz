@@ -25,7 +25,6 @@ import utils.utlis as tu
         State('checkbox-layerview-options','value')])
 def update_layout(hit0, canvasheight, layout, fenced, layerview):
 
-
     ctx = dash.callback_context
     trigger = ctx.triggered[0]['prop_id'].split('.')[0]
     if ctx.triggered:
@@ -55,7 +54,8 @@ def update_layout(hit0, canvasheight, layout, fenced, layerview):
             else:
                 pass #subgraph = 'all' # tmpgrh=glob.grh.copy
             #if removenodelist != []:    tmpgrh.remove_nodes_from(removenodelist)
-            if fenced!='': parenting=True
+            if len(fenced)>0 : parenting=True
+            else: parenting=False
             subelements = tu.setCytoElements(tmpgrh,True,parenting,layerview)
         # infer screenshots
             h=600*canvasheight
