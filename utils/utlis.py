@@ -38,12 +38,11 @@ def clearassetsfolder():
     except FileExistsError:
         print("Directory ", fldr, " exists")
 
-    print('deleting  from folder: ',fldr)
+    print('deleting old content from folder: ',fldr)
     for filename in os.listdir(fldr):
         try:
             if filename.endswith('.png') or filename.endswith('.xml') or filename.endswith('.csv') :
                 os.unlink(fldr+filename)
-                print('deleting old: '+fldr+filename)
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
@@ -91,8 +90,6 @@ def savescreenshottodisk(n, eldict, usecache=False):
                     return fname
                 found = re.search(glob.screenshotregex, eldict[glob.image_element]).group(1)
                 pngintarr=[(int(x)+256)%256  for x in found.split(",")]
-
-                print('saving...'+fname+ ' with size of ',len(pngintarr))
                 f = open(glob.scriptfolder +glob.assetfolder+glob.outputfolder+fname, 'wb')
                 f.write(bytearray(pngintarr ))
                 f.close()
@@ -114,7 +111,7 @@ def updateinferrablecreenshots(n, eldict, usecache=False):
 
 
 
-def setCytoElements(grh,usecache=False):
+def setCytoElements(grh,usecache=False,parenting=False,layerview=[]):
 
 #    tu.extractscreenshotsfromnxgraph(glob.grh,glob.image_element,glob.screenshotregex)
 
@@ -139,51 +136,53 @@ def setCytoElements(grh,usecache=False):
             tempdict.update({'label': ndict[glob.label_nodeelement]})  #copy as cyto wants the 'label' tag
             tempdict.update({'id': n});
             tempdict.update({'nodeid': n})
-            if ndict[glob.default_nodeelement]=='ConcreteState':
-                tempdict.update({'parent': 'ConcreteLayer'})
-                Cparentnode = {'data': {'id': 'ConcreteLayer', 'label': 'ConcreteLayer'}}
-            # if ndict[glob.default_nodeelement] == 'Widget':
-            #     tempdict.update({'parent': 'WidgetLayer'})
-            #     Cparentnode = {'data': {'id': 'WidgetLayer', 'label': 'WidgetLayer'}}
-            if ndict[glob.default_nodeelement] == 'AbstractState':
-                tempdict.update({'parent': 'AbstractLayer'})
-                Aparentnode = {'data': {'id': 'AbstractLayer', 'label': 'AbstractLayer'}}
-            if ndict[glob.default_nodeelement] == 'SequenceNode' or ndict[glob.default_nodeelement] == 'TestSequence':
-                tempdict.update({'parent': 'TestTraceLayer'})
-                Tparentnode = {'data': {'id': 'TestTraceLayer', 'label': 'TestTraceLayer'}}
+            if parenting:
+                if  'Concrete' in layerview and ndict[glob.default_nodeelement]=='ConcreteState':
+                    tempdict.update({'parent': 'ConcreteLayer'})
+                    Cparentnode = {'data': {'id': 'ConcreteLayer', 'nodeid': 'ConcreteLayer'}}
+                if 'Widget' in layerview and ndict[glob.default_nodeelement] == 'Widget':
+                     tempdict.update({'parent': 'WidgetLayer'})
+                     Wparentnode = {'data': {'id': 'WidgetLayer', 'nodeid': 'WidgetLayer'}}
+                if 'Abstract' in layerview and ndict[glob.default_nodeelement] == 'AbstractState':
+                    tempdict.update({'parent': 'AbstractLayer'})
+                    Aparentnode = {'data': {'id': 'AbstractLayer', 'nodeid': 'AbstractLayer'}}
+                if ('Test Executions' in layerview) and ((ndict[glob.default_nodeelement] == 'SequenceNode') or (ndict[glob.default_nodeelement] == 'TestSequence')):
+                    tempdict.update({'parent': 'TestTraceLayer'})
+                    Tparentnode = {'data': {'id': 'TestTraceLayer', 'nodeid': 'Test executions'}}
 
-            #'improvement : parentnode needs to be read from viz table'
-            # par=ndict['parentnode']
-            # if par!='':
-            #     tempdict.update({'parent': par})
-            #     # Parent Nodes
-            #     parentdict = dict()
-            #     parentdict.update({'id': ndict['parentnode'], 'label': ndict['parentnode']})
-            #     par = ndict['grantparentnode']
-            #     if par != '':
-            #         parentdict.update({'parent': par})
-            #     parentnode = {'data': parentdict}
-            #     parentnodes.update(parentnode)
-            #     # GrantParent Nodes
-            #     if par != '':
-            #         grantparentdict = dict()
-            #         grantparentdict.update({'id': ndict['grantparentnode'], 'label': ndict['grantparentnode']})
-            #         grantparentnode = {'data': grantparentdict}
-            #         grantparentnodes.update(grantparentnode)
+
+                #'improvement : parentnode needs to be read from viz table'
+                # par=ndict['parentnode']
+                # if par!='':
+                #     tempdict.update({'parent': par})
+                #     # Parent Nodes
+                #     parentdict = dict()
+                #     parentdict.update({'id': ndict['parentnode'], 'label': ndict['parentnode']})
+                #     par = ndict['grantparentnode']
+                #     if par != '':
+                #         parentdict.update({'parent': par})
+                #     parentnode = {'data': parentdict}
+                #     parentnodes.update(parentnode)
+                #     # GrantParent Nodes
+                #     if par != '':
+                #         grantparentdict = dict()
+                #         grantparentdict.update({'id': ndict['grantparentnode'], 'label': ndict['grantparentnode']})
+                #         grantparentnode = {'data': grantparentdict}
+                #         grantparentnodes.update(grantparentnode)
 
 
             fname= glob.outputfolder + savescreenshottodisk(str(n), tempdict, usecache)
             tempdict.update({glob.elementimgurl:app.get_asset_url(fname)}) #pointer to the image
             nodes.append({'data':  tempdict ,'position': {'x': 0, 'y': 0}})
-
-        allnodes.append(Cparentnode)
-        # allnodes.append(Wparentnode)
-        allnodes.append(Aparentnode)
-        allnodes.append(Tparentnode)
+        if parenting:
+            if Cparentnode!={}: allnodes.append(Cparentnode)
+            if Wparentnode!={}:allnodes.append(Wparentnode)
+            if Aparentnode!={}:allnodes.append(Aparentnode)
+            if Tparentnode!={}:allnodes.append(Tparentnode)
         # allnodes.extend(list(grantparentnodes))
         # allnodes.extend(list(parentnodes))
         allnodes.extend(nodes)
-
+        # next line can raise an error while initializing: just ignore. no negative impact
         for source, target, n,edict in grh.edges(data=True,keys=True):
             tempdict=dict(edict)
             tempdict.update({'label': edict[glob.label_edgeelement]})  #copy as cyto wants the label tag
@@ -228,14 +227,12 @@ def loadoracles( contents = None, filename=''):
 
 #############
 def setgraphattributes(infer=True, contents = None, filename=''):
-    print('set data for  attrib table')
 
     if infer :  # infer from graph
             nodelabels = set()
             l = nx.get_node_attributes(glob.grh, glob.label_nodeelement)
             nodelabels.update(l.values())
             nodelabels.update({glob.default_subtypeelement})
-
             edgelabels = set()
             l = nx.get_edge_attributes(glob.grh, glob.label_edgeelement)
             edgelabels.update(l.values())
@@ -288,7 +285,6 @@ def setgraphattributes(infer=True, contents = None, filename=''):
         pass
 
 def setvizproperties(loaddefaults=True, contents=None, filename=''):
-    print('set data viz table')
     if loaddefaults:  # load defaults
         displaydict = dict()
         glob.dfdisplayprops = pd.DataFrame()

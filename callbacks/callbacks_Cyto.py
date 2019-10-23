@@ -21,38 +21,43 @@ import utils.utlis as tu
         [Input('submit-button', 'n_clicks'),#Input('fittocanvas','value'),
           Input('canvas_height','value')],
         [State('dropdown-update-layout', 'value'),
-        State('dropdown-subgraph-options','value')])
-def update_layout(hit0, canvasheight,layout, subgraph):
+        State('fenced','value'),
+        State('checkbox-layerview-options','value')])
+def update_layout(hit0, canvasheight, layout, fenced, layerview):
 
 
     ctx = dash.callback_context
     trigger = ctx.triggered[0]['prop_id'].split('.')[0]
     if ctx.triggered:
-        if  (trigger=='submit-button' and  hit0 >= 1) or trigger=='fittocanvas' or trigger=='canvas_height':
+        if  (trigger=='submit-button' and  hit0 >= 1)  or trigger=='canvas_height':
             #cytostylesheet = updateCytoStyleSheet()
             tmpgrh = glob.grh.copy()
             removenodelist = []
-            if subgraph == 'no widgets':
+            if  not 'Abstract' in layerview :
+                removenodelist = [n for n, v in glob.grh.nodes(data=True) if v['labelV'] == 'AbstractState' or v['labelV'] == 'AbstractStateModel' or v['labelV'] == 'BlackHole']
+                tmpgrh.remove_nodes_from(removenodelist)
+
+            if not 'Widget' in layerview :
                 removenodelist = [n for n, v in glob.grh.nodes(data=True) if v['labelV'] == 'Widget']
                 tmpgrh.remove_nodes_from(removenodelist)
-            elif subgraph == 'only abstract states':
-                removenodelist = [n for n, v in glob.grh.nodes(data=True) if v['labelV'] != 'AbstractState']
+
+            if not 'Concrete' in layerview :
+                removenodelist = [n for n, v in glob.grh.nodes(data=True) if v['labelV'] == 'ConcreteState']
                 tmpgrh.remove_nodes_from(removenodelist)
-            elif subgraph == 'only concrete states':
-                removenodelist = [n for n, v in glob.grh.nodes(data=True) if v['labelV'] != 'ConcreteState']
+
+            if not 'Test Executions' in layerview :
+               # removeedgelist = [(s,t) for s,t,n, v in glob.grh.edges(data=True,keys=True) if v['labelE'] == 'Accessed']
+               # tmpgrh.remove_edges_from(removeedgelist)
+                removenodelist = [n for n, v in glob.grh.nodes(data=True) if ( v['labelV'] == 'SequenceNode' or v[
+                                                                'labelV'] == 'TestSequence')]
                 tmpgrh.remove_nodes_from(removenodelist)
-            elif subgraph == 'concrete+sequence':
-                removeedgelist = [(s,t) for s,t,n, v in glob.grh.edges(data=True,keys=True) if v['labelE'] == 'Accessed']
-                tmpgrh.remove_edges_from(removeedgelist)
-                removenodelist = [n for n, v in glob.grh.nodes(data=True) if (
-                         v['labelV'] != 'ConcreteState' and v['labelV'] != 'SequenceNode' and v[
-                        'labelV'] != 'TestSequence')]
-                tmpgrh.remove_nodes_from(removenodelist)
+
             else:
                 pass #subgraph = 'all' # tmpgrh=glob.grh.copy
             #if removenodelist != []:    tmpgrh.remove_nodes_from(removenodelist)
-            subelements = tu.setCytoElements(tmpgrh,True)
-
+            if fenced!='': parenting=True
+            subelements = tu.setCytoElements(tmpgrh,True,parenting,layerview)
+        # infer screenshots
             h=600*canvasheight
            # fit=True if len(fitting)==0 or fitting[0] == '1' else False
             return subelements, {
@@ -88,9 +93,9 @@ def updateCytoStyleSheet(element,layout,button,selectedcells,rows,currentcondsty
         stylepropdict = dict()
         selectordict = dict()
         if row[glob.elementtype] == 'node':
-            '''                if row[glob.elementsubtype] == glob.default_subtypeelement:
-                selectorfilter=''
-            else:'''
+            # if row[glob.elementsubtype] == glob.default_subtypeelement:
+            #     selectorfilter=''
+            # else:
             selectorfilter = '[' + glob.label_nodeelement + ' = ' + '\'' + row[glob.elementsubtype] + '\'' + ']'
             selectordict.update({'selector': 'node' + selectorfilter})
             dsp = 'element'
@@ -115,10 +120,12 @@ def updateCytoStyleSheet(element,layout,button,selectedcells,rows,currentcondsty
                  }
             )
 
+
         elif row[glob.elementtype] == 'edge':
-            '''              if row[glob.elementsubtype] == glob.default_subtypeelement:
-                selectorfilter=''
-            else:'''
+
+            # if row[glob.elementsubtype] == glob.default_subtypeelement:
+            #     selectorfilter = ''
+            # else:
             selectorfilter = "[" + glob.label_edgeelement + " = " + "'" + row[glob.elementsubtype] + "'" + "]"
             selectordict.update({'selector': 'edge' + selectorfilter})
             dsp = 'element'
@@ -137,7 +144,6 @@ def updateCytoStyleSheet(element,layout,button,selectedcells,rows,currentcondsty
                  'mid-target-arrow-color': row['arrow-color'],
                  'arrow-scale': row['arrow-scale'],
                  'width': row['line-width'],
-
                  'line-color': row['color'],
                  'curve-style': row['edgestyle'],
                  'line-fill': row['edgefill'],
@@ -220,7 +226,6 @@ def updateCytoStyleSheet(element,layout,button,selectedcells,rows,currentcondsty
             tmpgrh = glob.grh.copy()
             removenodelist = [n for n, v in glob.grh.nodes(data=True) if v['labelV'] != 'ConcreteState']
             removeedgelist = [(s,t) for s,t,n, v in glob.grh.edges(data=True,keys=True) if v['labelE'] != 'ConcreteAction']
-            print('length edgelist: ',len(removeedgelist))
             tmpgrh.remove_edges_from(removeedgelist)
             tmpgrh.remove_nodes_from(removenodelist)
             properties = [ r for r in data if r[glob.elementtype] == 'node' and r[glob.elementsubtype] == 'ConcreteState']

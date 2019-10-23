@@ -65,15 +65,15 @@ nodedisplayprop={
                 'color' : 'grey',
                 'color_if_deadstate' : 'purple',
                 'shape_if_deadstate': 'octagon',
-                'parentnode':'Concretelayer',
-                'grantparentnode': '',
-                'NA_color_if_intrace': 'yellow',
-                'NA_on_hover_color' : 'teal',
-                'NA_on_hover_color_neighbor' : 0,
-                'NA_on_select_color_neighbors' : 0,
-                'NA_color_if_neighbor' : 'blue',
-                'NA_action_on_select' : 'NA',
-                'NA_action_on_hover': 'NA'
+                # 'NA_parentnode':'Concretelayer',
+                # 'NA_grantparentnode': '',
+                # 'NA_color_if_intrace': 'yellow',
+                # 'NA_on_hover_color' : 'teal',
+                # 'NA_on_hover_color_neighbor' : 0,
+                # 'NA_on_select_color_neighbors' : 0,
+                # 'NA_color_if_neighbor' : 'blue',
+                # 'NA_action_on_select' : 'NA',
+                # 'NA_action_on_hover': 'NA'
                 }
 edgedisplayprop={
                 'hide':0,
@@ -88,11 +88,11 @@ edgedisplayprop={
                 'edgestyle' : 'bezier',
                 'edgefill' : 'solid',
                 'color' : 'grey',
-                'NA_color_if_partoftrace': 'yellow',
-                'NA_on_hover_color' : 'teal',
-                'NA_on_hover_color_neighbor' : 0,
-                'NA_on_select_color_neighbors' : 0,
-                'NA_color_if_neighbor' : 'blue',
-                'NA_action_on_select' : 'NA',
-                'NA_action_on_hover': 'NA'
+                # 'NA_color_if_partoftrace': 'yellow',
+                # 'NA_on_hover_color' : 'teal',
+                # 'NA_on_hover_color_neighbor' : 0,
+                # 'NA_on_select_color_neighbors' : 0,
+                # 'NA_color_if_neighbor' : 'blue',
+                # 'NA_action_on_select' : 'NA',
+                # 'NA_action_on_hover': 'NA'
                 }
