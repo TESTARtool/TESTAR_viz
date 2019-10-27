@@ -41,7 +41,7 @@ app.config['suppress_callback_exceptions'] = True
 cyto.load_extra_layouts()
 
 # callbacks are connected to layout: Keep/remain despite pythonwarnings !!!
-#import serverroutes
+import serverroutes
 import servershutdown
 import callbacks.callbacks_LoadGraph
 import callbacks.callbacks_VisualTuning

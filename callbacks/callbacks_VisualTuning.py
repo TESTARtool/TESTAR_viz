@@ -37,7 +37,6 @@ def getattributes(loadlog,hitsb0,  contents, filename, date):
     if ctx.triggered:
         if  trigger=='infer-attrib-from-source-button'  : #infer from graph
             utils.setgraphattributes(True, None, '')
-            print("ok");
         elif contents is not None:  # load file  trigger=='upload-button-viz-file':
             utils.setgraphattributes(False, contents, filename)
         # else # via loadlog. this gets updated via the load graph button

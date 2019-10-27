@@ -24,8 +24,8 @@ import dash_cytoscape as cyto
 #**************************
 cytolayout =  html.Div([
             html.Div([
+                html.Button(id='submit-button', n_clicks=0, children='Update layout', style={'width': '250','display': 'inline-block'}),
                 html.Div([
-                    html.Button(id='submit-button', n_clicks=0, children='Update layout', style={'width': '250','display': 'inline-block'}),
                     dcc.Dropdown(
                         id='dropdown-update-layout',
                         value='random',
@@ -41,39 +41,25 @@ cytolayout =  html.Div([
                           'padding': '10px', 'display': 'inline-block'}),
                 html.Div([
                     html.Div(children='Layer view:', style={'width': '2'}),
-                    # dcc.Dropdown(
-                    #     id='dropdown-subgraph-options',
-                    #     value='only concrete states',
-                    #     clearable=False,
-                    #     style={'width': '250', 'color': 'black', 'fontSize': 12},
-                    #     options=[
-                    #         {'label': name.capitalize(), 'value': name}
-                    #         for name in ['all', 'no widgets', 'only abstract states', 'only concrete states',
-                    #                      'concrete+sequence']
-                    #                      ]),
                     dcc.Checklist(
                         id='checkbox-layerview-options',
                         value=['Concrete'],
                         style={'width': '250', 'color': 'black', 'fontSize': 12},
                         options=[{'label': name.capitalize(), 'value': name}
                                  for name in ['Abstract', 'Concrete', 'Widget', 'Test Executions']])
-                ], style={'max-width': '300px', 'height': '40px', 'margin': '5px', 'border-style': 'solid',
-                          'padding': '10px', 'display': 'inline-block'}),
-                html.Div(
-                    children=[
-                        html.Div(children='Fenced:', style={'width': '2'}),
+                    ], style={'max-width': '300px', 'height': '40px', 'margin': '5px', 'border-style': 'solid', 'padding': '10px', 'display': 'inline-block'}),
+                html.Div([
+                        html.Div(children='Layers with Boxes', style={'width': '2'}),
                         dcc.Checklist(
                             id='fenced',
                             options=[
-                                {'label': 'Yes (Slower)', 'value': 'Fenced'}, ],
+                                {'label': 'Fenced (Slower)', 'value': 'Fenced'}, ],
                             value=['Fenced']
                         )
-                    ],
-                    style={'max-width': '300px', 'height': '40px','margin': '5px', 'border-style': 'solid','padding': '10px','display': 'inline-block'}),
+                    ], style={'max-width': '300px', 'height': '40px','margin': '5px', 'border-style': 'solid','padding': '10px','display': 'inline-block'}),
 
-                html.Div(
-                    children=[
-                        html.Div('Zoom : (overrides mouse wheel!)', ),#style={'display': 'inline-block'},),
+                html.Div([
+                        html.Div('Zoom : (overrides mouse wheel!)', style={'width': '2'}),
                         dcc.Slider(
                             id='canvas_zoom',
                             min=-3,
@@ -86,7 +72,7 @@ cytolayout =  html.Div([
 
                 html.Div(
                     children=[
-                        html.Div('Canvas height:', style={'display': 'inline-block'}),
+                        html.Div('Canvas height:', style={'width': '2'}),
                         dcc.Slider(
                             id='canvas_height',
                             min=1,

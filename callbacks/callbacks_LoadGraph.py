@@ -47,13 +47,8 @@ def loadgraph( contents,filename, date):
                     fout.write(decoded.decode('utf-8')) # writes the uploaded file to the newly created file.
 #                   tu.savetofile(decoded.decode('utf-8'),filename )
                     fout.close() # closes the file, upload complete.
-                      
-                    glob.grh = nx.read_graphml(glob.graphmlfile)
-                    glob.elements =tu.setCytoElements(glob.grh) 
-                    log.append('*  node count in file: '+glob.graphmlfile+" is: "+str(glob.grh.number_of_nodes()))
-                    log.append('*  edge count in file: '+glob.graphmlfile+" is: "+str(glob.grh.number_of_edges()))
-                    utils.setgraphattributes(True, None, '')
-                    utils.setvizproperties(True, None, '')
+                    log.append(tu.processgraphmlfile())
+
                 except Exception as e:
                     log.append('*  There was an error processing file <'+filename+'> :'+str(e))
                     exc_type, exc_obj, exc_tb = sys.exc_info()

@@ -27,6 +27,13 @@ import dash_resumable_upload
 loadGraph = html.Div([
                 #html.Div( id='graph_dropzone',className="dropzone dz-clickable"),
                 html.A(id='goto-large-upload-page', children='(or use this Large File upload)', n_clicks=0,n_clicks_timestamp=0, href="/large-upload", target='_blank' ),
+                html.Form(id="dropper",action="/large-file-upload", encType="multipart/form-data", className="dropzone dz-clickable"),
+                html.Script(id='dzscriptje,', children=
+                    "Dropzone.options.dropper = {        paramName: 'file',        chunking: true,"
+                    "        timeout:30000, //milisec        forceChunking: true,        url: '/large-file-upload',   //points to the flask handling method "
+                    "       maxFilesize: 1025, // megabytes        chunkSize: 7000000, // bytes        parallelUploads: 1,        maxFiles: 1    }",
+                    type="application/javascript"),
+
                 dcc.Upload(
                     id='upload-graphfile',
                     children=html.Button(

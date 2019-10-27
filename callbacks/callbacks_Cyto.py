@@ -16,14 +16,13 @@ import utils.utlis as tu
 #cyto
 @app.callback(
         [Output('cytoscape-update-layout', 'elements'),
-         Output('cytoscape-update-layout', 'layout'),
-         Output('cytoscape-update-layout', 'style'), ],
-        [Input('submit-button', 'n_clicks'),#Input('fittocanvas','value'),
-          Input('canvas_height','value')],
+         Output('cytoscape-update-layout', 'layout'), Output('cytoscape-update-layout', 'style')],
+        [Input('submit-button', 'n_clicks')    ,
+         Input('canvas_height','value')         ],
         [State('dropdown-update-layout', 'value'),
         State('fenced','value'),
         State('checkbox-layerview-options','value')])
-def update_layout(hit0, canvasheight, layout, fenced, layerview):
+def update_layout(hit0,  canvasheight, layout, fenced, layerview):
 
     ctx = dash.callback_context
     trigger = ctx.triggered[0]['prop_id'].split('.')[0]
@@ -58,13 +57,12 @@ def update_layout(hit0, canvasheight, layout, fenced, layerview):
             else: parenting=False
             subelements = tu.setCytoElements(tmpgrh,True,parenting,layerview)
         # infer screenshots
-            h=600*canvasheight
-           # fit=True if len(fitting)==0 or fitting[0] == '1' else False
-            return subelements, {
+        h = 600 * canvasheight
+        return subelements, {
                     'name': layout,
                     'animate': False,
                     #'fit' : fit
-                    },{'height': ''+str(h)+'px'},
+                    } , {'height': ''+str(h)+'px'},
 
 
  #############################
@@ -134,7 +132,8 @@ def updateCytoStyleSheet(element,layout,button,selectedcells,rows,currentcondsty
             dsplabel = {'label': ''}
             if not row['label'] is None:
                 if row['label'] != '':
-                    dsplabel = {'label': 'data(' + dsplabel + ')'}
+
+                    dsplabel = {'label': 'data(' + row['label'] + ')'}
 
             stylepropdict.update(dsplabel),
             stylepropdict.update(
@@ -239,8 +238,8 @@ def updateCytoStyleSheet(element,layout,button,selectedcells,rows,currentcondsty
 
  #############################
 @app.callback(
-    Output('cytoscape-update-layout', 'zoom'),
-    [Input('canvas_zoom', 'value')],
+    [Output('cytoscape-update-layout', 'zoom')],
+    [Input('canvas_zoom', 'value') ],
     [State('cytoscape-update-layout', 'zoom')]
  )
 def updatezoom(factor,currentzoom):
@@ -285,7 +284,7 @@ def update_selectednodestabletest(selnodes):
        fname=glob.outputfolder+tu.imagefilename(c['id'])
        try:
             screens.append(html.P( children='Screenprint of node: '+c['id']))
-            screens.append(html.Img(id='screenimage'+c['id'],style={'max-height':'550px'},src= app.get_asset_url(fname)))
+            screens.append(html.Img(id='screenimage'+c['id'],style={'max-height':'600px', 'display': 'inline-block'},src= app.get_asset_url(fname)))
        except (RuntimeError, TypeError, NameError, OSError):
             screens.append(html.P( children='No Screenprint of node: '+c['id']))
        for d in c.keys():

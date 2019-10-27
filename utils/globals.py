@@ -29,7 +29,7 @@ oraclesfile = ''
 resultsfile = ''
 visualstylefile= ''
 
-graphmlfile = os.path.join(assetfolder+outputfolder,'graphml.xml')
+graphmlfile = os.path.join(assetfolder+outputfolder,'GraphML.xml')
 subgraphmlfile=os.path.join(assetfolder+outputfolder,'subgraphml.xml')
 default_nodeelement='labelV'
 default_edgeelement='labelE'

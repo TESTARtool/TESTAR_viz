@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+
+    <link rel="stylesheet"
+     href="assets/dropzone.css"/>
+
+    <link rel="stylesheet"
+     href="assets/basic.min.css"/>
+
+    <script type="application/javascript"
+     src="assets/dropzone.js">
+    </script>
+
+    <title>GraphMl.XML dropper</title>
+</head>
+<body>
+
+<form method="POST" action='/large-file-upload' class="dropzone dz-clickable"
+      id="dropper" enctype="multipart/form-data">
+</form>
+
+<script type="application/javascript">
+    Dropzone.options.dropper = {
+        dictDefaultMessage : 'Drop large XML File here or Click to Select',
+        dictFileTooBig: 'File is too large. We only allow 1000 MB or smaller, Timeout is set to maximum of 120 seconds',
+        dictInvalidFileType: 'Invalid FileType',
+        dictMaxFilesExceeded :'Max nr of Files reached. remove a file',
+        paramName: 'file',
+        chunking: true,
+        timeout:120000, //milisec
+        forceChunking: true,
+        url: '/large-file-upload',   //points to the flask handling method
+        maxFilesize: 1000, // megabytes
+        chunkSize: 5000000, // bytes
+        parallelUploads: 1,
+        acceptedFiles : '.xml',
+        addRemoveLinks: true,
+        accept: function(file, done) {
+            var filename=file.name.toLowerCase();
+            var ext = filename.substring(filename.lastIndexOf('.') + 1);
+            if (ext != "xml") {
+            done("Only XML files are Allowed");
+            }
+            else { done(); }
+            },
+        maxFiles: 1
+
+    }
+</script>
+</body>
+</html>

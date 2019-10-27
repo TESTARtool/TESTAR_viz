@@ -24,6 +24,16 @@ def savetofile(data, tofile='graphml.xml'):
     f.close()
     print('saved to : ',tofile, ' size: ', os.path.getsize(tofile))
 
+def processgraphmlfile():
+    glob.grh = nx.read_graphml(glob.graphmlfile)
+    glob.elements = setCytoElements(glob.grh)
+    log=[]
+    log.append('*  node count in file: ' + glob.graphmlfile + " is: " + str(glob.grh.number_of_nodes()))
+    log.append('*  edge count in file: ' + glob.graphmlfile + " is: " + str(glob.grh.number_of_edges()))
+    setgraphattributes(True, None, '')
+    setvizproperties(True, None, '')
+    return log
+
 def imagefilename(s =""):
      return glob.imgfiletemplate+s.replace(':','.').replace('#','8')+glob.imgfileextension #do not change!!
 
