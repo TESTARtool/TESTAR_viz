@@ -55,9 +55,9 @@ def uploadlarge():
                       f" expected {request.form['dztotalfilesize']} ")
             return make_response(('Size mismatch', 500))
         else:
-            log=tu.processgraphmlfile()
-            print("large File"+file.filename+"has been uploaded successfully")
-            print(log);
+           # log=tu.processgraphmlfile()
+            print("large File "+file.filename+" has been uploaded successfully")
+            #print(log);
             logging.info(f'File {file.filename} has been uploaded successfully')
     else:
         logging.info(f'Chunk {current_chunk + 1} of {total_chunks} '

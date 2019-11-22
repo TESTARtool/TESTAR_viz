@@ -40,7 +40,7 @@ def getattributes(loadlog,hitsb0,  contents, filename, date):
         elif contents is not None:  # load file  trigger=='upload-button-viz-file':
             utils.setgraphattributes(False, contents, filename)
         # else # via loadlog. this gets updated via the load graph button
-        columns=[{'id': c, 'name': c} for c in  glob.dfattributes.columns]
+        columns=[{'id': c, 'name': c, 'hideable': True} for c in  glob.dfattributes.columns]
         data= glob.dfattributes.to_dict("rows")
         return columns, data
 #    else:
@@ -86,7 +86,7 @@ def update_viz_table(loadlog,hitsb0,contents,filename, date):
         elif  contents is not None: #load file  trigger=='upload-button-viz-file': 
             utils.setvizproperties(False, contents, filename)
         # else # via loadlog. this gets updated via the load graph button
-        cols= [{'id': c, 'name': c} for c in  glob.dfdisplayprops.columns]
+        cols= [{'id': c, 'name': c, 'hideable': True} for c in  glob.dfdisplayprops.columns]
         data= glob.dfdisplayprops.to_dict("rows")
         return cols, data#, csvstr
 #    else:
@@ -106,5 +106,43 @@ def save_viz_table(data,cols):
         return  csvstr
 
 ########################################
+
+@app.callback(
+    [Output('executions-table', 'columns'),
+    Output('executions-table', 'data')],
+    [        Input('loading-logtext', 'children'),
+             Input('load-executions-table-button','n_clicks')],   #dash table does not load nicely on initial load
+    )
+def update_executions_table( loadlog, dummybutton):
+    ctx = dash.callback_context
+    trigger = ctx.triggered[0]['prop_id'].split('.')[0]
+    if ctx.triggered:
+        if glob.testexecutions.empty:
+            return [{'id': 'dummy', 'name': 'dummy'}], [{'dummy': ''}]
+            # CSS: if the above code between [] [] is  left-out, the table will not rendered at first hit of load button
+        else:
+            # via loadlog. this gets updated via the load graph button
+            cols= [{'id': c, 'name': c} for c in  glob.testexecutions.columns]
+            data= glob.testexecutions.to_dict("rows")
+            return cols, data#, csvstr
+
+
+########################################
+@app.callback(
+    Output('save-testexecutions-settings', 'href'),
+    [Input( 'executions-table','derived_virtual_data')],
+    [State( 'executions-table','columns')])
+
+def save_viz_table(data,cols):
+    if data!=None:
+        pdcol= [i['id'] for i in cols]
+        glob.dfdisplayprops=pd.DataFrame(data,columns = pdcol)
+        csvstr = glob.dfdisplayprops.to_csv(index=False,encoding='utf-8',sep = ';')
+        csvstr = "data:text/csv;charset=utf-8," + urllib.parse.quote(csvstr)
+        return  csvstr
+
+########################################
+
+
 
 

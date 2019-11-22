@@ -27,6 +27,7 @@ import dash_cytoscape as cyto
 import sys
 import os
 import utils.globals as glob
+import utils.utlis as tu
 print('dash components version: ', dash_core_components.__version__)
 
 glob.scriptfolder=os.path.realpath(__file__)[:(len(os.path.realpath(__file__))-len(os.path.basename(__file__)))]
@@ -47,6 +48,9 @@ import callbacks.callbacks_LoadGraph
 import callbacks.callbacks_VisualTuning
 import callbacks.callbacks_Oracles
 import callbacks.callbacks_Cyto
+import callbacks.callbacks_Cytolegenda
+import callbacks.callbacks_BaseLine_Oracles
+import callbacks.callbacks_SelectedData
 
 port=8050;
 if len(sys.argv) == 1 or (len(sys.argv) >1 and sys.argv[1]!='--port'):
@@ -78,7 +82,7 @@ elif (len(sys.argv) >1 and sys.argv[1]=='--port'):
 
 
 
-
+tu.clearassetsfolder()
 if __name__ == '__main__':
     app.title = 'TESTAR Temporal Visualizer'
     app.run_server(port=port, debug=False)

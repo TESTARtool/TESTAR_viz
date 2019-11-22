@@ -15,7 +15,7 @@ from appy import app
 import utils.globals as glob
 import utils.utlis as utils
 import networkx as nx
-import utils.graph as tg
+import Scratch.graph as tg
 import utils.utlis as tu
 ##############################################
 

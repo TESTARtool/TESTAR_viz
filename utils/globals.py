@@ -9,10 +9,7 @@ import pandas as pd
 import networkx as nx
 import os
 grh = nx.DiGraph()
-grhsub = nx.DiGraph()
 elements = []
-dfmijn = pd.DataFrame()
-dfmijne = pd.DataFrame()
 initialselectednodeslist=[]
 nodetable = dict()
 edgetable = dict()
@@ -30,28 +27,36 @@ resultsfile = ''
 visualstylefile= ''
 
 graphmlfile = os.path.join(assetfolder+outputfolder,'GraphML.xml')
-subgraphmlfile=os.path.join(assetfolder+outputfolder,'subgraphml.xml')
 default_nodeelement='labelV'
 default_edgeelement='labelE'
 elementtype = 'node/edge'
 elementsubtype ='subtype'
 elementimgurl ='imgurl'
-imgfiletemplate ='testarscreenshot_node_'
+elementwithmetadata = 'AbstractStateModel'
+imgfiletemplate ='screenshot_of_node_'
 imgfileextension ='.png'
-image_directory = '.'
 static_image_route ='/xxx/'   # '/static/'  #
 
 label_nodeelement=default_nodeelement
 label_edgeelement=default_edgeelement
-default_subtypeelement ='-Default-'
-referencezoom=-1
+#default_subtypeelement ='-Default-'
+parent_subtypeelement ='-ParentNode-'
+
 dfattributes=pd.DataFrame()
 dforacles=pd.DataFrame()
+dfbaselineoracles=pd.DataFrame()
 dfdisplayprops=pd.DataFrame()
+nodeonselectmultiplier=3
+edgeonselectmultiplier=3
+sortedsequencetuples=[]
+sortedsequenceids=[]
+elementcreationdistri=[]
+testexecutions=pd.DataFrame()
 nodedisplayprop={
                 'hide':0,
-                'toggle_children' : 0,
-                'toggle_decendants' :0,
+                'hide_conditionally':'',
+                #'toggle_children' : 0,
+                #'toggle_decendants' :0,
                 'label':'nodeid',
                 'label_fontsize' : 14,
                 'shape' :'rectangle',
@@ -62,24 +67,37 @@ nodedisplayprop={
                  #' image-source': 'infer|in|isAbstractedBy',
                 'border-width' : 1,
                 'border-color' : 'black',
+                'border-style' :'solid',
                 'color' : 'grey',
                 'color_if_deadstate' : 'purple',
                 'shape_if_deadstate': 'octagon',
-                # 'NA_parentnode':'Concretelayer',
-                # 'NA_grantparentnode': '',
-                # 'NA_color_if_intrace': 'yellow',
-                # 'NA_on_hover_color' : 'teal',
-                # 'NA_on_hover_color_neighbor' : 0,
-                # 'NA_on_select_color_neighbors' : 0,
-                # 'NA_color_if_neighbor' : 'blue',
-                # 'NA_action_on_select' : 'NA',
-                # 'NA_action_on_hover': 'NA'
+                'opacity': 1
+                }
+parentnodedisplayprop={
+                'hide':0,
+                'hide_conditionally': '',
+                #'toggle_children' : 0,
+                #'toggle_decendants' :0,
+                'label':'nodeid',
+                'label_fontsize' : 18,
+                'shape' :'rectangle',
+                'width': 30,
+                'height': 30,
+                'image-source': '',
+                 #'image-source': 'infer|out|Accessed',
+                 #' image-source': 'infer|in|isAbstractedBy',
+                'border-width' : 2,
+                'border-color' : 'black',
+                'color' : 'wheat',
+                'color_if_deadstate' : '',
+                'shape_if_deadstate': ''
                 }
 edgedisplayprop={
                 'hide':0,
+                'hide_conditionally': '',
                 'label':'',
-                'label_fontsize' : 8,
-                'midshape' :'rectangle',
+                'label_fontsize' : 10,
+                'label-onselect': 'Desc',
                 'arrow-shape' : 'vee',
                 'arrow-scale' : 1,
                 'arrow-color' : 'blue',
@@ -88,11 +106,6 @@ edgedisplayprop={
                 'edgestyle' : 'bezier',
                 'edgefill' : 'solid',
                 'color' : 'grey',
-                # 'NA_color_if_partoftrace': 'yellow',
-                # 'NA_on_hover_color' : 'teal',
-                # 'NA_on_hover_color_neighbor' : 0,
-                # 'NA_on_select_color_neighbors' : 0,
-                # 'NA_color_if_neighbor' : 'blue',
-                # 'NA_action_on_select' : 'NA',
-                # 'NA_action_on_hover': 'NA'
+                'opacity': 1
+
                 }

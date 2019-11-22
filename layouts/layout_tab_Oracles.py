@@ -23,7 +23,7 @@ import dash_html_components as html
 #**************************
 oracles = html.Div([
             html.Div([
-            html.A(id='collapse-oracle-link',children='Collapse/Expand Oracle table:', n_clicks=0,n_clicks_timestamp=0, href="javascript:toggle1(document.getElementById('oracle-area'))" ),
+            html.A(id='collapse-oracle-link',children='Collapse/Expand Oracle table:', n_clicks=0,n_clicks_timestamp=0,style = {'font-size': 12}, href="javascript:toggle1(document.getElementById('oracle-area'))" ),
             html.Div(id='oracle-area',children=[
             html.P(),
 
@@ -35,12 +35,11 @@ oracles = html.Div([
                        multiple=False
                        ),
                     style={'display': 'inline-block'}),
-            html.A(html.Button(id='save-oracles-to-file-button', n_clicks=0, n_clicks_timestamp=0,children='Save to File'),   id='save-oracles',
-                download="testar-visually-checked-oracles.csv",
-                href="",
-                target="_blank", style={'display': 'inline-block'}
-            ),
-            #html.Button(id='show-selected-oracle-button', n_clicks=0,n_clicks_timestamp=0, children='Show Selected Path', style={'display': 'inline-block'}),
+
+            html.Button(id='apply-oracle_style-button', n_clicks=0, n_clicks_timestamp=0, children='Apply Style',
+                            style={'display': 'inline-block'}),
+
+                #html.Button(id='show-selected-oracle-button', n_clicks=0,n_clicks_timestamp=0, children='Show Selected Path', style={'display': 'inline-block'}),
             dcc.Loading(
                     id="loading-oracletable",
                     children=[
@@ -51,10 +50,14 @@ oracles = html.Div([
                             columns=[],
                             data=[],
                             fixed_rows={ 'headers': True, 'data': 0 },
-                            #fixed_columns={'headers': True, 'data': 2},# n_fixed_columns=2,
-                            #row_selectable='multi',
+                            #fixed_columns={'headers': True, 'data': 0},# n_fixed_columns=2,
+                            row_selectable='multi',
                             selected_rows=[],
-                            style_cell={ 'overflow': 'hidden','textOverflow': 'ellipsis',
+                            # style_cell={ 'overflow': 'hidden','textOverflow': 'ellipsis',
+                            #             'minWidth': '30px',  #'width': '125px','maxWidth': '170px',
+                            #            'whiteSpace': 'nowrap'
+                            #            },
+                            style_cell={
                                         'minWidth': '30px',  #'width': '125px','maxWidth': '170px',
                                        'whiteSpace': 'nowrap'
                                        },
@@ -72,12 +75,71 @@ oracles = html.Div([
                             ),
                         ],
                     type="circle", 
-                    style={ 'font-size': '12','width':'100%'},
+                    style={ 'font-size': '10','width':'100%'},
             ),
 
-            ])
+            ],style={'display': 'none'})
                 ], style={'border-width': '1','border-color':'grey','border-style': 'dashed','width': '100%'}),
                        
-            ], style={ 'font-size': '12'})
-  
-#######################################################
+#             ], style={ 'font-size': '10'})
+#
+# #######################################################
+#
+# baselineoracles = html.Div([
+            html.Div([
+            html.A(id='collapse-baseline-oracle-link', children='Collapse/Expand Base Line Oracle table:', n_clicks=0,
+                   n_clicks_timestamp=0, style = {'font-size': 12},href="javascript:toggle1(document.getElementById('baseline-oracle-area'))"),
+            html.Div(id='baseline-oracle-area', children=[
+                html.P(),
+
+                html.A(dcc.Upload(id='upload-baseline-oracles-from-file',
+                                  children=html.Button(id='upload-button-baseline-oracles-file', n_clicks=0,
+                                                       children='Load BaseLine Oracles File'),
+                                  accept='.csv',
+                                  contents=None,
+                                  multiple=False
+                                  ),
+                       style={'display': 'inline-block'}),
+                html.Button(id='apply-baseline-oracle_style-button', n_clicks=0, n_clicks_timestamp=0,
+                            children='Apply Style',
+                            style={'display': 'inline-block'}),
+
+                # html.Button(id='show-selected-oracle-button', n_clicks=0,n_clicks_timestamp=0, children='Show Selected Path', style={'display': 'inline-block'}),
+                dcc.Loading(
+                    id="loading-baseline-oracletable",
+                    children=[
+                        dt.DataTable(
+                            # fixed columns conflicts in width of of table
+                            id='baseline-oracletable',
+                            style_table={'overflowX': 'scroll', 'width': '100%', 'maxHeight': '150'},
+                            columns=[],
+                            data=[],
+                            fixed_rows={'headers': True, 'data': 0},
+                            # fixed_columns={'headers': True, 'data': 2},# n_fixed_columns=2,
+                            row_selectable='multi',
+                            selected_rows=[],
+                            style_cell={'overflow': 'hidden', 'textOverflow': 'ellipsis',
+                                        'minWidth': '30px',  # 'width': '125px','maxWidth': '170px',
+                                        'whiteSpace': 'nowrap'
+                                        },
+                            style_data_conditional=[
+                                {
+                                    'if': {'row_index': 'odd'},
+                                    'backgroundColor': 'AliceBlue'
+                                }],
+                            editable=True,
+                            filter_action='native',
+                            sort_action='native',
+                            sort_mode="multi",
+                            virtualization=True,
+                            page_action='none'
+                        ),
+                    ],
+                    type="circle",
+                    style={'font-size': '10', 'width': '100%'},
+                ),
+
+            ], style={'display': 'none'})
+                ], style={'border-width': '1', 'border-color': 'grey', 'border-style': 'dashed', 'width': '100%'}),
+
+            ], style={'font-size': '10'})

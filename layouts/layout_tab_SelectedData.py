@@ -14,6 +14,12 @@ import dash_html_components as html
 selectedData = html.Div([
     html.Div([
         html.P(id='selectednodes', children='selected nodes:'),
+        html.A(html.Button(id='save-selected-nodedata-to-file-button', n_clicks=0, n_clicks_timestamp=0,
+                           children='Save to File'), id='save-nodedata',
+               download="testar-selected-node-data.csv",
+               href="",
+               target="_blank", style={'display': 'inline-block'}
+               ),
         dt.DataTable(
             id='selectednodetable',
             #style_table={'overflowX': 'scroll', 'width': 1200},
@@ -41,6 +47,12 @@ selectedData = html.Div([
 
         html.P(id='selectededges', children='selected edges:'),
         html.Div([
+            html.A(html.Button(id='save-selected-edgedata-to-file-button', n_clicks=0, n_clicks_timestamp=0,
+                               children='Save to File'), id='save-edgedata',
+                   download="testar-selected-edge-data.csv",
+                   href="",
+                   target="_blank", style={'display': 'inline-block'}
+                   ),
             dt.DataTable(
                 id='selectededgetable',
                 #style_table={'overflowX': 'scroll', 'width': 1200},

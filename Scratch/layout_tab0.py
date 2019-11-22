@@ -101,7 +101,7 @@ tab0 =   html.Div([
                                     dcc.Input(
                                     id='nodetypelabel', 
                                     type='text', 
-                                    value='labelV',
+                                    value='glob.label_nodeelement',
                                     style= {'width':'300'},
                                     )
                                 ]),
@@ -112,7 +112,7 @@ tab0 =   html.Div([
                                     dcc.Input(
                                     id='edgetypelabel', 
                                     type='text', 
-                                    value='labelE',
+                                    value='glob.label_edgeelement',
                                     style= {'width':'300'},
                                     )
                                 ]),
