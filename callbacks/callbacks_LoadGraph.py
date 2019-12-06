@@ -8,13 +8,10 @@ Created on Wed Apr  3 18:27:03 2019
 import base64
 import os
 import sys
-import dash
+
 from dash.dependencies import Input, Output,State
-import dash_core_components as dcc
 from appy import app
 import utils.globals as glob
-import utils.utlis as utils
-import networkx as nx
 import utils.utlis as tu
 ##############################################
 

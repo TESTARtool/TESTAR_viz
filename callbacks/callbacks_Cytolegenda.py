@@ -7,12 +7,8 @@ Created on Wed Apr  3 18:27:03 2019
 """
 import dash
 from dash.dependencies import Input, Output,State
-import dash_html_components as html
-
 from appy import app
 import utils.globals as glob
-import utils.utlis as tu
-import callbacks.callback_helpers as ch
 
 ##############################################
 #cyto

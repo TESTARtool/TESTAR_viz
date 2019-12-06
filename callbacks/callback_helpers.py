@@ -112,6 +112,7 @@ def updateCytoStyleSheet(button, selectedoracles, oracledata, selectedbaselineor
                  'opacity': row['opacity'],
                  'line-color': row['color'],
                  'curve-style': row['edgestyle'],
+                 #'control-point-step-size': 25,
                  'line-style': row['edgefill'],
                  'text-rotation':'autorotate',
                  'text-margin-y' : -5,
@@ -195,39 +196,40 @@ def updateCytoStyleSheet(button, selectedoracles, oracledata, selectedbaselineor
 #######  oracles
 ###### baseline oracles
     selectedbaselinerows=selectedbaselineoracles
-    if not (baselineoracledata is None) and len(baselineoracledata) > 0 and len(selectedbaselinerows) > 0:
-        rowsdata = [baselineoracledata[i] for i in range(len(baselineoracledata)) if i in selectedbaselinerows]
-        prefixcolor = ''
-        cyclecolor = ''
-        i = -1
-        for r in baselineoracledata:
-            i = i + 1
-            if i in selectedbaselinerows:
-                # piggyback the oracle table stylesheet
+    if not(baselineoracledata is None):
+        if len(baselineoracledata) > 0 and len(selectedbaselinerows) > 0:
+            rowsdata = [baselineoracledata[i] for i in range(len(baselineoracledata)) if i in selectedbaselinerows]
+            prefixcolor = ''
+            cyclecolor = ''
+            i = -1
+            for r in baselineoracledata:
+                i = i + 1
+                if i in selectedbaselinerows:
+                    # piggyback the oracle table stylesheet
 
-                if r['ORACLE_VERDICT'] == 'FAIL':
-                    prefixcolor = 'plum'
-                    cyclecolor = 'deeppink'
-                    baselineoracleconditionalstyle.append({
-                        "if": {"row_index": i},
-                        "backgroundColor": "red",
-                        'color': 'white'})
+                    if r['ORACLE_VERDICT'] == 'FAIL':
+                        prefixcolor = 'plum'
+                        cyclecolor = 'deeppink'
+                        baselineoracleconditionalstyle.append({
+                            "if": {"row_index": i},
+                            "backgroundColor": "red",
+                            'color': 'white'})
 
-                elif r['ORACLE_VERDICT'] == 'PASS':
-                    prefixcolor = 'gold'
-                    cyclecolor = 'goldenrod'
-                    baselineoracleconditionalstyle.append({
-                        "if": {"row_index": i},
-                        "backgroundColor": "green",
-                        'color': 'white'})
-                stylepropdict = {'border-width': 2, 'border-color': cyclecolor , 'border-style': 'dashed'}
-                stylesheet.extend(updatestyleoftrace(r['EXAMPLERUN_CYCLE_STATES'], 'node', stylepropdict))
-                stylepropdict = {'border-width': 2, 'border-color': prefixcolor, 'border-style': 'dashed' }
-                stylesheet.extend(updatestyleoftrace(r['EXAMPLERUN_PREFIX_STATES'], 'node', stylepropdict))
-                stylepropdict = {'width': 4, 'line-style':'dashed',  'mid-target-arrow-color': cyclecolor}
-                stylesheet.extend(updatestyleoftrace(r['EXAMPLERUN_CYCLE_TRANSITIONS'], 'edge', stylepropdict))
-                stylepropdict = {'width': 4,  'line-style':'dashed', 'mid-target-arrow-color': prefixcolor}
-                stylesheet.extend(updatestyleoftrace(r['EXAMPLERUN_PREFIX_TRANSITIONS'], 'edge', stylepropdict))
+                    elif r['ORACLE_VERDICT'] == 'PASS':
+                        prefixcolor = 'gold'
+                        cyclecolor = 'goldenrod'
+                        baselineoracleconditionalstyle.append({
+                            "if": {"row_index": i},
+                            "backgroundColor": "green",
+                            'color': 'white'})
+                    stylepropdict = {'border-width': 2, 'border-color': cyclecolor , 'border-style': 'dashed'}
+                    stylesheet.extend(updatestyleoftrace(r['EXAMPLERUN_CYCLE_STATES'], 'node', stylepropdict))
+                    stylepropdict = {'border-width': 2, 'border-color': prefixcolor, 'border-style': 'dashed' }
+                    stylesheet.extend(updatestyleoftrace(r['EXAMPLERUN_PREFIX_STATES'], 'node', stylepropdict))
+                    stylepropdict = {'width': 4, 'line-style':'dashed',  'mid-target-arrow-color': cyclecolor}
+                    stylesheet.extend(updatestyleoftrace(r['EXAMPLERUN_CYCLE_TRANSITIONS'], 'edge', stylepropdict))
+                    stylepropdict = {'width': 4,  'line-style':'dashed', 'mid-target-arrow-color': prefixcolor}
+                    stylesheet.extend(updatestyleoftrace(r['EXAMPLERUN_PREFIX_TRANSITIONS'], 'edge', stylepropdict))
 ###### baseline oracles
         # else: no special handling for display oracles
 

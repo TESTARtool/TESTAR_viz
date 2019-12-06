@@ -22,18 +22,31 @@ This example is partial based on the script from https://dash.plot.ly/cytoscape/
 
 from appy import app
 
-import dash_core_components
+from dash import __version__ as dashversion
+from networkx import __version__ as networkxversion
+from pandas import __version__ as pandasversion
 import dash_cytoscape as cyto
 import sys
 import os
 import utils.globals as glob
 import utils.utlis as tu
-print('dash components version: ', dash_core_components.__version__)
-
-glob.scriptfolder=os.path.realpath(__file__)[:(len(os.path.realpath(__file__))-len(os.path.basename(__file__)))]
-print('scriptfolder : ',glob.scriptfolder)
-os.chdir(glob.scriptfolder)
+import platform
 from layouts.layout import testarlayout
+
+print('************  TESTAR graph visualizer properties  ************')
+print('python version:',platform.python_version())
+print ('script version:',glob.version)
+
+glob.scriptfolder = os.path.realpath(__file__)[:(len(os.path.realpath(__file__))-len(os.path.basename(__file__)))]
+print('scriptfolder : ',glob.scriptfolder)
+print('dash package version: ', dashversion)
+print('dash cytoscape package version: ', cyto.__version__)
+print('networkx package version: ', networkxversion)
+print('pandas package version: ', pandasversion)
+print('************  TESTAR graph visualizer  Starts now  ************')
+
+
+os.chdir(glob.scriptfolder)
 
 app.layout = testarlayout
 app.config['suppress_callback_exceptions'] = True
@@ -52,36 +65,36 @@ import callbacks.callbacks_Cytolegenda
 import callbacks.callbacks_BaseLine_Oracles
 import callbacks.callbacks_SelectedData
 
-port=8050;
+
 if len(sys.argv) == 1 or (len(sys.argv) >1 and sys.argv[1]!='--port'):
-    port = 8050
-    if len(sys.argv) == 3 and sys.argv[1] != '--model':
-            glob.modelfile = sys.argv[2]
-    elif len(sys.argv) == 5 and sys.argv[1] != '--model' and sys.argv[3] != '--oracles':
-        glob.modelfile = sys.argv[2]
-        glob.oraclesfile = sys.argv[4]
-    elif len(sys.argv) == 7 and sys.argv[1] != '--model' and \
-            sys.argv[3] != '--oracles' and sys.argv[5] != '--results':
-        glob.modelfile = sys.argv[2]
-        glob.oraclesfile = sys.argv[4]
-        glob.resultsfile = sys.argv[6]
+    port=glob.port
+    # if len(sys.argv) == 3 and sys.argv[1] != '--model':
+    #         glob.modelfile = sys.argv[2]
+    # elif len(sys.argv) == 5 and sys.argv[1] != '--model' and sys.argv[3] != '--oracles':
+    #     glob.modelfile = sys.argv[2]
+    #     glob.oraclesfile = sys.argv[4]
+    # elif len(sys.argv) == 7 and sys.argv[1] != '--model' and \
+    #         sys.argv[3] != '--oracles' and sys.argv[5] != '--results':
+    #     glob.modelfile = sys.argv[2]
+    #     glob.oraclesfile = sys.argv[4]
+    #     glob.resultsfile = sys.argv[6]
 elif (len(sys.argv) >1 and sys.argv[1]=='--port'):
     port=int(sys.argv[2])
-    if len(sys.argv) == 5 and sys.argv[3] != '--model':
-        glob.modelfile = sys.argv[4]
-    elif len(sys.argv) == 7 and sys.argv[3] != '--model' and sys.argv[5] != '--oracles':
-        glob.modelfile = sys.argv[4]
-        glob.oraclesfile = sys.argv[6]
-    elif len(sys.argv) == 9 and sys.argv[3] != '--model' \
-            and sys.argv[5] != '--oracles' and sys.argv[7] != '--results':
-        glob.modelfile = sys.argv[4]
-        glob.oraclesfile = sys.argv[6]
-        glob.resultsfile = sys.argv[8]
+    # if len(sys.argv) == 5 and sys.argv[3] != '--model':
+    #     glob.modelfile = sys.argv[4]
+    # elif len(sys.argv) == 7 and sys.argv[3] != '--model' and sys.argv[5] != '--oracles':
+    #     glob.modelfile = sys.argv[4]
+    #     glob.oraclesfile = sys.argv[6]
+    # elif len(sys.argv) == 9 and sys.argv[3] != '--model' \
+    #         and sys.argv[5] != '--oracles' and sys.argv[7] != '--results':
+    #     glob.modelfile = sys.argv[4]
+    #     glob.oraclesfile = sys.argv[6]
+    #     glob.resultsfile = sys.argv[8]
 
 # if len(sys.argv) == 2: # not a valid scenario
 
 
-
+print ('use commandline option --port to run an instance other than',port)
 tu.clearassetsfolder()
 if __name__ == '__main__':
     app.title = 'TESTAR Temporal Visualizer'

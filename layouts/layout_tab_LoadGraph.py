@@ -22,7 +22,7 @@ import dash_core_components as dcc
 import dash_html_components as html
 
 # **************************
-import dash_resumable_upload
+#import dash_resumable_upload
 
 loadGraph = html.Div([
                 html.A(id='collapse-loading-link', children='Collapse/Expand Graph Properties:', n_clicks=0,

@@ -5,16 +5,12 @@ Created on Wed Apr  3 18:27:03 2019
 
 @author: cseng
 """
-import base64
 
 import urllib
 import pandas as pd
-import dash
 from dash.dependencies import Input, Output,State
 from appy import app
 import utils.globals as glob
-import utils.utlis as utils
-import networkx as nx
 ##############################################
 
 

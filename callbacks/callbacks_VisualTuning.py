@@ -14,7 +14,6 @@ from dash.dependencies import Input, Output,State
 from appy import app
 import utils.globals as glob
 import utils.utlis as utils
-import networkx as nx
 ##############################################
 
 

@@ -8,16 +8,8 @@ Created on Wed Apr  3 18:27:03 2019
 
 import flask
 from appy import app
-import utils.globals as glob
-import os
-##############################################
-
-
-
-
-
 from flask import request
-
+##############################################
 
 def shutdown_server():
     func = request.environ.get('werkzeug.server.shutdown')

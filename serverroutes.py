@@ -9,16 +9,15 @@ Created on Wed Apr  3 18:27:03 2019
 from flask import render_template, Blueprint, request, make_response, send_from_directory
 from appy import app
 import utils.globals as glob
-import utils.utlis as tu
 import logging
 import os
-
+#supply the dropzone layout
 @app.server.route('/large-upload')
 def index():
     # Route to serve the upload form
     return send_from_directory('assets', 'large-upload.html')
 
-
+#process the dropzone request
 @app.server.route('/large-file-upload', methods=['POST'])
 def uploadlarge():
     file = request.files['file']

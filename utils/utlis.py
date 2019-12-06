@@ -76,11 +76,8 @@ def processgraphmlfile(details=True):
                     if d1['createdby_sequenceid'] == tup[0]:
                         createdbylist.append(n1)
         edgecount = len(createdbylist)
-
-        #glob.edgecreationdistri.update({tup[0]: {'actionsperformed': count, 'startDateTime': tup[1],'nrofteststeps':tup[2]}})
         glob.elementcreationdistri.append({'sequenceId':tup[0], 'startDateTime': tup[1],'statescreated':nodecount, 'actionsperformed': edgecount, 'nrofteststeps': tup[2]})
-    print('distribution concreteitems_created per sequence:', glob.elementcreationdistri)
-    #print('distribution concreteaction_created/sequence:', glob.edgecreationdistri)
+
     glob.testexecutions=pd.DataFrame(glob.elementcreationdistri)
 
     masterlog={}
@@ -130,11 +127,10 @@ def clearassetsfolder():
     try:
         # Create target Directory
         os.mkdir(fldr)
-        print("Directory ", fldr, " Created ")
     except FileExistsError:
-        print("Directory ", fldr, " exists")
+        pass
 
-    print('deleting old content from folder: ',fldr)
+    print('deleting old content (.png, .xml, .csv) from folder: ',fldr)
     for filename in os.listdir(fldr):
         try:
             if filename.endswith('.png') or filename.endswith('.xml') or filename.endswith('.csv') :
@@ -172,8 +168,7 @@ def savescreenshottodisk(n, eldict, usecache=False):
 # with format <#00:00><[<byte>,<byte>,...]><v1>
 #action: extract the substring [...], split at the separator, convert the list to a bytelist
 # save the bytelist as bytearray and voila, there is the deserialized png
-
-		#alternative found=(grh.nodes[n][image_element].split("["))[1].split("]")[0]
+#alternative found=(grh.nodes[n][image_element].split("["))[1].split("]")[0]
     fname='_no_image_for_'+n
     try:
 

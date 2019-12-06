@@ -136,13 +136,11 @@ def update_selectednodestabletest(selnodes):
         screens = []
         for c in selnodes:
             fname = glob.outputfolder + tu.imagefilename(c['id'])
-            if os.path.exists(glob.scriptfolder + glob.assetfolder + fname):
-                screens.append(html.P(children='Screenprint of node: ' + c['id']))
-                screens.append(
-                    html.Img(id='screenimage' + c['id'], style={'max-height': '600px', 'display': 'inline-block'},
-                             src=app.get_asset_url(fname)))
-            else:
-                screens.append(html.P(children='No Screenprint of node: ' + c['id']))
+            screens.append(html.P(children='Screenprint of node: ' + c['id']))
+            imgname = fname if  os.path.exists(glob.scriptfolder + glob.assetfolder + fname) else glob.no_image_file
+            screens.append(
+                html.Img(id='screenimage' + c['id'], style={'max-height': '600px', 'display': 'inline-block'},
+                             src=app.get_asset_url(imgname)))
         return cols, data,screens
     else:
         return [],[],[]
