@@ -320,8 +320,8 @@ def updateCytoStyleSheet(button, selectedoracles, oracledata, selectedbaselineor
     #######  testexecutions
 
     ### experiment
-   # if 'Longest shortest path' in advancedtraces:
-    if True:
+    if ('Longest shortest path' in advancedtraces):
+        #if True:
         subgraph = tu.updatesubgraph(layerview)  # calculate only over visible layes
         traces = glob.sortedsequencetuples  # concreteStateId
         initialnodes = [initialnode for id, daterun, length, initialnode in traces]
