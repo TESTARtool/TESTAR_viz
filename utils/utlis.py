@@ -33,15 +33,35 @@ def processgraphmlfile(details=True):
     glob.grh = nx.read_graphml(glob.graphmlfile)
     ######## part 1
     sequencetuples = []
+    # testsequence_nodes = {n: d for n, d in glob.grh.nodes(data=True) if d[glob.label_nodeelement] == 'TestSequence'}
+    # for n, d in testsequence_nodes.items():
+    #     date_time_obj = dateutil.parser.parse(d['startDateTime'],ignoretz=True)  # date_time_str='Wed Nov 13 18:56:29 CET 2019'
+    #     # date_time_obj=datetime.datetime.strptime(d['startDateTime'],'%a %b %d %H:%M:%S CET %Y')#fragile
+    #     ts = [tn for tn, tndict in glob.grh.nodes(data=True) if tndict[glob.label_nodeelement] == 'SequenceNode' and tndict['sequenceId'] == d['sequenceId']]
+    #     testlength=len(ts)-1 # substrct testsequencenode
+    #     sequencetuples.append((d['sequenceId'], date_time_obj,testlength))
+    # glob.sortedsequencetuples = sorted(sequencetuples, key=lambda x: x[1])
+    # glob.sortedsequenceids = [s for s, d,l in glob.sortedsequencetuples]
+
+
     testsequence_nodes = {n: d for n, d in glob.grh.nodes(data=True) if d[glob.label_nodeelement] == 'TestSequence'}
     for n, d in testsequence_nodes.items():
         date_time_obj = dateutil.parser.parse(d['startDateTime'],ignoretz=True)  # date_time_str='Wed Nov 13 18:56:29 CET 2019'
         # date_time_obj=datetime.datetime.strptime(d['startDateTime'],'%a %b %d %H:%M:%S CET %Y')#fragile
-        ts = [tn for tn, tndict in glob.grh.nodes(data=True) if tndict[glob.label_nodeelement] == 'SequenceNode' and tndict['sequenceId'] == d['sequenceId']]
-        testlength=len(ts)-1 # substrct testsequencenode
-        sequencetuples.append((d['sequenceId'], date_time_obj,testlength))
+        i=0
+        initialnode=''
+        for tn, tndict in glob.grh.nodes(data=True):
+            if tndict[glob.label_nodeelement] == 'SequenceNode' and tndict['sequenceId'] == d['sequenceId']:
+                i=i+1
+                if i==1:
+                    initialnode = [x for x, y in glob.grh.nodes(data=True) if y[glob.label_nodeelement] == 'ConcreteState' and y['ConcreteIDCustom']==tndict['concreteStateId'] ]
+        testlength=i # len(ts)-1 # substrct testsequencenode
+        sequencetuples.append((d['sequenceId'], date_time_obj,testlength,initialnode[0]))
     glob.sortedsequencetuples = sorted(sequencetuples, key=lambda x: x[1])
-    glob.sortedsequenceids = [s for s, d,l in glob.sortedsequencetuples]
+    glob.sortedsequenceids = [s for s, d,l,i in glob.sortedsequencetuples]
+
+
+
 
     for n, ndict in glob.grh.nodes(data=True):
         if ndict[glob.label_nodeelement] == 'ConcreteState':
@@ -76,7 +96,10 @@ def processgraphmlfile(details=True):
                     if d1['createdby_sequenceid'] == tup[0]:
                         createdbylist.append(n1)
         edgecount = len(createdbylist)
-        glob.elementcreationdistri.append({'sequenceId':tup[0], 'startDateTime': tup[1],'statescreated':nodecount, 'actionsperformed': edgecount, 'nrofteststeps': tup[2]})
+        glob.elementcreationdistri.append({'sequenceId':tup[0], 'startDateTime': tup[1],'statescreated':nodecount, 'initialNode':tup[3],'actionsperformed': edgecount, 'nrofteststeps': tup[2]})
+
+
+
 
     glob.testexecutions=pd.DataFrame(glob.elementcreationdistri)
 
@@ -117,6 +140,42 @@ def processgraphmlfile(details=True):
     #ch.updateCytoStyleSheet(0, None, None)  # discard the return values
     return masterlog
 
+
+def updatesubgraph(layerview):
+    grh_copy = glob.grh.copy()
+
+    removenodelist = []
+    if not 'Abstract' in layerview:
+        removenodelist = [n for n, v in glob.grh.nodes(data=True) if
+                          v[glob.label_nodeelement] == 'AbstractState' or v[
+                              glob.label_nodeelement] == 'AbstractStateModel']
+        grh_copy.remove_nodes_from(removenodelist)
+    if not 'Incl Blackhole' in layerview:
+        removenodelist = [n for n, v in glob.grh.nodes(data=True) if v[glob.label_nodeelement] == 'BlackHole']
+        grh_copy.remove_nodes_from(removenodelist)
+
+    if not 'Widget' in layerview:
+        removenodelist = [n for n, v in glob.grh.nodes(data=True) if v[glob.label_nodeelement] == 'Widget']
+        grh_copy.remove_nodes_from(removenodelist)
+
+    if not 'Concrete' in layerview:
+        removenodelist = [n for n, v in glob.grh.nodes(data=True) if v[glob.label_nodeelement] == 'ConcreteState']
+        grh_copy.remove_nodes_from(removenodelist)
+
+    if not 'Test Executions' in layerview:
+        # removeedgelist = [(s,t) for s,t,n, v in glob.grh.edges(data=True,keys=True) if v['glob.label_edgeelement'] == 'Accessed']
+        # tmpgrh.remove_edges_from(removeedgelist)
+        removenodelist = [n for n, v in glob.grh.nodes(data=True) if
+                          (v[glob.label_nodeelement] == 'SequenceNode' or v[
+                              glob.label_nodeelement] == 'TestSequence')]
+        grh_copy.remove_nodes_from(removenodelist)
+
+    else:
+        pass  # subgraph = 'all' # tmpgrh=glob.grh.copy
+    return grh_copy
+
+
+#xxxxxxxxxxxxxx8888888888888888888888888888888888
 def imagefilename(s =""):
      return glob.imgfiletemplate+s.replace(':','.').replace('#','_')+glob.imgfileextension #do not change!!
 

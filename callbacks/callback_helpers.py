@@ -1,5 +1,7 @@
+import networkx as nx
+import utils.utlis as tu
 import utils.globals as glob
-def updateCytoStyleSheet(button, selectedoracles, oracledata, selectedbaselineoracles, baselineoracledata,selectedexecutions, executionsdata ): #,currentcondstyle):
+def updateCytoStyleSheet(button, selectedoracles, oracledata, selectedbaselineoracles, baselineoracledata,selectedexecutions, executionsdata,layerview ): #,currentcondstyle):
     stylesheet = []
     oracleconditionalstyle = [{
           'if': {'row_index': 'odd'},
@@ -11,8 +13,6 @@ def updateCytoStyleSheet(button, selectedoracles, oracledata, selectedbaselineor
     executionstyle = [{
         'if': {'row_index': 'odd'},
         'backgroundColor': 'AliceBlue'}]  # a comma <,> at the end of this line cost me a day
-
-
 
 
     data = glob.dfdisplayprops.to_dict('records');
@@ -316,6 +316,39 @@ def updateCytoStyleSheet(button, selectedoracles, oracledata, selectedbaselineor
         tmpstyle.update(styledict)
         stylesheet.append(tmpstyle)
     #######  testexecutions
+
+    ### experiment
+    #    if 'Longest shortest path' in advancedtraces:
+    subgraph = tu.updatesubgraph(layerview)  # calculate only over visible layes
+    traces = glob.sortedsequencetuples  # concreteStateId
+    initialnodes = [initialnode for id, daterun, length, initialnode in traces]
+    for inode in initialnodes:
+        spdict = nx.shortest_path(glob.grh, inode)
+
+        lsplength = 0
+        longestshortestpath = []
+        targetnode = inode
+        for target, shortestpath in spdict.items():
+            if len(shortestpath) > lsplength:
+                lsplength = len(shortestpath)
+                longestshortestpath = shortestpath
+        # get the edges as well
+        csvlspsubsequentnodes = ''
+        csvlspfirstnode=longestshortestpath[0];
+        csvlsplastnode = longestshortestpath[len(longestshortestpath)-1];
+
+        for item in longestshortestpath:
+            if not(item == csvlspfirstnode or item==csvlsplastnode):
+                csvlspsubsequentnodes = csvlspsubsequentnodes + item + ';'
+        csvlspsubsequentnodes = csvlspsubsequentnodes[:-1]
+        print('longest path: ', csvlspfirstnode+';'+csvlspsubsequentnodes+';'+csvlsplastnode)
+        stylepropdict = {'border-width': 5, 'border-color': 'brown', 'background-color': 'yellow'}
+        stylesheet.extend(updatestyleoftrace(csvlspfirstnode, 'node', stylepropdict))
+        stylepropdict = {'border-width': 5, 'border-color': 'brown', 'background-color': 'white'}
+        stylesheet.extend(updatestyleoftrace(csvlspsubsequentnodes, 'node', stylepropdict))
+        stylepropdict = {'border-width': 5, 'border-color': 'brown', 'background-color': 'black'}
+        stylesheet.extend(updatestyleoftrace(csvlsplastnode, 'node', stylepropdict))
+    ### expiriment
 
     return  stylesheet ,oracleconditionalstyle,baselineoracleconditionalstyle
 
