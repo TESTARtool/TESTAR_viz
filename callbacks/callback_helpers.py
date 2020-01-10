@@ -336,22 +336,25 @@ def updateCytoStyleSheet(button, selectedoracles, oracledata, selectedbaselineor
                 if len(shortestpath) > lsplength:
                     lsplength = len(shortestpath)
                     longestshortestpath = shortestpath
-            # get the edges as well
-            csvlspsubsequentnodes = ''
-            csvlspfirstnode=longestshortestpath[0];
-            csvlsplastnode = longestshortestpath[len(longestshortestpath)-1];
 
-            for item in longestshortestpath:
-                if not(item == csvlspfirstnode or item==csvlsplastnode):
-                    csvlspsubsequentnodes = csvlspsubsequentnodes + item + ';'
-            csvlspsubsequentnodes = csvlspsubsequentnodes[:-1]
-            print('longest shortest path: ', csvlspfirstnode+';'+csvlspsubsequentnodes+';'+csvlsplastnode)
-            stylepropdict = {'border-width': 5, 'border-color': 'brown', 'background-color': 'yellow'}
-            stylesheet.extend(updatestyleoftrace(csvlspfirstnode, 'node', stylepropdict))
+            csvlspfirstnode=longestshortestpath[0]
+            csvlsplastnode = longestshortestpath[len(longestshortestpath)-1]
+            csvlspallnodes = ';'.join(longestshortestpath)
+            print('longest shortest path: ', csvlspallnodes)
+
             stylepropdict = {'border-width': 5, 'border-color': 'brown', 'background-color': 'white'}
-            stylesheet.extend(updatestyleoftrace(csvlspsubsequentnodes, 'node', stylepropdict))
-            stylepropdict = {'border-width': 5, 'border-color': 'brown', 'background-color': 'black'}
+            stylesheet.extend(updatestyleoftrace(csvlspallnodes, 'node', stylepropdict)) #default
+            stylepropdict = {'border-width': 5, 'border-color': 'yellow', 'background-color': 'yellow'}
+            stylesheet.extend(updatestyleoftrace(csvlspfirstnode, 'node', stylepropdict)) # after default, so prevails
+            stylepropdict = {'border-width': 5, 'border-color': 'black', 'background-color': 'black'}
             stylesheet.extend(updatestyleoftrace(csvlsplastnode, 'node', stylepropdict))
+            edgelist=[]
+            for i in range(len(longestshortestpath)-1):
+                e=subgraph.get_edge_data(longestshortestpath[i],longestshortestpath[i+1])
+                edgelist.append(list(e.keys())[0]) # just take the first
+            csvlspedges = ';'.join(edgelist)
+            stylepropdict = {'line-width': 5, 'mid-target-arrow-color': 'brown', 'arrow-scale': 2,'line-color': 'blue'}
+            stylesheet.extend(updatestyleoftrace(csvlspedges, 'edge', stylepropdict))
     ### expiriment
 
     return  stylesheet ,oracleconditionalstyle,baselineoracleconditionalstyle
