@@ -200,17 +200,17 @@ visualTuning = html.Div([
                     html.P('!! time consuming calculations !!!'),
                     dcc.Checklist(
                         id='checkbox-advancedproperties-options',
-                        value=[''],  # none per default
+                        value=[],  # none per default
                         style={'width': '250', 'color': 'black', 'display': 'inline-block', 'fontSize': 12},
 
                         options=[{'label': name.capitalize(), 'value': name}
                                  for name in ['Indegree', 'Outdegree', 'Betweenness', 'Eccentricity']]),
                     dcc.Checklist(
                         id='checkbox-advancedtraces-options',
-                        value=[''],  # none per default
+                        value=[],  # none per default
                         style={'width': '250', 'color': 'black', 'display': 'inline-block', 'fontSize': 12},
                         options=[{'label': name.capitalize(), 'value': name}
-                                 for name in ['Longest shortest path', 'Bridges']]),
+                                 for name in ['Longest shortest path']]),
 
                 ], style={'display': 'none', 'margin': '5px'})
             ], style={'border-width': '1', 'border-color': 'grey', 'border-style': 'dashed'}),

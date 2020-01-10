@@ -92,12 +92,19 @@ def update_layout(hit0,  canvasheight, layout, fenced, layerview):
      State('executions-table', "derived_virtual_selected_rows"),
      State('executions-table', "data"),
     State('checkbox-layerview-options','value')
-
+         ,
+     State('checkbox-advancedtraces-options', 'value'),
+     State('checkbox-advancedproperties-options', 'value')
      ]
     )
 
-def updateCytoStyleSheet(button, oraclebutton,baselineoraclebutton,executionsbutton,log,selectedoracles, oracledata, selectedbaselineoracles, baselineoracledata,selectedexecutions, executionsdata,layerview):
-    return ch.updateCytoStyleSheet(button, selectedoracles, oracledata,selectedbaselineoracles, baselineoracledata,selectedexecutions, executionsdata,layerview)
+def updateCytoStyleSheet(button, oraclebutton,baselineoraclebutton,executionsbutton,log,selectedoracles, oracledata,
+            selectedbaselineoracles, baselineoracledata,selectedexecutions, executionsdata,
+            layerview,advancedtraces,advancedproperties):
+    #advancedtraces=['Longest shortest path']
+    advancedproperties=''
+    return ch.updateCytoStyleSheet(button, selectedoracles, oracledata,selectedbaselineoracles,
+            baselineoracledata,selectedexecutions, executionsdata,layerview,advancedtraces,advancedproperties)
 
 #  #############################
 # @app.callback(
