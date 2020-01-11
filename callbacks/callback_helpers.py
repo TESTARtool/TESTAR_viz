@@ -3,7 +3,8 @@ import utils.utlis as tu
 import utils.globals as glob
 def updateCytoStyleSheet(button, selectedoracles, oracledata, selectedbaselineoracles,
     baselineoracledata,selectedexecutions, executionsdata,
-    layerview,advancedtraces,advancedproperties ):
+    layerview,selectedadvancedproperties,advancedpropertiesdata ):
+
     stylesheet = []
     oracleconditionalstyle = [{
           'if': {'row_index': 'odd'},
@@ -161,7 +162,7 @@ def updateCytoStyleSheet(button, selectedoracles, oracledata, selectedbaselineor
     # selectedrows=[i['row'] for i in selectedoracles]
     # selectedrows=list(set(selectedrows))  #ascending order?
     selectedrows=selectedoracles
-    if not (oracledata is None) and len(oracledata)>0 and len(selectedrows)>0:
+    if not (oracledata is None) and len(oracledata)>0 and not(selectedrows is None) and len(selectedrows)>0:
         rowsdata = [oracledata[i] for i in range(len(oracledata)) if i in selectedrows]
         prefixcolor = ''
         cyclecolor = ''
@@ -199,8 +200,7 @@ def updateCytoStyleSheet(button, selectedoracles, oracledata, selectedbaselineor
 ###### baseline oracles
     selectedbaselinerows=selectedbaselineoracles
     if not(baselineoracledata is None):
-        if len(baselineoracledata) > 0 and len(selectedbaselinerows) > 0:
-            rowsdata = [baselineoracledata[i] for i in range(len(baselineoracledata)) if i in selectedbaselinerows]
+        if not (baselineoracledata is None) and len(baselineoracledata) > 0 and not (selectedbaselinerows is None) and len(selectedbaselinerows) > 0:
             prefixcolor = ''
             cyclecolor = ''
             i = -1
@@ -283,10 +283,10 @@ def updateCytoStyleSheet(button, selectedoracles, oracledata, selectedbaselineor
             i = i + 1
             if not i in selectedrows:
                 createdattribute = 'createdby_sequenceid'
-                executionstyle.append({
-                    "if": {"row_index": i},
-                    "backgroundColor": "royalblue ",
-                    'color': 'white'})
+                # executionstyle.append({
+                #     "if": {"row_index": i},
+                #     "backgroundColor": "royalblue ",
+                #     'color': 'white'})
                 nodeselectorfilter = "node[labelV = 'ConcreteState'][" + createdattribute + " = " + "'" + r['sequenceId'] + "'" + "]"
                 edgeselectorfilter = "edge[labelE = 'ConcreteAction'][" + createdattribute + " = " + "'" + r['sequenceId'] + "'" + "]"
                 #nodeselectorfilter = "node[nodeid = '#159:8']"
@@ -319,43 +319,35 @@ def updateCytoStyleSheet(button, selectedoracles, oracledata, selectedbaselineor
         stylesheet.append(tmpstyle)
     #######  testexecutions
 
-    ### experiment
-    if ('Longest shortest path' in advancedtraces):
-        #if True:
-        subgraph = tu.updatesubgraph(layerview)  # calculate only over visible layes
-        traces = glob.sortedsequencetuples  # concreteStateId
-        initialnodes = [initialnode for id, daterun, length, initialnode in traces]
-        initialnodes = list(dict.fromkeys(initialnodes))#remove duplicates
-        for inode in initialnodes:
-            spdict = nx.shortest_path(subgraph, inode)
 
-            lsplength = 0
-            longestshortestpath = []
-            targetnode = inode
-            for target, shortestpath in spdict.items():
-                if len(shortestpath) > lsplength:
-                    lsplength = len(shortestpath)
-                    longestshortestpath = shortestpath
+    ## update experiment
 
-            csvlspfirstnode=longestshortestpath[0]
-            csvlsplastnode = longestshortestpath[len(longestshortestpath)-1]
-            csvlspallnodes = ';'.join(longestshortestpath)
-            print('longest shortest path: ', csvlspallnodes)
-
-            stylepropdict = {'border-width': 5, 'border-color': 'brown', 'background-color': 'white'}
-            stylesheet.extend(updatestyleoftrace(csvlspallnodes, 'node', stylepropdict)) #default
-            stylepropdict = {'border-width': 5, 'border-color': 'yellow', 'background-color': 'yellow'}
-            stylesheet.extend(updatestyleoftrace(csvlspfirstnode, 'node', stylepropdict)) # after default, so prevails
-            stylepropdict = {'border-width': 5, 'border-color': 'black', 'background-color': 'black'}
-            stylesheet.extend(updatestyleoftrace(csvlsplastnode, 'node', stylepropdict))
-            edgelist=[]
-            for i in range(len(longestshortestpath)-1):
-                e=subgraph.get_edge_data(longestshortestpath[i],longestshortestpath[i+1])
-                edgelist.append(list(e.keys())[0]) # just take the first
-            csvlspedges = ';'.join(edgelist)
-            stylepropdict = {'line-width': 5, 'mid-target-arrow-color': 'brown', 'arrow-scale': 2,'line-color': 'blue'}
-            stylesheet.extend(updatestyleoftrace(csvlspedges, 'edge', stylepropdict))
-    ### expiriment
+    selectedadvancedrows = selectedadvancedproperties
+    if not (advancedpropertiesdata is None) and len(advancedpropertiesdata) > 0 and not (selectedadvancedrows is None) and len(selectedadvancedrows) > 0:
+        subgraph = tu.updatesubgraph('Concrete')  # regard only items: NOT in ABSTRACT and NOT in WIDGET and NOT in TEST
+        i = -1
+        for r in advancedpropertiesdata:
+            i = i + 1
+            if i in selectedadvancedrows:
+                csvlspfirstnode = r['initialNode']
+                csvlsplastnode = r['LSP'].split(';')[-1]
+                csvlspallnodes = r['LSP']
+                stylepropdict = {'border-width': 3, 'border-color': 'brown', 'background-color': 'white'}
+                stylesheet.extend(updatestyleoftrace(csvlspallnodes, 'node', stylepropdict))  # default
+                stylepropdict = {'border-width': 3, 'border-color': 'blue', 'background-color': 'blue'}
+                stylesheet.extend(
+                    updatestyleoftrace(csvlspfirstnode, 'node', stylepropdict))  # after default, so prevails
+                stylepropdict = {'border-width': 3, 'border-color': 'black', 'background-color': 'black'}
+                stylesheet.extend(updatestyleoftrace(csvlsplastnode, 'node', stylepropdict))
+                edgelist = []
+                longestshortestpath=r['LSP'].split(';')
+                for i in range(len(longestshortestpath) - 1):
+                    e = subgraph.get_edge_data(longestshortestpath[i], longestshortestpath[i + 1])
+                    edgelist.append(list(e.keys())[0])  # just take the first
+                csvlspedges = ';'.join(edgelist)
+                stylepropdict = {'width': 3, 'mid-target-arrow-color': 'brown', 'arrow-scale': 2, 'line-color': 'blue'}
+                stylesheet.extend(updatestyleoftrace(csvlspedges, 'edge', stylepropdict))
+    ## update expiriment
 
     return  stylesheet ,oracleconditionalstyle,baselineoracleconditionalstyle
 

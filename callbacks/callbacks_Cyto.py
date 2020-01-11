@@ -36,34 +36,6 @@ def update_layout(hit0,  canvasheight, layout, fenced, layerview):
         if  (trigger=='submit-button' and  hit0 >= 1)  or trigger=='canvas_height':
             #cytostylesheet = updateCytoStyleSheet()
             if glob.grh.size() != 0:
-                # tmpgrh = glob.grh.copy()
-                # removenodelist = []
-                # if  not 'Abstract' in layerview :
-                #     removenodelist = [n for n, v in glob.grh.nodes(data=True) if v[glob.label_nodeelement] == 'AbstractState' or v[glob.label_nodeelement] == 'AbstractStateModel' ]
-                #     tmpgrh.remove_nodes_from(removenodelist)
-                # if not 'Incl Blackhole' in layerview:
-                #     removenodelist = [n for n, v in glob.grh.nodes(data=True) if  v[glob.label_nodeelement] == 'BlackHole']
-                #     tmpgrh.remove_nodes_from(removenodelist)
-                #
-                #
-                # if not 'Widget' in layerview :
-                #     removenodelist = [n for n, v in glob.grh.nodes(data=True) if v[glob.label_nodeelement] == 'Widget']
-                #     tmpgrh.remove_nodes_from(removenodelist)
-                #
-                # if not 'Concrete' in layerview :
-                #     removenodelist = [n for n, v in glob.grh.nodes(data=True) if v[glob.label_nodeelement] == 'ConcreteState']
-                #     tmpgrh.remove_nodes_from(removenodelist)
-                #
-                # if not 'Test Executions' in layerview :
-                #    # removeedgelist = [(s,t) for s,t,n, v in glob.grh.edges(data=True,keys=True) if v['glob.label_edgeelement'] == 'Accessed']
-                #    # tmpgrh.remove_edges_from(removeedgelist)
-                #     removenodelist = [n for n, v in glob.grh.nodes(data=True) if ( v[glob.label_nodeelement] == 'SequenceNode' or v[
-                #                                                     glob.label_nodeelement] == 'TestSequence')]
-                #     tmpgrh.remove_nodes_from(removenodelist)
-                #
-                # else:
-                #     pass #subgraph = 'all' # tmpgrh=glob.grh.copy
-                # #if removenodelist != []:    tmpgrh.remove_nodes_from(removenodelist)
                 tmpgrh=tu.updatesubgraph(layerview)
                 if len(fenced)>0 : parenting=True
                 else: parenting=False
@@ -84,39 +56,25 @@ def update_layout(hit0,  canvasheight, layout, fenced, layerview):
     Input('apply-oracle_style-button', 'n_clicks'),
      Input('apply-baseline-oracle_style-button', 'n_clicks'),
      Input('apply-executions-button', 'n_clicks'),
-     Input('loading-logtext', 'children')],
+     Input('loading-logtext', 'children'),
+     Input('apply-advancedproperties-button', 'n_clicks')], # was 'children'.. cost me 1/2 day to debug
     [State('oracletable',"derived_virtual_selected_rows"),
     State('oracletable', "data"),
      State('baseline-oracletable',"derived_virtual_selected_rows"),
     State('baseline-oracletable', "data"),
      State('executions-table', "derived_virtual_selected_rows"),
      State('executions-table', "data"),
-    State('checkbox-layerview-options','value')
-         ,
-     State('checkbox-advancedtraces-options', 'value'),
-     State('checkbox-advancedproperties-options', 'value')
+    State('checkbox-layerview-options','value'),
+     State('advancedproperties-table', "derived_virtual_selected_rows"),
+     State('advancedproperties-table', "data")
      ]
     )
 
-def updateCytoStyleSheet(button, oraclebutton,baselineoraclebutton,executionsbutton,log,selectedoracles, oracledata,
+def updateCytoStyleSheet(button, oraclebutton,baselineoraclebutton,executionsbutton,log,advancedpropertiesbutton,selectedoracles, oracledata,
             selectedbaselineoracles, baselineoracledata,selectedexecutions, executionsdata,
-            layerview,advancedtraces,advancedproperties):
-    #advancedtraces=['Longest shortest path']
-    advancedproperties=''
+            layerview,selectedadvancedproperties,advancedpropertiesdata):
     return ch.updateCytoStyleSheet(button, selectedoracles, oracledata,selectedbaselineoracles,
-            baselineoracledata,selectedexecutions, executionsdata,layerview,advancedtraces,advancedproperties)
-
-#  #############################
-# @app.callback(
-#     Output('cytoscape-update-layout', 'zoom'),
-#     [Input('canvas_zoom', 'value') ],
-#     [State('cytoscape-update-layout', 'zoom')]
-#  )
-# def updatezoom(factor,currentzoom):
-#    factoring = 2**factor * (currentzoom*1.01) #discard fraction
-#    newzoom = factoring
-#    if factor==0: newzoom=newzoom
-#    return newzoom
+            baselineoracledata,selectedexecutions, executionsdata,layerview,selectedadvancedproperties,advancedpropertiesdata)
 
 
 

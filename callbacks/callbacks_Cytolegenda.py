@@ -12,6 +12,7 @@ import utils.globals as glob
 
 ##############################################
 #cyto
+
 @app.callback(
         [Output('cytoscape-legenda', 'elements'),
          Output('cytoscape-legenda', 'stylesheet')],

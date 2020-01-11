@@ -20,13 +20,11 @@ import utils.utlis as utils
 @app.callback(
     [Output('oracletable', 'columns'),
     Output('oracletable', 'data')],
-    [    Input('loading-logtext', 'children'),
-    Input('upload-oracles-from-file', 'contents')],
+    [Input('upload-oracles-from-file', 'contents')],
     [State('upload-oracles-from-file', 'filename'),
     State('upload-oracles-from-file', 'last_modified')])
 
-
-def loadoracles(logtrigger, contents, filename, date):
+def  loadoraclesfromfile(contents, filename, date):
     ctx = dash.callback_context
     trigger = ctx.triggered[0]['prop_id'].split('.')[0]
     if ctx.triggered:

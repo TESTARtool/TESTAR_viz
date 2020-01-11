@@ -45,13 +45,14 @@ dforacles=pd.DataFrame()
 dfbaselineoracles=pd.DataFrame()
 dfdisplayprops=pd.DataFrame()
 testexecutions=pd.DataFrame()
-
+lsptraces=pd.DataFrame()
 imgfiletemplate ='screenshot_of_node_'
 imgfileextension ='.png'
 
 sortedsequencetuples=[]
 sortedsequenceids=[]
 elementcreationdistri=[]
+
 
 nodeonselectmultiplier=3
 edgeonselectmultiplier=3

@@ -29,8 +29,9 @@ def savetofile(data, tofile='graphml.xml'):
     f.close()
     print('saved to : ',tofile, ' size: ', os.path.getsize(tofile))
 
-def processgraphmlfile(details=True):
+def processgraphmlfile(details=True,advanced=False):
     glob.grh = nx.read_graphml(glob.graphmlfile)
+    subgraph = updatesubgraph('Concrete')  # regard only items: NOT in ABSTRACT and NOT in WIDGET and NOT in TEST
     ######## part 1
     sequencetuples = []
     # testsequence_nodes = {n: d for n, d in glob.grh.nodes(data=True) if d[glob.label_nodeelement] == 'TestSequence'}
@@ -75,6 +76,21 @@ def processgraphmlfile(details=True):
             sequenceid=getConcreteActionSequenceid(edict['actionId'])
             tempdict.update({'createdby_sequenceid': sequenceid})
             glob.grh[source][target][n]['createdby_sequenceid']= sequenceid  # is syntax for multidi graph edges
+    if advanced:  #advanded properties
+        d = nx.in_degree_centrality(subgraph)
+        nx.set_node_attributes(glob.grh, d, 'indegree')
+        d = nx.out_degree_centrality(subgraph)
+        nx.set_node_attributes(glob.grh, d, 'outdegree')
+        V = len(subgraph)
+        E = subgraph.size()
+        #     d = nx.betweenness_centrality(subgraph) # not implemented in networkx for MultiDigraph
+        #     nx.set_node_attributes(glob.grh, d, 'betweenness')
+        if (V * E) < (2000 * 20000):  # 40.000.000 will take 60 seconds??
+            d = nx.load_centrality(subgraph)
+            nx.set_node_attributes(glob.grh, d, 'loadcentrality')
+        pass
+        #binning:
+
 
     ######## part 2
     glob.elements = setCytoElements(glob.grh)
@@ -102,6 +118,33 @@ def processgraphmlfile(details=True):
 
 
     glob.testexecutions=pd.DataFrame(glob.elementcreationdistri)
+
+    ##########advanced properties
+
+    lspbyinitial = [{'initialNode': 'N/A', 'LSP length': '-1', 'LSP': 'N/A'}]
+    if advanced:
+        pass
+        traces = glob.sortedsequencetuples  # concreteStateId
+        initialnodes = [initialnode for id, daterun, length, initialnode in traces]
+        initialnodes = list(dict.fromkeys(initialnodes))#remove duplicates
+        lspbyinitial=[]
+        for inode in initialnodes:
+            spdict = nx.shortest_path(subgraph, inode)
+            lsplength = 0
+            longestshortestpath = []
+            targetnode = inode
+            for target, shortestpath in spdict.items():
+                if len(shortestpath) > lsplength:
+                    lsplength = len(shortestpath)
+                    longestshortestpath = shortestpath
+            csvlspallnodes = ';'.join(longestshortestpath)
+            print('longest shortest path: ', csvlspallnodes)
+            lspbyinitial.append({'initialNode': inode,'LSP length':str(len(longestshortestpath)),'LSP':csvlspallnodes})
+        pass
+    pass
+    glob.lsptraces = pd.DataFrame(lspbyinitial)
+    ##########advanced properties
+
 
     masterlog={}
     log=[]

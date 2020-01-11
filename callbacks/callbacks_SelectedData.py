@@ -13,9 +13,6 @@ from appy import app
 import utils.globals as glob
 ##############################################
 
-
-
-########################################
          
 @app.callback(    
     Output('save-nodedata', 'href'),

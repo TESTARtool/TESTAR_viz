@@ -67,7 +67,8 @@ def save_att_table(data,cols):
 @app.callback(    
     [Output('viz-settings-table', 'columns'),
     Output('viz-settings-table', 'data')],
-    [Input('loading-logtext', 'children'),Input( 'load-visual-defaults-button', 'n_clicks'),
+    [Input('loading-logtext', 'children'),
+     Input( 'load-visual-defaults-button', 'n_clicks'),
     Input('upload-visual-from-file', 'contents')],
     [State('upload-visual-from-file', 'filename'),
     State('upload-visual-from-file', 'last_modified')])
@@ -99,8 +100,8 @@ def update_viz_table(loadlog,hitsb0,contents,filename, date):
 def save_viz_table(data,cols):
     if data!=None:
         pdcol= [i['id'] for i in cols]
-        glob.dfdisplayprops=pd.DataFrame(data,columns = pdcol)
-        csvstr = glob.dfdisplayprops.to_csv(index=False,encoding='utf-8',sep = ';')    
+        df=pd.DataFrame(data,columns = pdcol)
+        csvstr = df.to_csv(index=False,encoding='utf-8',sep = ';')
         csvstr = "data:text/csv;charset=utf-8," + urllib.parse.quote(csvstr)  
         return  csvstr
 
@@ -108,22 +109,33 @@ def save_viz_table(data,cols):
 
 @app.callback(
     [Output('executions-table', 'columns'),
-    Output('executions-table', 'data')],
-    [        Input('loading-logtext', 'children'),
-             Input('load-executions-table-button','n_clicks')],   #dash table does not load nicely on initial load
+    Output('executions-table', 'data')
+        ,
+     Output('advancedproperties-table', 'columns'),
+     Output('advancedproperties-table', 'data')
+     ],
+    [Input('loading-logtext', 'children'),
+     Input('load-executions-table-button','n_clicks')],   #dash table does not load nicely on initial load
     )
-def update_executions_table( loadlog, dummybutton):
+def update_execandadvanced_table(loadlog, dummybutton):
     ctx = dash.callback_context
     trigger = ctx.triggered[0]['prop_id'].split('.')[0]
+    dummycol={'id': 'dummy', 'name': 'dummy'}
+    dummydata={'dummy': 'NA'}
+    cols = [dummycol]# CSS: if the above code between [] [] is  left-out, the table will not rendered at first hit of load button
+    data = [dummydata]
+    cols1 = [dummycol]
+    data1 = [dummydata]
     if ctx.triggered:
         if glob.testexecutions.empty:
-            return [{'id': 'dummy', 'name': 'dummy'}], [{'dummy': ''}]
-            # CSS: if the above code between [] [] is  left-out, the table will not rendered at first hit of load button
+            pass
         else:
             # via loadlog. this gets updated via the load graph button
             cols= [{'id': c, 'name': c} for c in  glob.testexecutions.columns]
             data= glob.testexecutions.to_dict("rows")
-            return cols, data#, csvstr
+            cols1 = [{'id': c, 'name': c} for c in glob.lsptraces.columns]
+            data1= glob.lsptraces.to_dict("rows")
+    return cols, data,cols1,data1
 
 
 ########################################
@@ -132,16 +144,32 @@ def update_executions_table( loadlog, dummybutton):
     [Input( 'executions-table','derived_virtual_data')],
     [State( 'executions-table','columns')])
 
-def save_viz_table(data,cols):
-    if data!=None:
+def save_exec_table(data,cols):
+    csvstr=''
+    if not data is None:
         pdcol= [i['id'] for i in cols]
-        glob.dfdisplayprops=pd.DataFrame(data,columns = pdcol)
-        csvstr = glob.dfdisplayprops.to_csv(index=False,encoding='utf-8',sep = ';')
+        df=pd.DataFrame(data,columns = pdcol)
+        csvstr =df.to_csv(index=False,encoding='utf-8',sep = ';')
         csvstr = "data:text/csv;charset=utf-8," + urllib.parse.quote(csvstr)
-        return  csvstr
+    return  csvstr
 
 ########################################
 
 
+########################################
+@app.callback(
+    Output('save-advproperties-table', 'href'),
+    [Input( 'advancedproperties-table','derived_virtual_data')],
+    [State( 'advancedproperties-table','columns')])
 
+def save_properties_table(data,cols):
+    csvstr = ''
+    if not data is None:
+        pdcol= [i['id'] for i in cols]
+        df=pd.DataFrame(data,columns = pdcol)
+        csvstr = df.to_csv(index=False,encoding='utf-8',sep = ';')
+        csvstr = "data:text/csv;charset=utf-8," + urllib.parse.quote(csvstr)
+    return  csvstr
+
+########################################
 

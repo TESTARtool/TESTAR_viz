@@ -35,18 +35,13 @@ loadGraph = html.Div([
                                 n_clicks=0,
                                 children='Validate GraphML File',
                                 style={'display': 'inline-block','vertical-align':'top'}),
-                            #html.Div( id='graph_dropzone',className="dropzone dz-clickable"),
-                            #html.A(id='goto-large-upload-page', children='(or use this Large File upload)', n_clicks=0,n_clicks_timestamp=0, href="/large-upload", target='_blank' ),
-                            # dcc.Upload(
-                            #     id='upload-graphfile',
-                            #     children=html.Button(
-                            #         id='load-button-file',
-                            #         n_clicks=0,
-                            #         children='Load GraphML File',
-                            #         style={'display': 'inline-block'}),
-                            #     accept='text/xml', contents=None,
-                            #     multiple=False,
-                            #     style={'display': 'inline-block'}),
+                            dcc.Checklist(
+                                id='advanced_properties',
+                                options=[
+                                    {'label': 'Advanced properties (can take more time)', 'value': 'Advanced'}],
+                                value=[],
+                                style={'width': '75', 'color': 'black', 'display': 'inline-block', 'fontSize': 12},
+                            ),
                             dcc.Loading(id="loading-log-spinner",
                                 children=[
                                     dcc.Markdown(id='loading-logtext', children = '',style = {'display': 'inline-block','vertical-align':'top','font-size': 12}) ,
