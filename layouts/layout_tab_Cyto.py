@@ -77,28 +77,28 @@ cytolayout =  html.Div([
 
              dcc.Loading(
                     id="loading-2",
-                    children=[
-                        cyto.Cytoscape(
-                        id='cytoscape-update-layout',
-                      #  layout={},
-                        layout={'name': 'grid', 'animate':False, 'fit' : True},
-                        style={'width': '100%', 
-                               'height': '600px',
-                                'border-width': '2',
-                                'border-color':'brown',
-                                'border-style': 'solid'
-                                },
-                        boxSelectionEnabled=True,
-                        minZoom=0.005,
-                        zoom = 1,
-                        zoomingEnabled =True,
-
-                        elements=[], #glob.elements,
-                        stylesheet=[],  #adding a default stylesheet--->new styles seems to be not applied always
-                    )
+                    children=[html.P(id='dummycytospinner',children=' ')
                     ],
                 type="circle", 
-                ), 
+                ),
+            cyto.Cytoscape(
+                id='cytoscape-update-layout',
+                #  layout={},
+                layout={'name': 'grid', 'animate': False, 'fit': True},
+                style={'width': '100%',
+                       'height': '600px',
+                       'border-width': '2',
+                       'border-color': 'brown',
+                       'border-style': 'solid'
+                       },
+                boxSelectionEnabled=True,
+                minZoom=0.005,
+                zoom=1,
+                zoomingEnabled=True,
+
+                elements=[],  # glob.elements,
+                stylesheet=[],  # adding a default stylesheet--->new styles seems to be not applied always
+            )
        ])    
  
 #######################################################

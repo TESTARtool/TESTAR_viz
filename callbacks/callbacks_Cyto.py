@@ -9,6 +9,7 @@ import os
 import dash
 from dash.dependencies import Input, Output,State
 import dash_html_components as html
+from dash.exceptions import PreventUpdate
 
 from appy import app
 import utils.globals as glob
@@ -49,17 +50,21 @@ def update_layout(hit0,  canvasheight, layout, fenced, layerview):
  #############################
 
 @app.callback(
-    [Output('cytoscape-update-layout', 'stylesheet'),
+    [ Output('dummycytospinner','children'),
+        Output('cytoscape-update-layout', 'stylesheet'),
      Output('oracletable', 'style_data_conditional'),
-     Output('baseline-oracletable', 'style_data_conditional')],
+     Output('baseline-oracletable', 'style_data_conditional'),
+    Output('shortestpathlog','children')],
+
     [Input('apply-viz_style-button', 'n_clicks'),
     Input('apply-oracle_style-button', 'n_clicks'),
      Input('apply-baseline-oracle_style-button', 'n_clicks'),
      Input('apply-executions-button', 'n_clicks'),
      Input('loading-logtext', 'children'),
-     Input('apply-advancedproperties-button', 'n_clicks'),
-    Input('apply-centralities-button', 'n_clicks')
-     ], # was 'children'.. cost me 1/2 day to debug
+     Input('apply-advancedproperties-button', 'n_clicks'),# was 'children'.. cost me 1/2 day to debug
+    Input('apply-centralities-button', 'n_clicks'),
+     Input('apply-shortestpath-button', 'n_clicks'),
+     ],
 
     [State('oracletable',"derived_virtual_selected_rows"),
     State('oracletable', "data"),
@@ -71,17 +76,28 @@ def update_layout(hit0,  canvasheight, layout, fenced, layerview):
      State('advancedproperties-table', "derived_virtual_selected_rows"),
      State('advancedproperties-table', "data"),
      State('centralities-table', "derived_virtual_selected_rows"),
-     State('centralities-table', "data")
+     State('centralities-table', "data"),
+    State('selectednodetable', 'data')
      ]
     )
 
 def updateCytoStyleSheet(button, oraclebutton,baselineoraclebutton,executionsbutton,log,advancedpropertiesbutton,
-            centralitiesbutton,selectedoracles, oracledata,
+            centralitiesbutton,shortestpathbutton,selectedoracles, oracledata,
             selectedbaselineoracles, baselineoracledata,selectedexecutions, executionsdata,
-            layerview,selectedadvancedproperties,advancedpropertiesdata,selectedcentralities,centralitiesdata):
-    return ch.updateCytoStyleSheet(button, selectedoracles, oracledata,selectedbaselineoracles,
-            baselineoracledata,selectedexecutions, executionsdata,layerview,selectedadvancedproperties,
-            advancedpropertiesdata,selectedcentralities,centralitiesdata)
+            layerview,selectedadvancedproperties,advancedpropertiesdata,selectedcentralities,centralitiesdata,selectednodedata):
+    ctx = dash.callback_context
+    trigger = ctx.triggered[0]['prop_id'].split('.')[0]
+    if ctx.triggered:
+        returndata= ch.updateCytoStyleSheet(button, selectedoracles, oracledata,selectedbaselineoracles,
+                    baselineoracledata,selectedexecutions, executionsdata,layerview,selectedadvancedproperties,
+                    advancedpropertiesdata,selectedcentralities,centralitiesdata,selectednodedata)
+        if not ('error' in returndata[-1]): #shortestpatherror
+            return returndata
+        else:
+            if trigger=='apply-shortestpath-button':
+                return dash.no_update,dash.no_update,dash.no_update,dash.no_update,returndata[-1]
+            else:
+                return  returndata
 
 
 

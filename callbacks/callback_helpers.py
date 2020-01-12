@@ -1,11 +1,13 @@
 import json
 
 import networkx as nx
+from dash.exceptions import PreventUpdate
+
 import utils.utlis as tu
 import utils.globals as glob
 def updateCytoStyleSheet(button, selectedoracles, oracledata, selectedbaselineoracles,
     baselineoracledata,selectedexecutions, executionsdata,
-    layerview,selectedadvancedproperties,advancedpropertiesdata,selectedcentralities,centralitiesdata ):
+    layerview,selectedadvancedproperties,advancedpropertiesdata,selectedcentralities,centralitiesdata,selectednodedata ):
 
     stylesheet = []
     oracleconditionalstyle = [{
@@ -385,12 +387,44 @@ def updateCytoStyleSheet(button, selectedoracles, oracledata, selectedbaselineor
                 stylepropdict = {'width': 3, 'mid-target-arrow-color': 'brown', 'arrow-scale': 2, 'line-color': 'blue'}
                 stylesheet.extend(updatestyleoftrace(csvlspedges, 'edge', stylepropdict))
 
-
+    shortestpatherror=''
     ## update expiriment
+    ##Sp between 2 nodes
+    if not (selectednodedata is None) and len(selectednodedata) > 0:
+        if not (len(selectednodedata) == 2):
+            shortestpatherror = '(shortestpath error: select exactly 2 nodes in current view)'
+        else:
+            tmpgrh = tu.updatesubgraph(layerview)
+            sourcenode=selectednodedata[0]['nodeid']
+            targetnode = selectednodedata[1]['nodeid']
+            try:
+                spnodelist = nx.shortest_path(tmpgrh, sourcenode,targetnode)
+            except nx.NetworkXNoPath:
+                shortestpatherror='(shortestpath error:  no path found for  source '+sourcenode+' to target node '+targetnode+'  in current view)'
+                print(shortestpatherror)
+                spnodelist = []
+            except nx.NodeNotFound as e:
+                shortestpatherror ='(shortestpath error:  '+sourcenode+' or target node '+targetnode+' not in current view)'
+                print(shortestpatherror)
+                spnodelist= []
+            if len(spnodelist)>0:
+                stylepropdict = {'border-width': 3, 'border-color': 'brown', 'background-color': 'white'}
+                stylesheet.extend(updatestyleoftrace(';'.join(spnodelist), 'node', stylepropdict))  # default
+                stylepropdict = {'border-width': 3, 'border-color': 'blue', 'background-color': 'blue'}
+                stylesheet.extend(updatestyleoftrace(sourcenode, 'node', stylepropdict))  # after default, so prevails
+                stylepropdict = {'border-width': 3, 'border-color': 'black', 'background-color': 'black'}
+                stylesheet.extend(updatestyleoftrace(targetnode, 'node', stylepropdict))
+                shortestpatherror='('+';'.join(spnodelist)+')'
+                edgelist=[]
+                for i in range(len(spnodelist) - 1):
+                    e = tmpgrh.get_edge_data(spnodelist[i], spnodelist[i + 1])
+                    edgelist.append(list(e.keys())[0])  # just take the first
+                csvlspedges = ';'.join(edgelist)
+                stylepropdict = {'width': 3, 'mid-target-arrow-color': 'brown', 'arrow-scale': 2, 'line-color': 'blue'}
+                stylesheet.extend(updatestyleoftrace(csvlspedges, 'edge', stylepropdict))
 
-
-
-    return  stylesheet ,oracleconditionalstyle,baselineoracleconditionalstyle
+    ## SP between 2 nodes
+    return  '',stylesheet ,oracleconditionalstyle,baselineoracleconditionalstyle,shortestpatherror
 
 #helper method:
 def updatestyleoftrace(csvlistofelements,elementype,stylepropdict):

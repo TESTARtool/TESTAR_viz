@@ -23,6 +23,7 @@ selectedData = html.Div([
                href="",
                target="_blank", style={'display': 'inline-block'}
                ),
+        html.P(id='shortestpathlog',children=''),
         dt.DataTable(
             id='selectednodetable',
             #style_table={'overflowX': 'scroll', 'width': 1200},
