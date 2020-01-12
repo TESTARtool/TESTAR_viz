@@ -46,6 +46,7 @@ dfbaselineoracles=pd.DataFrame()
 dfdisplayprops=pd.DataFrame()
 testexecutions=pd.DataFrame()
 lsptraces=pd.DataFrame()
+centralitiemeasures=pd.DataFrame()
 imgfiletemplate ='screenshot_of_node_'
 imgfileextension ='.png'
 

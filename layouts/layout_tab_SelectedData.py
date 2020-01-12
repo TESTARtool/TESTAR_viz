@@ -14,6 +14,9 @@ import dash_html_components as html
 selectedData = html.Div([
     html.Div([
         html.P(id='selectednodes', children='selected nodes:'),
+        html.Button(id='apply-shortestpath-button', n_clicks=0, n_clicks_timestamp=0,
+                           children='ShortestPath', style={'display': 'inline-block'}),
+
         html.A(html.Button(id='save-selected-nodedata-to-file-button', n_clicks=0, n_clicks_timestamp=0,
                            children='Save to File'), id='save-nodedata',
                download="testar-selected-node-data.csv",

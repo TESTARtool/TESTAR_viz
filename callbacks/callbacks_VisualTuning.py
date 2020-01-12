@@ -113,6 +113,9 @@ def save_viz_table(data,cols):
         ,
      Output('advancedproperties-table', 'columns'),
      Output('advancedproperties-table', 'data')
+        ,
+     Output('centralities-table', 'columns'),
+     Output('centralities-table', 'data')
      ],
     [Input('loading-logtext', 'children'),
      Input('load-executions-table-button','n_clicks')],   #dash table does not load nicely on initial load
@@ -126,16 +129,20 @@ def update_execandadvanced_table(loadlog, dummybutton):
     data = [dummydata]
     cols1 = [dummycol]
     data1 = [dummydata]
-    if ctx.triggered:
-        if glob.testexecutions.empty:
-            pass
-        else:
-            # via loadlog. this gets updated via the load graph button
+    cols2 = [dummycol]
+    data2 = [dummydata]
+
+    if ctx.triggered:# via loadlog. this gets updated via the load graph button
+        if not glob.testexecutions.empty:
             cols= [{'id': c, 'name': c} for c in  glob.testexecutions.columns]
             data= glob.testexecutions.to_dict("rows")
+        if not glob.lsptraces.empty:
             cols1 = [{'id': c, 'name': c} for c in glob.lsptraces.columns]
             data1= glob.lsptraces.to_dict("rows")
-    return cols, data,cols1,data1
+        if not glob.centralitiemeasures.empty:
+            cols2 = [{'id': c, 'name': c} for c in glob.centralitiemeasures.columns]
+            data2 = glob.centralitiemeasures.to_dict("rows")
+    return cols, data,cols1,data1,cols2,data2
 
 
 ########################################

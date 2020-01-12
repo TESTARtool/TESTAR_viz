@@ -7,12 +7,14 @@ testar graph module
 """
 import base64
 import datetime
+import json
 import time
 import re
 import os
 import sys
 
 import dateutil
+import matplotlib.colors as mplcolors
 
 from appy import app
 import utils.globals as glob
@@ -76,21 +78,79 @@ def processgraphmlfile(details=True,advanced=False):
             sequenceid=getConcreteActionSequenceid(edict['actionId'])
             tempdict.update({'createdby_sequenceid': sequenceid})
             glob.grh[source][target][n]['createdby_sequenceid']= sequenceid  # is syntax for multidi graph edges
-    if advanced:  #advanded properties
+    centralitymeasure = [{'measure': 'N/A','binning':'N/A'}]
+    if advanced:  #advanded properties: this must be caluculate before the call setcytoelements.
+        centralitymeasure = []
         d = nx.in_degree_centrality(subgraph)
+        ############
+        bindf=pd.DataFrame(list(d.items()), columns=['node', 'indegreecentrality'])
+        #cut_labels_7=[v for k,v in  colorgradient(colornameStart='red', colornameEnd='blue', n=6).items() if k=='hex']
+        ditemvaluelist = list(d.values())
+        ditemvaluelist.sort()
+        halfmaxval=ditemvaluelist[-1]/2
+        cut_bins=[]
+        for i in range(7):
+            cut_bins.append(halfmaxval*pow(2,-i))
+        cut_bins.append(-0.00001) # include zero as actual value
+        cut_bins.sort()
+        cut_labels=[str(i+1) for i in range(len(cut_bins)-1)]
+        bindf['indegree'] = pd.cut(bindf['indegreecentrality'], bins=cut_bins, labels=cut_labels)
+        newd=bindf.set_index('node')['indegree'].to_dict()
         nx.set_node_attributes(glob.grh, d, 'indegree')
+        nx.set_node_attributes(glob.grh, newd, 'indegree_class')
+        dicy = dict(zip(cut_labels, cut_bins))
+        centralitymeasure.append({'measure': 'indegree','binning':json.dumps(dicy)})
+        ##############
+
         d = nx.out_degree_centrality(subgraph)
+        ############
+        bindf=pd.DataFrame(list(d.items()), columns=['node', 'outdegreecentrality'])
+        ditemvaluelist = list(d.values())
+        ditemvaluelist.sort()
+        halfmaxval=ditemvaluelist[-1]
+        cut_bins=[]
+        for i in range(7):
+            cut_bins.append(halfmaxval*pow(2,-i))
+        cut_bins.append(-0.00001) # include zero as actual value
+        cut_bins.sort()
+        cut_labels=[str(i+1) for i in range(len(cut_bins)-1)]
+        bindf['outdegree'] = pd.cut(bindf['outdegreecentrality'], bins=cut_bins, labels=cut_labels)
+        newd=bindf.set_index('node')['outdegree'].to_dict()
         nx.set_node_attributes(glob.grh, d, 'outdegree')
+        nx.set_node_attributes(glob.grh, newd, 'outdegree_class')
+        dicy = dict(zip(cut_labels, cut_bins))
+        centralitymeasure.append({'measure': 'outdegree','binning':json.dumps(dicy)})
+        ##############
+
+
+
+
         V = len(subgraph)
         E = subgraph.size()
         #     d = nx.betweenness_centrality(subgraph) # not implemented in networkx for MultiDigraph
-        #     nx.set_node_attributes(glob.grh, d, 'betweenness')
         if (V * E) < (2000 * 20000):  # 40.000.000 will take 60 seconds??
             d = nx.load_centrality(subgraph)
+            ############
+            bindf = pd.DataFrame(list(d.items()), columns=['node', 'loadcentrality'])
+            # cut_labels_7=[v for k,v in  colorgradient(colornameStart='red', colornameEnd='blue', n=6).items() if k=='hex']
+            ditemvaluelist = list(d.values())
+            ditemvaluelist.sort()
+            halfmaxval = ditemvaluelist[-1]
+            cut_bins = []
+            for i in range(7):
+                cut_bins.append(halfmaxval * pow(2, -i))
+            cut_bins.append(-0.00001) # include zero as actual value
+            cut_bins.sort()
+            cut_labels = [str(i + 1) for i in range(len(cut_bins) - 1)]
+            bindf['loadcentrality'] = pd.cut(bindf['loadcentrality'], bins=cut_bins, labels=cut_labels)
+            newd = bindf.set_index('node')['loadcentrality'].to_dict()
             nx.set_node_attributes(glob.grh, d, 'loadcentrality')
+            nx.set_node_attributes(glob.grh, newd, 'loadcentrality_class')
+            dicy = dict(zip(cut_labels, cut_bins))
+            centralitymeasure.append({'measure': 'loadcentrality', 'binning': json.dumps(dicy)})
+            ##############
         pass
-        #binning:
-
+    glob.centralitiemeasures = pd.DataFrame(centralitymeasure)
 
     ######## part 2
     glob.elements = setCytoElements(glob.grh)
@@ -539,4 +599,54 @@ def setvizproperties(loaddefaults=True, contents=None, filename=''):
         pass
 
 ########################################
+
+#inspired by https://bsou.io/posts/color-gradients-with-python
+def hex_to_RGB(hex):
+  ''' "#FFFFFF" -> [255,255,255] '''
+  # Pass 16 to the integer function for change of base
+  return [int(hex[i:i+2], 16) for i in range(1,6,2)]
+
+
+def RGB_to_hex(RGB):
+  ''' [255,255,255] -> "#FFFFFF" '''
+  # Components need to be integers for hex to make sense
+  RGB = [int(x) for x in RGB]
+  return "#"+"".join(["0{0:x}".format(v) if v < 16 else
+            "{0:x}".format(v) for v in RGB])
+
+def color_dict(gradient):
+    ''' Takes in a list of RGB sub-lists and returns dictionary of
+      colors in RGB and hex form for use in a graphing function
+      defined later on '''
+    return {"hex": [RGB_to_hex(RGB) for RGB in gradient],
+            "r": [RGB[0] for RGB in gradient],
+            "g": [RGB[1] for RGB in gradient],
+            "b": [RGB[2] for RGB in gradient]}
+
+def linear_gradient(start_hex, finish_hex="#FFFFFF", n=10):
+    ''' returns a gradient list of (n) colors between
+      two hex colors. start_hex and finish_hex
+      should be the full six-digit color string,
+      inlcuding the number sign ("#FFFFFF") '''
+    # Starting and ending colors in RGB form
+    s = hex_to_RGB(start_hex)
+    f = hex_to_RGB(finish_hex)
+    # Initilize a list of the output colors with the starting color
+    RGB_list = [s]
+    # Calcuate a color at each evenly spaced value of t from 1 to n
+    for t in range(1, n):
+        # Interpolate RGB vector for color at the current value of t
+        curr_vector = [
+            int(s[j] + (float(t) / (n - 1)) * (f[j] - s[j]))
+            for j in range(3)
+        ]
+        # Add it to our list of output colors
+        RGB_list.append(curr_vector)
+
+    return color_dict(RGB_list)
+
+def colorgradient(colornameStart,colornameEnd='dark blue', n=10):
+    #return linear_gradient(matplotlib.colors.cnames[colornameStart],matplotlib.colors.cnames[colornameStart],n)
+    return linear_gradient(mplcolors.cnames[colornameStart],mplcolors.cnames[colornameEnd],n)
+
 

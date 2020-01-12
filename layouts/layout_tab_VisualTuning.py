@@ -241,7 +241,47 @@ visualTuning = html.Div([
                         ],
                         type="circle",
                         style={'font-size': '12'},
-                    )
+                    ),
+                    html.P(),
+                    html.Button(id='apply-centralities-button', n_clicks=0, n_clicks_timestamp=0,
+                                children='Apply Style',
+                                style={'display': 'inline-block'}),
+                    dcc.Loading(
+                        id="loading-centralitiestable",
+                        children=[
+
+                            dt.DataTable(
+                                id='centralities-table',
+                                style_table={'overflowX': 'scroll', 'width': '1100', 'maxWidth': '70%',
+                                             'maxHeight': '100'},
+                                columns=[],
+                                data=[],
+                                fixed_rows={'headers': True, 'data': 0},
+                                # fixed_columns={'headers': True, 'data': 2},  # n_fixed_columns=2,
+                                row_selectable='multi',
+                                selected_rows=[],
+                                style_cell={
+                                    'minWidth': '130px',
+                                    'whiteSpace': 'nowrap',
+                                    'text-align': 'left'
+                                },
+                                style_data_conditional=[
+                                    {
+                                        'if': {'row_index': 'odd'},
+                                        'backgroundColor': 'AliceBlue'
+                                    }],
+                                filter_action='native',
+                                sort_action='native',
+                                sort_mode="multi",
+                                # virtualization=True,
+                                page_action='none'
+
+                            ),
+                        ],
+                        type="circle",
+                        style={'font-size': '12'},
+                    ),
+
 
                 ], style={'display': 'none', 'margin': '5px'})
             ], style={'border-width': '1', 'border-color': 'grey', 'border-style': 'dashed'}),

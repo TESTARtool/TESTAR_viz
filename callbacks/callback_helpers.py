@@ -1,9 +1,11 @@
+import json
+
 import networkx as nx
 import utils.utlis as tu
 import utils.globals as glob
 def updateCytoStyleSheet(button, selectedoracles, oracledata, selectedbaselineoracles,
     baselineoracledata,selectedexecutions, executionsdata,
-    layerview,selectedadvancedproperties,advancedpropertiesdata ):
+    layerview,selectedadvancedproperties,advancedpropertiesdata,selectedcentralities,centralitiesdata ):
 
     stylesheet = []
     oracleconditionalstyle = [{
@@ -322,13 +324,48 @@ def updateCytoStyleSheet(button, selectedoracles, oracledata, selectedbaselineor
 
     ## update experiment
 
+    ########centralities
+    selectedcentralitiesrows = selectedcentralities
+    if  not (centralitiesdata is None):
+        if not (centralitiesdata is None) and len(centralitiesdata) > 0 and not (
+                selectedcentralitiesrows is None) and len(selectedcentralitiesrows) > 0:
+            i = -1
+            for r in centralitiesdata:
+                i = i + 1
+                if i in selectedcentralitiesrows:
+                    styledict = dict()
+                    selectordict = dict()
+                    # piggyback the oracle table stylesheet
+                    #: 'loadcentrality
+                    nodeselectorfilter=''
+                    bins=json.loads(r['binning'])  # convert string back to dict
+                    minwidth=20
+                    minheight=20
+                    colorlist=tu.colorgradient(colornameStart='red', colornameEnd='green', n=len(bins))['hex']
+                    j=0
+                    for k,v in bins.items():
+
+                        nodeselectorfilter = "node[" + r['measure'] + " >= " + "'" + str(v) + "'" + "]"
+                        selectordict.update({'selector': nodeselectorfilter})
+                        stylepropdict = {'shape': 'ellipse','width': int(minwidth*pow(1.25,(j))),'height': int(minheight*pow(1.25,(j))),'background-color': colorlist[j],  'border-color': colorlist[j]}
+
+                        styledict.update({'style': stylepropdict})
+                        tmpstyle = dict()
+                        tmpstyle.update(selectordict)
+                        tmpstyle.update(styledict)
+                        stylesheet.append(tmpstyle)
+                        j=j+1
+    # else: no special handling for display oracles
+
+
+    ########centralities
     selectedadvancedrows = selectedadvancedproperties
     if not (advancedpropertiesdata is None) and len(advancedpropertiesdata) > 0 and not (selectedadvancedrows is None) and len(selectedadvancedrows) > 0:
         subgraph = tu.updatesubgraph('Concrete')  # regard only items: NOT in ABSTRACT and NOT in WIDGET and NOT in TEST
         i = -1
         for r in advancedpropertiesdata:
             i = i + 1
-            if i in selectedadvancedrows:
+            if i in selectedadvancedrows: # multiple rows selected: some node style become updated!!
                 csvlspfirstnode = r['initialNode']
                 csvlsplastnode = r['LSP'].split(';')[-1]
                 csvlspallnodes = r['LSP']
@@ -347,7 +384,11 @@ def updateCytoStyleSheet(button, selectedoracles, oracledata, selectedbaselineor
                 csvlspedges = ';'.join(edgelist)
                 stylepropdict = {'width': 3, 'mid-target-arrow-color': 'brown', 'arrow-scale': 2, 'line-color': 'blue'}
                 stylesheet.extend(updatestyleoftrace(csvlspedges, 'edge', stylepropdict))
+
+
     ## update expiriment
+
+
 
     return  stylesheet ,oracleconditionalstyle,baselineoracleconditionalstyle
 

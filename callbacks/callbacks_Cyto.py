@@ -57,7 +57,10 @@ def update_layout(hit0,  canvasheight, layout, fenced, layerview):
      Input('apply-baseline-oracle_style-button', 'n_clicks'),
      Input('apply-executions-button', 'n_clicks'),
      Input('loading-logtext', 'children'),
-     Input('apply-advancedproperties-button', 'n_clicks')], # was 'children'.. cost me 1/2 day to debug
+     Input('apply-advancedproperties-button', 'n_clicks'),
+    Input('apply-centralities-button', 'n_clicks')
+     ], # was 'children'.. cost me 1/2 day to debug
+
     [State('oracletable',"derived_virtual_selected_rows"),
     State('oracletable', "data"),
      State('baseline-oracletable',"derived_virtual_selected_rows"),
@@ -66,15 +69,19 @@ def update_layout(hit0,  canvasheight, layout, fenced, layerview):
      State('executions-table', "data"),
     State('checkbox-layerview-options','value'),
      State('advancedproperties-table', "derived_virtual_selected_rows"),
-     State('advancedproperties-table', "data")
+     State('advancedproperties-table', "data"),
+     State('centralities-table', "derived_virtual_selected_rows"),
+     State('centralities-table', "data")
      ]
     )
 
-def updateCytoStyleSheet(button, oraclebutton,baselineoraclebutton,executionsbutton,log,advancedpropertiesbutton,selectedoracles, oracledata,
+def updateCytoStyleSheet(button, oraclebutton,baselineoraclebutton,executionsbutton,log,advancedpropertiesbutton,
+            centralitiesbutton,selectedoracles, oracledata,
             selectedbaselineoracles, baselineoracledata,selectedexecutions, executionsdata,
-            layerview,selectedadvancedproperties,advancedpropertiesdata):
+            layerview,selectedadvancedproperties,advancedpropertiesdata,selectedcentralities,centralitiesdata):
     return ch.updateCytoStyleSheet(button, selectedoracles, oracledata,selectedbaselineoracles,
-            baselineoracledata,selectedexecutions, executionsdata,layerview,selectedadvancedproperties,advancedpropertiesdata)
+            baselineoracledata,selectedexecutions, executionsdata,layerview,selectedadvancedproperties,
+            advancedpropertiesdata,selectedcentralities,centralitiesdata)
 
 
 
