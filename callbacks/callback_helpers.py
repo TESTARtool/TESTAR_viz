@@ -401,11 +401,9 @@ def updateCytoStyleSheet(button, selectedoracles, oracledata, selectedbaselineor
                 spnodelist = nx.shortest_path(tmpgrh, sourcenode,targetnode)
             except nx.NetworkXNoPath:
                 shortestpatherror='(shortestpath error:  no path found for  source '+sourcenode+' to target node '+targetnode+'  in current view)'
-                print(shortestpatherror)
                 spnodelist = []
             except nx.NodeNotFound as e:
                 shortestpatherror ='(shortestpath error:  '+sourcenode+' or target node '+targetnode+' not in current view)'
-                print(shortestpatherror)
                 spnodelist= []
             if len(spnodelist)>0:
                 stylepropdict = {'border-width': 3, 'border-color': 'brown', 'background-color': 'white'}
