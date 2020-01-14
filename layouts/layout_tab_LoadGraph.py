@@ -39,7 +39,7 @@ loadGraph = html.Div([
             dcc.Checklist(
                 id='advanced_properties',
                 options=[
-                    {'label': 'I want to analyze Test Sequences(takes initially more time to validate)', 'value': 'Advanced'}],
+                    {'label': 'Analyze Test Sequences (takes more time to validate)', 'value': 'Advanced'}],
                 value=['Advanced'],  # hidden and default  is set
                 style={'width': '75', 'color': 'black', 'display': 'inline-block', 'fontSize': 12},
             ),

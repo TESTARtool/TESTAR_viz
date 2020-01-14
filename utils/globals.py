@@ -14,19 +14,19 @@ assetfolder = 'assets'+os.sep #20190428 there is a dependency with app.get_asset
 outputfolder = 'content'+os.sep
 port = 8050
 
-# modelfile = ''
-# oraclesfile = ''
-# resultsfile = ''
-# visualstylefile= ''
 
 grh = nx.DiGraph()
+subgraph= nx.DiGraph()
+layerviewincache='--unknown--'
+parentingincache='--unknown--'
 graphmlfile = os.path.join(assetfolder+outputfolder,'GraphML.xml')
 screenshotregex='.*\[(.+?)\].*'
 image_attrib_key='image-source'
 image_element = 'screenshot'
 no_image_file= 'no_image.png'
 
-elements = []
+# test if still needed elements = []
+cytoelements=[]
 #initialselectednodeslist=[]
 nodetable = dict()
 edgetable = dict()

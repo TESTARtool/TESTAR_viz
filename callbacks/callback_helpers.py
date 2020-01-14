@@ -363,7 +363,7 @@ def updateCytoStyleSheet(button, selectedoracles, oracledata, selectedbaselineor
     ########centralities
     selectedadvancedrows = selectedadvancedproperties
     if not (advancedpropertiesdata is None) and len(advancedpropertiesdata) > 0 and not (selectedadvancedrows is None) and len(selectedadvancedrows) > 0:
-        subgraph = tu.updatesubgraph('Concrete')  # regard only items: NOT in ABSTRACT and NOT in WIDGET and NOT in TEST
+        subgraph = tu.updatesubgraph('Concrete')  # regard only itemsthat are NOT in ABSTRACT and NOT in WIDGET and NOT in TEST
         i = -1
         for r in advancedpropertiesdata:
             i = i + 1

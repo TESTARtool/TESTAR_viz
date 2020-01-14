@@ -34,17 +34,14 @@ def update_layout(hit0,  canvasheight, layout, fenced, layerview):
     trigger = ctx.triggered[0]['prop_id'].split('.')[0]
     subelements=[]
     if ctx.triggered:
-        if  (trigger=='submit-button' and  hit0 >= 1)  or trigger=='canvas_height':
-            #cytostylesheet = updateCytoStyleSheet()
+        if  (trigger=='submit-button' and  hit0 >= 1):
             if glob.grh.size() != 0:
-                tmpgrh=tu.updatesubgraph(layerview)
                 if len(fenced)>0 : parenting=True
                 else: parenting=False
-                subelements = tu.setCytoElements(tmpgrh,True,parenting,layerview)
-
+                tu.setCytoElements(False, parenting, layerview)
         # infer screenshots
         h = 600 * canvasheight
-        return subelements, {'name': layout,'animate': False} , {'height': ''+str(h)+'px'},
+        return glob.cytoelements, {'name': layout, 'animate': False} , {'height': '' + str(h) + 'px'},
 
 
  #############################

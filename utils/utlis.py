@@ -315,25 +315,28 @@ def processgraphmlfile(details=True, advanced=False):
 
 
 def updatesubgraph(layerview):
-    grh_copy = glob.grh.copy()
+    if glob.layerviewincache==layerview:
+        return glob.subgraph
+    glob.layerviewincache = layerview
+    glob.subgraph = glob.grh.copy()
 
     removenodelist = []
     if not 'Abstract' in layerview:
         removenodelist = [n for n, v in glob.grh.nodes(data=True) if
                           v[glob.label_nodeelement] == 'AbstractState' or v[
                               glob.label_nodeelement] == 'AbstractStateModel']
-        grh_copy.remove_nodes_from(removenodelist)
+        glob.subgraph.remove_nodes_from(removenodelist)
     if not 'Incl Blackhole' in layerview:
         removenodelist = [n for n, v in glob.grh.nodes(data=True) if v[glob.label_nodeelement] == 'BlackHole']
-        grh_copy.remove_nodes_from(removenodelist)
+        glob.subgraph.remove_nodes_from(removenodelist)
 
     if not 'Widget' in layerview:
         removenodelist = [n for n, v in glob.grh.nodes(data=True) if v[glob.label_nodeelement] == 'Widget']
-        grh_copy.remove_nodes_from(removenodelist)
+        glob.subgraph.remove_nodes_from(removenodelist)
 
     if not 'Concrete' in layerview:
         removenodelist = [n for n, v in glob.grh.nodes(data=True) if v[glob.label_nodeelement] == 'ConcreteState']
-        grh_copy.remove_nodes_from(removenodelist)
+        glob.subgraph.remove_nodes_from(removenodelist)
 
     if not 'Test Executions' in layerview:
         # removeedgelist = [(s,t) for s,t,n, v in glob.grh.edges(data=True,keys=True) if v['glob.label_edgeelement'] == 'Accessed']
@@ -341,11 +344,11 @@ def updatesubgraph(layerview):
         removenodelist = [n for n, v in glob.grh.nodes(data=True) if
                           (v[glob.label_nodeelement] == 'SequenceNode' or v[
                               glob.label_nodeelement] == 'TestSequence')]
-        grh_copy.remove_nodes_from(removenodelist)
+        glob.subgraph.remove_nodes_from(removenodelist)
 
     else:
         pass  # subgraph = 'all' # tmpgrh=glob.grh.copy
-    return grh_copy
+    return glob.subgraph
 
 
 # xxxxxxxxxxxxxx8888888888888888888888888888888888
@@ -435,7 +438,7 @@ def updateinferrablecreenshots(n, eldict, usecache=False):
     return True
 
 
-def setCytoElements(grh, usecache=False, parenting=False, layerview=[]):
+def setCytoElements(usecache=False, parenting=False, layerview=[]):
     TestSequenceKey = ''
     nodes = []
     edges = []
@@ -449,68 +452,72 @@ def setCytoElements(grh, usecache=False, parenting=False, layerview=[]):
     TestSequencekeylist = set()
     try:
         copydefaultimagetoasset()  # optimize: do only once:-)
+        if (glob.layerviewincache == layerview and glob.parentingincache == parenting):
+            pass
+        else:
+            grh = updatesubgraph(layerview)
+            for n, ndict in grh.nodes(data=True):
 
-        for n, ndict in grh.nodes(data=True):
+                tempdict = dict(ndict)
+                tempdict.update({'label': ndict[glob.label_nodeelement]})  # copy as cyto wants the 'label' tag
+                tempdict.update({'id': n});
+                tempdict.update({'nodeid': n})
 
-            tempdict = dict(ndict)
-            tempdict.update({'label': ndict[glob.label_nodeelement]})  # copy as cyto wants the 'label' tag
-            tempdict.update({'id': n});
-            tempdict.update({'nodeid': n})
+                if parenting:
+                    if 'Concrete' in layerview and ndict[glob.label_nodeelement] == 'ConcreteState':
+                        tempdict.update({'parent': 'ConcreteLayer'})
+                        Cparentnode = {'data': {'id': 'ConcreteLayer', glob.label_nodeelement: glob.parent_subtypeelement,
+                                                'nodeid': 'ConcreteLayer'}}
+                    if 'Widget' in layerview and ndict[glob.label_nodeelement] == 'Widget':
+                        tempdict.update({'parent': 'WidgetLayer'})
+                        Wparentnode = {'data': {'id': 'WidgetLayer', glob.label_nodeelement: glob.parent_subtypeelement,
+                                                'nodeid': 'WidgetLayer'}}
+                    if 'Abstract' in layerview and ndict[glob.label_nodeelement] == 'AbstractState':
+                        tempdict.update({'parent': 'AbstractLayer'})
+                        Aparentnode = {'data': {'id': 'AbstractLayer', glob.label_nodeelement: glob.parent_subtypeelement,
+                                                'nodeid': 'AbstractLayer'}}
+                    if ('Test Executions' in layerview) and ((ndict[glob.label_nodeelement] == 'SequenceNode') or (
+                            ndict[glob.label_nodeelement] == 'TestSequence')):
+                        TestSequenceKey = 'TestTrace_' + ndict['sequenceId']
+                        TestSequencekeylist.add(TestSequenceKey)
+                        tempdict.update({'parent': TestSequenceKey})  # sync with nodeid of the child
 
+                fname = glob.outputfolder + savescreenshottodisk(str(n), tempdict, usecache)
+                tempdict.update({glob.elementimgurl: app.get_asset_url(fname)})  # pointer to the image
+                nodes.append({'data': tempdict, 'position': {'x': 0, 'y': 0}})
             if parenting:
-                if 'Concrete' in layerview and ndict[glob.label_nodeelement] == 'ConcreteState':
-                    tempdict.update({'parent': 'ConcreteLayer'})
-                    Cparentnode = {'data': {'id': 'ConcreteLayer', glob.label_nodeelement: glob.parent_subtypeelement,
-                                            'nodeid': 'ConcreteLayer'}}
-                if 'Widget' in layerview and ndict[glob.label_nodeelement] == 'Widget':
-                    tempdict.update({'parent': 'WidgetLayer'})
-                    Wparentnode = {'data': {'id': 'WidgetLayer', glob.label_nodeelement: glob.parent_subtypeelement,
-                                            'nodeid': 'WidgetLayer'}}
-                if 'Abstract' in layerview and ndict[glob.label_nodeelement] == 'AbstractState':
-                    tempdict.update({'parent': 'AbstractLayer'})
-                    Aparentnode = {'data': {'id': 'AbstractLayer', glob.label_nodeelement: glob.parent_subtypeelement,
-                                            'nodeid': 'AbstractLayer'}}
-                if ('Test Executions' in layerview) and ((ndict[glob.label_nodeelement] == 'SequenceNode') or (
-                        ndict[glob.label_nodeelement] == 'TestSequence')):
-                    TestSequenceKey = 'TestTrace_' + ndict['sequenceId']
-                    TestSequencekeylist.add(TestSequenceKey)
-                    tempdict.update({'parent': TestSequenceKey})  # sync with nodeid of the child
+                if Cparentnode != {}: allnodes.append(Cparentnode)
+                if Wparentnode != {}: allnodes.append(Wparentnode)
+                if Aparentnode != {}: allnodes.append(Aparentnode)
 
-            fname = glob.outputfolder + savescreenshottodisk(str(n), tempdict, usecache)
-            tempdict.update({glob.elementimgurl: app.get_asset_url(fname)})  # pointer to the image
-            nodes.append({'data': tempdict, 'position': {'x': 0, 'y': 0}})
-        if parenting:
-            if Cparentnode != {}: allnodes.append(Cparentnode)
-            if Wparentnode != {}: allnodes.append(Wparentnode)
-            if Aparentnode != {}: allnodes.append(Aparentnode)
-
-            for TestSequenceKey in TestSequencekeylist:
-                Tparentnode = {'data': {'id': TestSequenceKey, glob.label_nodeelement: glob.parent_subtypeelement,
-                                        'nodeid': TestSequenceKey}}
-                allnodes.append(Tparentnode)
-
-        allnodes.extend(nodes)
-        # next line can raise an error while initializing: just ignore. no negative impact
-        for source, target, n, edict in grh.edges(data=True, keys=True):
-            tempdict = dict(edict)
-            tempdict.update({'label': edict[glob.label_edgeelement]})  # copy as cyto wants the label tag
-            tempdict.update({'source': source})
-            tempdict.update({'target': target})
-            tempdict.update({'id': n});
-            tempdict.update({'edgeid': n})
-            if usecache:
-                fname = glob.outputfolder + imagefilename(n)
-            else:
-                fname = glob.outputfolder + savescreenshottodisk(str(n), tempdict)  # n was ''+source+target
-            tempdict.update({glob.elementimgurl: app.get_asset_url(fname)})
-            edges.append({'data': tempdict})
+                for TestSequenceKey in TestSequencekeylist:
+                    Tparentnode = {'data': {'id': TestSequenceKey, glob.label_nodeelement: glob.parent_subtypeelement,
+                                            'nodeid': TestSequenceKey}}
+                    allnodes.append(Tparentnode)
+            glob.parentingincache = parenting
+            allnodes.extend(nodes)
+            # next line can raise an error while initializing: just ignore. no negative impact
+            for source, target, n, edict in grh.edges(data=True, keys=True):
+                tempdict = dict(edict)
+                tempdict.update({'label': edict[glob.label_edgeelement]})  # copy as cyto wants the label tag
+                tempdict.update({'source': source})
+                tempdict.update({'target': target})
+                tempdict.update({'id': n});
+                tempdict.update({'edgeid': n})
+                if usecache:
+                    fname = glob.outputfolder + imagefilename(n)
+                else:
+                    fname = glob.outputfolder + savescreenshottodisk(str(n), tempdict)  # n was ''+source+target
+                tempdict.update({glob.elementimgurl: app.get_asset_url(fname)})
+                edges.append({'data': tempdict})
+            glob.cytoelements = allnodes + edges
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         fname1 = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
         print(exc_type, fname1, exc_tb.tb_lineno)
         print('*  There was an error processing : ' + str(e))
 
-    return allnodes + edges
+
 
 
 #############
