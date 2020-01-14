@@ -92,7 +92,7 @@ cytolayout =  html.Div([
                        'border-style': 'solid'
                        },
                 boxSelectionEnabled=True,
-                minZoom=0.005,
+                minZoom=0.05,
                 zoom=1,
                 zoomingEnabled=True,
 

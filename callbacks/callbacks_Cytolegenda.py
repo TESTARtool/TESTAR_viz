@@ -5,13 +5,14 @@ Created on Wed Apr  3 18:27:03 2019
 
 @author: cseng
 """
-import dash
+
 from dash.dependencies import Input, Output,State
 from appy import app
 import utils.globals as glob
 
 ##############################################
-#cyto
+
+from utils import styler
 
 @app.callback(
         [Output('cytoscape-legenda', 'elements'),
@@ -20,69 +21,39 @@ import utils.globals as glob
      Input('loading-logtext', 'children')],
 )
 def update_legenda(hit0,  newlog):
-    nodeelements = []
-    edgeelements = []
 
     stylesheet = []
-    styledict = dict()
-    stylepropdict = dict()
-    selectordict = dict()
-    selectordict.update({'selector': 'node' })
-    stylepropdict.update(
-        {
+    displayproperties= glob.dfdisplayprops.to_dict('records');
+    celements=[]
+
+    itemstyle={ #default style
             'font-size': 10,
             'shape': 'rectangle',
             'width': 3,
             'height': 3,
             'opacity': 1,
-            'label': '',
-            'background-color': 'grey'
-        })
-    styledict.update({'style': stylepropdict})
-    tmpstyle = dict()
-    tmpstyle.update(selectordict)
-    tmpstyle.update(styledict)  # blunder  tmpstyle=tmpstyle.update(styledict)
-    stylesheet.append(tmpstyle)
+            'label': '',  # intended
+            'background-color': 'grey'}
+    legenda = styler.stylelegenda('node', '', itemstyle)
+    stylesheet.append(legenda[0])
 
-    data = glob.dfdisplayprops.to_dict('records');
-    for row in data:
-        styledict = dict()
-        stylepropdict = dict()
-        selectordict = dict()
+    for row in displayproperties:
         if row[glob.elementtype] == 'node':
-            nodeelements.append({'data': {'id': row[glob.elementsubtype] }})
-            selectorfilter = '[' + 'id' + ' = ' + '\'' + row[glob.elementsubtype] + '\'' + ']'
-            selectordict.update({'selector': 'node' + selectorfilter})
-            stylepropdict.update(
-                {
-                 'font-size': row['label_fontsize'],
-                 'shape': row['shape'],
-                 'width': row['width'],
-                 'height': row['height'],
-                 'opacity': row['opacity'],
-                 'label': row[glob.elementsubtype],
-                 'border-width': row['border-width'],
-                 'border-style': row['border-style'],
-                 'border-color': row['border-color'],
-                 'background-color': row['color'],
-                 'background-fit': 'contain'
-                 })
-            styledict.update({'style': stylepropdict})
-            tmpstyle = dict()
-            tmpstyle.update(selectordict)
-            tmpstyle.update(styledict)  # blunder  tmpstyle=tmpstyle.update(styledict)
-            stylesheet.append(tmpstyle)
-
+            itemstyle=    {
+                     'font-size': row['label_fontsize'],
+                     'shape': row['shape'],
+                     'width': row['width'],
+                     'height': row['height'],
+                     'opacity': row['opacity'],
+                     'label': row[glob.elementsubtype],
+                     'border-width': row['border-width'],
+                     'border-style': row['border-style'],
+                     'border-color': row['border-color'],
+                     'background-color': row['color'],
+                     'background-fit': 'contain'
+                     }
         elif row[glob.elementtype] == 'edge':
-            nodeelements.append({'data': {'id':'s'+row[glob.elementsubtype], 'width': 1, 'height':1}})
-            nodeelements.append({'data': {'id':'t'+row[glob.elementsubtype], 'width': 1, 'height':1}})
-
-            edgeelements.append({'data': {'source': 's'+row[glob.elementsubtype],'target': 't'+row[glob.elementsubtype], 'id': row[glob.elementsubtype]}})
-            selectorfilter = '[' + 'id' + ' = ' + '\'' + row[glob.elementsubtype] + '\'' + ']'
-            selectordict.update({'selector': 'edge' + selectorfilter})
-
-            stylepropdict.update(
-                {
+            itemstyle=     {
                  'font-size': row['label_fontsize'],
                  'label': row[glob.elementsubtype],
                  'mid-target-arrow-shape': row['arrow-shape'],
@@ -95,23 +66,11 @@ def update_legenda(hit0,  newlog):
                  'line-style': row['edgefill'],
                  'text-rotation': 'autorotate',
                  'text-margin-y': -5,
-
                  }
-            )
-            styledict.update({'style': stylepropdict})
-            tmpstyle = dict()
-            tmpstyle.update(selectordict)
-            tmpstyle.update(styledict)  # blunder  tmpstyle=tmpstyle.update(styledict)
-            stylesheet.append(tmpstyle)
-
-
-        else:
-            selectorfilter = ""  # should not happen
-
-    return nodeelements+edgeelements,stylesheet
-
-
- #############################
+        legenda=styler.stylelegenda(row[glob.elementtype], row[glob.elementsubtype], itemstyle)
+        stylesheet.append(legenda[0])
+        celements.extend(legenda[1])
+    return celements,stylesheet
 
 
 

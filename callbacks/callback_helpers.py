@@ -5,6 +5,9 @@ from dash.exceptions import PreventUpdate
 
 import utils.utlis as tu
 import utils.globals as glob
+from utils import styler
+
+
 def updateCytoStyleSheet(button, selectedoracles, oracledata, selectedbaselineoracles,
     baselineoracledata,selectedexecutions, executionsdata,
     layerview,selectedadvancedproperties,advancedpropertiesdata,selectedcentralities,centralitiesdata,selectednodedata ):
@@ -28,19 +31,15 @@ def updateCytoStyleSheet(button, selectedoracles, oracledata, selectedbaselineor
         stylepropdict = dict()
         selectordict = dict()
         if row[glob.elementtype] == 'node':
-            # if row[glob.elementsubtype] == glob.default_subtypeelement:
-            #     selectorfilter=''
-            # else:
-            selectorfilter = '[' + glob.label_nodeelement + ' = ' + '\'' + row[glob.elementsubtype] + '\'' + ']'
-            selectordict.update({'selector': 'node' + selectorfilter})
             dsp = 'element'
             if not row.get('hide') is None:
                 if int(row['hide']) == 1:  dsp = 'none'
+            itemstyle={}
             if not row[glob.image_attrib_key] is None:
                 if row[glob.image_attrib_key] != '':
-                    stylepropdict.update({'background-image': 'data(' + glob.elementimgurl + ')'})  # unstable?
-            stylepropdict.update(
-                {'display': dsp,  # non deterministic syntax
+                    itemstyle={'background-image': 'data(' + glob.elementimgurl + ')'}
+            itemstyle.update( {
+                 'display': dsp,  # non deterministic syntax
                  'font-size': row['label_fontsize'],
                  'shape': row['shape'],
                  'width': row['width'],
@@ -52,65 +51,34 @@ def updateCytoStyleSheet(button, selectedoracles, oracledata, selectedbaselineor
                  'border-color': row['border-color'],
                  'background-color': row['color'],
                  'background-fit': 'contain',
-                 #          'background-image':'data('+glob.elementimgurl+')',  #unstable?
-                 #          'background-width' :'95%'              #unstable?
-                 }
-            )
-            styledict.update({'style': stylepropdict})
-            tmpstyle = dict()
-            tmpstyle.update(selectordict)
-            tmpstyle.update(styledict)  # blunder  tmpstyle=tmpstyle.update(styledict)
-            stylesheet.append(tmpstyle)
-
-            selectordict = {'selector': 'node' + selectorfilter + ':selected'}
-            stylepropdict = {
+                 })
+            legenda = styler.stylelegenda(row[glob.elementtype], row[glob.elementsubtype], itemstyle,glob.label_nodeelement)
+            stylesheet.append(legenda[0])
+            itemstyle={
                 'width': int((glob.nodeonselectmultiplier) * (int(row['width'] if row['width'] != '' else 0))),
                 'height': int((glob.nodeonselectmultiplier) * (int(row['height'] if row['height'] != '' else 0))),
             }
-            styledict = {'style': stylepropdict}
-            tmpstyle = dict()
-            tmpstyle.update(selectordict)
-            tmpstyle.update(styledict)
-            stylesheet.append(tmpstyle)
+            legenda = styler.stylelegenda(row[glob.elementtype], row[glob.elementsubtype], itemstyle,glob.label_nodeelement,':selected')
+            stylesheet.append(legenda[0])
 
             if not row['hide_conditionally'] is None:
                 if row['hide_conditionally']!='' :
-                   styledict = dict()
-                   stylepropdict = dict()
-                   selectordict = dict()
-                   selectorfilter=selectorfilter+'['+ row['hide_conditionally']+']'
-                   selectordict.update({'selector': 'node' + selectorfilter})
-                   stylepropdict= {'display': 'none'}
-                   styledict.update({'style': stylepropdict})
-                   tmpstyle = dict()
-                   tmpstyle.update(selectordict)
-                   tmpstyle.update(styledict)
-                   stylesheet.append(tmpstyle)
-
-
-
-
-
+                   itemstyle = {'display': 'none' }
+                   condition='['+ row['hide_conditionally']+']'
+                   legenda = styler.stylelegenda(row[glob.elementtype], row[glob.elementsubtype]+condition, itemstyle,glob.label_nodeelement)
+                   stylesheet.append(legenda[0])
 
         elif row[glob.elementtype] == 'edge':
 
-            # if row[glob.elementsubtype] == glob.default_subtypeelement:
-            #     selectorfilter = ''
-            # else:
-            selectorfilter = "[" + glob.label_edgeelement + " = " + "'" + row[glob.elementsubtype] + "'" + "]"
-            selectordict.update({'selector': 'edge' + selectorfilter})
             dsp = 'element'
             if not row.get('hide') is None:
                 if int(row['hide']) == 1:  dsp = 'none'
             dsplabel = {'label': ''}
             if not row['label'] is None:
                 if row['label'] != '':
-
                     dsplabel = {'label': 'data(' + row['label'] + ')'}
-
-            stylepropdict.update(dsplabel),
-            stylepropdict.update(
-                {'display': dsp,
+            itemstyle=dsplabel
+            itemstyle.update( {'display': dsp,
                  'font-size': row['label_fontsize'],
                  'mid-target-arrow-shape': row['arrow-shape'],
                  'mid-target-arrow-color': row['arrow-color'],
@@ -124,38 +92,25 @@ def updateCytoStyleSheet(button, selectedoracles, oracledata, selectedbaselineor
                  'text-rotation':'autorotate',
                  'text-margin-y' : -5,
 
-                 }
-            )
-            styledict.update({'style': stylepropdict})
-            tmpstyle = dict()
-            tmpstyle.update(selectordict)
-            tmpstyle.update(styledict)  # blunder  tmpstyle=tmpstyle.update(styledict)
-            stylesheet.append(tmpstyle)
+                 })
+            legenda = styler.stylelegenda(row[glob.elementtype], row[glob.elementsubtype], itemstyle,glob.label_edgeelement)
+            stylesheet.append(legenda[0])
 
-            selectordict = {'selector': 'edge' + selectorfilter + ':selected'}
-            stylepropdict = {
+            itemstyle = {
                 'width': int(glob.edgeonselectmultiplier * int(row['line-width'])),
                 'arrow-scale': int(glob.edgeonselectmultiplier * int(row['arrow-scale'])),
                 'label': 'data(' + row['label-onselect'] + ')'
             }
-            styledict = {'style': stylepropdict}
-            tmpstyle = dict()
-            tmpstyle.update(selectordict)
-            tmpstyle.update(styledict)
-            stylesheet.append(tmpstyle)
+            legenda = styler.stylelegenda(row[glob.elementtype], row[glob.elementsubtype], itemstyle,
+                                          glob.label_edgeelement, ':selected')
+            stylesheet.append(legenda[0])
+
             if not row['hide_conditionally'] is None:
                 if row['hide_conditionally']!='' :
-                   styledict = dict()
-                   stylepropdict = dict()
-                   selectordict = dict()
-                   selectorfilter=selectorfilter+'['+ row['hide_conditionally']+']'
-                   selectordict.update({'selector': 'edge' + selectorfilter})
-                   stylepropdict= {'display': 'none'}
-                   styledict.update({'style': stylepropdict})
-                   tmpstyle = dict()
-                   tmpstyle.update(selectordict)
-                   tmpstyle.update(styledict)
-                   stylesheet.append(tmpstyle)
+                   itemstyle = {'display': 'none' }
+                   condition='['+ row['hide_conditionally']+']'
+                   legenda = styler.stylelegenda(row[glob.elementtype], row[glob.elementsubtype]+condition, itemstyle,glob.label_edgeelement)
+                   stylesheet.append(legenda[0])
 
         else:
             selectorfilter = ""  # should not happen
