@@ -5,33 +5,20 @@ Created on Mon Apr  1 21:38:18 2019
 @author: cseng
 testar graph module
 """
-import base64
-import datetime
 import json
-import time
-import re
 import os
 import sys
 
 import dateutil
-import matplotlib.colors as mplcolors
 
 from appy import app
 import utils.globals as glob
 import networkx as nx
 import pandas as pd
-import datetime
 import time
 
-
-# import networkx as nx
-
-def savetofile(data, tofile='graphml.xml'):
-    # f=open("graphml.xml",encoding='ISO-8859-1',mode="w+")
-    f = open(tofile, encoding='utf-8', mode="w+")
-    for x in data:  f.write(str(x[0]))
-    f.close()
-    print('saved to : ', tofile, ' size: ', os.path.getsize(tofile))
+from utils.filehandling import imagefilename, savescreenshottodisk, copydefaultimagetoasset
+from utils.gui import updatesubgraph, setgraphattributes, setvizproperties
 
 
 def processgraphmlfile(details=True, advanced=False):
@@ -314,130 +301,6 @@ def processgraphmlfile(details=True, advanced=False):
     return masterlog
 
 
-def updatesubgraph(layerview):
-    if glob.layerviewincache==layerview:
-        return glob.subgraph
-    glob.layerviewincache = layerview
-    glob.subgraph = glob.grh.copy()
-
-    removenodelist = []
-    if not 'Abstract' in layerview:
-        removenodelist = [n for n, v in glob.grh.nodes(data=True) if
-                          v[glob.label_nodeelement] == 'AbstractState' or v[
-                              glob.label_nodeelement] == 'AbstractStateModel']
-        glob.subgraph.remove_nodes_from(removenodelist)
-    if not 'Incl Blackhole' in layerview:
-        removenodelist = [n for n, v in glob.grh.nodes(data=True) if v[glob.label_nodeelement] == 'BlackHole']
-        glob.subgraph.remove_nodes_from(removenodelist)
-
-    if not 'Widget' in layerview:
-        removenodelist = [n for n, v in glob.grh.nodes(data=True) if v[glob.label_nodeelement] == 'Widget']
-        glob.subgraph.remove_nodes_from(removenodelist)
-
-    if not 'Concrete' in layerview:
-        removenodelist = [n for n, v in glob.grh.nodes(data=True) if v[glob.label_nodeelement] == 'ConcreteState']
-        glob.subgraph.remove_nodes_from(removenodelist)
-
-    if not 'Test Executions' in layerview:
-        # removeedgelist = [(s,t) for s,t,n, v in glob.grh.edges(data=True,keys=True) if v['glob.label_edgeelement'] == 'Accessed']
-        # tmpgrh.remove_edges_from(removeedgelist)
-        removenodelist = [n for n, v in glob.grh.nodes(data=True) if
-                          (v[glob.label_nodeelement] == 'SequenceNode' or v[
-                              glob.label_nodeelement] == 'TestSequence')]
-        glob.subgraph.remove_nodes_from(removenodelist)
-
-    else:
-        pass  # subgraph = 'all' # tmpgrh=glob.grh.copy
-    return glob.subgraph
-
-
-# xxxxxxxxxxxxxx8888888888888888888888888888888888
-def imagefilename(s=""):
-    return glob.imgfiletemplate + s.replace(':', '.').replace('#', '_') + glob.imgfileextension  # do not change!!
-
-
-def clearassetsfolder():
-    fldr = glob.scriptfolder + glob.assetfolder + glob.outputfolder
-
-    try:
-        # Create target Directory
-        os.mkdir(fldr)
-    except FileExistsError:
-        pass
-
-    print('deleting old content (.png, .xml, .csv) from folder: ', fldr)
-    for filename in os.listdir(fldr):
-        try:
-            if filename.endswith('.png') or filename.endswith('.xml') or filename.endswith('.csv'):
-                os.unlink(fldr + filename)
-        except Exception as e:
-            exc_type, exc_obj, exc_tb = sys.exc_info()
-            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            print(exc_type, fname, exc_tb.tb_lineno)
-            print('*  There was an error processing : ' + str(e))
-
-
-def copydefaultimagetoasset():
-    try:
-        f = open(glob.scriptfolder + 'utils' + '/' + glob.no_image_file, 'rb')
-        fnew = open(glob.scriptfolder + glob.assetfolder + glob.outputfolder + '/' + glob.no_image_file, 'wb')
-        contnt = f.read()
-        f.close()
-        fnew.write(contnt)
-        fnew.close()
-        # copyfile(glob.no_image_file,'assets/'+glob.no_image_file)
-    except Exception as e:
-        exc_type, exc_obj, exc_tb = sys.exc_info()
-        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-        print(exc_type, fname, exc_tb.tb_lineno)
-        print('*  There was an error processing : ' + str(e))
-
-
-def prettytime(timestamp=None):
-    if timestamp != None:
-        return datetime.datetime.fromtimestamp(timestamp).isoformat("_", "milliseconds")
-    else:
-        return datetime.datetime.fromtimestamp(time.time()).isoformat("_", "milliseconds")
-
-
-def savescreenshottodisk(n, eldict, usecache=False):
-    # testar db in graphml export from orientdb has a screenshot attrbute
-    # with format <#00:00><[<byte>,<byte>,...]><v1>
-    # action: extract the substring [...], split at the separator, convert the list to a bytelist
-    # save the bytelist as bytearray and voila, there is the deserialized png
-    # alternative found=(grh.nodes[n][image_element].split("["))[1].split("]")[0]
-    fname = '_no_image_for_' + n
-    try:
-
-        if not (eldict.get(glob.image_element) is None):
-            param = eldict.get(glob.image_element)
-
-            if param.split('|')[0] != 'inferin' and param.split('|')[0] != 'inferout':
-                fname = imagefilename(n)
-                if usecache:
-                    return fname
-                found = re.search(glob.screenshotregex, eldict[glob.image_element]).group(1)
-                pngintarr = [(int(x) + 256) % 256 for x in found.split(",")]
-                f = open(glob.scriptfolder + glob.assetfolder + glob.outputfolder + fname, 'wb')
-                f.write(bytearray(pngintarr))
-                f.close()
-        else:
-            return glob.no_image_file
-    except Exception as e:  # AttributeError:	# [ ] not found in the original string
-        exc_type, exc_obj, exc_tb = sys.exc_info()
-        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-        print(exc_type, fname, exc_tb.tb_lineno)
-        print('*  There was an error processing : ' + str(e))
-        return glob.no_image_file
-    return fname
-
-
-def updateinferrablecreenshots(n, eldict, usecache=False):
-    # G.in_edges(node)
-    # G.out_edges(node)
-    return True
-
-
 def setCytoElements(usecache=False, parenting=False, layerview=[]):
     TestSequenceKey = ''
     nodes = []
@@ -519,31 +382,6 @@ def setCytoElements(usecache=False, parenting=False, layerview=[]):
 
 
 
-
-#############
-
-def loadoracles(contents=None, filename=''):
-    print('set data for  oracle table')
-
-    if contents is not None:  # load oracless from file trigger=='upload-button-oracle-file': #
-        content_type, content_string = contents.split(',')
-        decoded = base64.b64decode(content_string)
-        try:
-            # data=io.StringIO(decoded.decode('utf-8'))
-            directory = (glob.scriptfolder + glob.assetfolder + glob.outputfolder);
-            fout = open(directory + filename, encoding='utf-8', mode='w', newline='')
-            fout.write(decoded.decode('utf-8'))  # writes the uploaded file to the newly created file.
-            #                   tu.savetofile(decoded.decode('utf-8'),filename )
-            fout.close()  # closes the file, upload complete.
-            df = pd.read_csv(directory + filename, sep=';')
-        except Exception as e:
-            print('*  There was an error processing file <' + filename + '> :' + str(e))
-        return df
-    else:
-        pass
-
-
-#############
 def getConcreteStateSequenceid(concretestate):
     sequenceid = ''
     neighbors = glob.grh.predecessors(concretestate)
@@ -563,8 +401,6 @@ def getConcreteStateSequenceid(concretestate):
     return sequenceid
 
 
-#############
-#############
 def getConcreteActionSequenceid(concreteaction):
     sequenceids = set()
     # use the global graph object .. to ensure that TestSequence is always included
@@ -582,159 +418,5 @@ def getConcreteActionSequenceid(concreteaction):
     return sequenceid
 
 
-#############
-
-def setgraphattributes(infer=True, contents=None, filename=''):
-    if infer:  # infer from graph
-        print('inferring attributes from Graph')
-        nodelabels = set()
-        l = nx.get_node_attributes(glob.grh, glob.label_nodeelement)
-        # nodelabels.update({glob.default_subtypeelement})
-        nodelabels.update({glob.parent_subtypeelement})
-        nodelabels.update(l.values())
-        edgelabels = set()
-        l = nx.get_edge_attributes(glob.grh, glob.label_edgeelement)
-        # edgelabels.update({glob.default_subtypeelement})
-        edgelabels.update(l.values())
-        nodepropdict = dict()
-        dfnodes = pd.DataFrame()
-        for lbl in nodelabels:
-            nodepropdict = dict()
-            nodepropdict.update({'node/edge': 'node', 'subtype': lbl})
-            if lbl == glob.parent_subtypeelement or lbl == glob.label_nodeelement:  # ?????????????????
-                nodepropdict.update({glob.label_nodeelement: 1})
-            else:
-                for n, v in glob.grh.nodes(data=True):
-                    if v[glob.label_nodeelement] == lbl:  # find a node of each type
-                        for k in v.keys():
-                            nodepropdict.update({k: 1})
-                        nodepropdict.pop(lbl, '')
-                        break  # assume that nodesof the same type have the same attributes
-            df = pd.DataFrame(nodepropdict, index=[0])
-            dfnodes = pd.concat([dfnodes, df], ignore_index=True, sort=False)
-
-        edgepropdict = dict()
-        dfedges = pd.DataFrame()
-        for lbl in edgelabels:
-            edgepropdict = dict()
-            edgepropdict.update({'node/edge': 'edge', 'subtype': lbl})
-            if lbl == glob.label_edgeelement:  # ?????????????????
-                nodepropdict.update({glob.label_edgeelement: 1})
-            else:
-                for s, t, v in glob.grh.edges(data=True):
-                    if v[glob.label_edgeelement] == lbl:  # find a node of each type
-                        for k in v.keys():
-                            edgepropdict.update({k: 1})
-                            edgepropdict.pop(lbl, '')
-                        break  # assume that edges of the same type have the same attributes
-                df = pd.DataFrame(edgepropdict, index=[0])
-                dfedges = pd.concat([dfedges, df], ignore_index=True, sort=False)
-
-        glob.dfattributes = pd.concat([dfnodes, dfedges], ignore_index=True, sort=False)
-
-    elif contents is not None:  # load attributes from file trigger=='upload-button-attrib-file': #
-        content_type, content_string = contents.split(',')
-        decoded = base64.b64decode(content_string)
-        try:
-            # data=io.StringIO(decoded.decode('utf-8'))
-            directory = (glob.scriptfolder + glob.assetfolder + glob.outputfolder);
-            fout = open(directory + filename, encoding='utf-8', mode='w', newline='')
-            fout.write(decoded.decode('utf-8'))  # writes the uploaded file to the newly created file.
-            #                   tu.savetofile(decoded.decode('utf-8'),filename )
-            fout.close()  # closes the file, upload complete.
-            glob.dfattributes = pd.read_csv(directory + filename, sep=';')
-        except Exception as e:
-            print('*  There was an error processing file <' + filename + '> :' + str(e))
-    else:
-        pass
 
 
-def setvizproperties(loaddefaults=True, contents=None, filename=''):
-    if loaddefaults:  # load defaults
-        print('Setting visual defaults')
-        glob.dfdisplayprops = pd.DataFrame()
-        for index, row in glob.dfattributes.iterrows():
-            displaydict = dict()
-            displaydict.update({'node/edge': row['node/edge'], 'subtype': row['subtype']})
-            if row['node/edge'] == 'node':
-                if row['subtype'] == glob.parent_subtypeelement:
-                    displaydict.update(glob.parentnodedisplayprop)
-                else:
-                    displaydict.update(glob.nodedisplayprop)
-            else:
-                displaydict.update(glob.edgedisplayprop)
-            df = pd.DataFrame(displaydict, index=[0])
-            glob.dfdisplayprops = pd.concat([glob.dfdisplayprops, df], ignore_index=True, sort=False)
-
-    elif contents is not None:  # load file  trigger=='upload-button-viz-file':
-        content_type, content_string = contents.split(',')
-        decoded = base64.b64decode(content_string)
-        try:
-            # data=io.StringIO(decoded.decode('utf-8'))
-            directory = (glob.scriptfolder + glob.assetfolder + glob.outputfolder);
-            fout = open(directory + filename, encoding='utf-8', mode='w',
-                        newline='')  # creates the file where the uploaded file should be stored
-            fout.write(decoded.decode('utf-8'))  # writes the uploaded file to the newly created file.
-            #                   tu.savetofile(decoded.decode('utf-8'),filename )
-            fout.close()  # closes the file, upload complete.
-            glob.dfdisplayprops = pd.read_csv(directory + filename, sep=';')
-        except Exception as e:
-            print('*  There was an error processing file <' + filename + '> :' + str(e))
-            pass
-    else:
-        pass
-
-
-########################################
-
-# inspired by https://bsou.io/posts/color-gradients-with-python
-def hex_to_RGB(hex):
-    ''' "#FFFFFF" -> [255,255,255] '''
-    # Pass 16 to the integer function for change of base
-    return [int(hex[i:i + 2], 16) for i in range(1, 6, 2)]
-
-
-def RGB_to_hex(RGB):
-    ''' [255,255,255] -> "#FFFFFF" '''
-    # Components need to be integers for hex to make sense
-    RGB = [int(x) for x in RGB]
-    return "#" + "".join(["0{0:x}".format(v) if v < 16 else
-                          "{0:x}".format(v) for v in RGB])
-
-
-def color_dict(gradient):
-    ''' Takes in a list of RGB sub-lists and returns dictionary of
-      colors in RGB and hex form for use in a graphing function
-      defined later on '''
-    return {"hex": [RGB_to_hex(RGB) for RGB in gradient],
-            "r": [RGB[0] for RGB in gradient],
-            "g": [RGB[1] for RGB in gradient],
-            "b": [RGB[2] for RGB in gradient]}
-
-
-def linear_gradient(start_hex, finish_hex="#FFFFFF", n=10):
-    ''' returns a gradient list of (n) colors between
-      two hex colors. start_hex and finish_hex
-      should be the full six-digit color string,
-      inlcuding the number sign ("#FFFFFF") '''
-    # Starting and ending colors in RGB form
-    s = hex_to_RGB(start_hex)
-    f = hex_to_RGB(finish_hex)
-    # Initilize a list of the output colors with the starting color
-    RGB_list = [s]
-    # Calcuate a color at each evenly spaced value of t from 1 to n
-    for t in range(1, n):
-        # Interpolate RGB vector for color at the current value of t
-        curr_vector = [
-            int(s[j] + (float(t) / (n - 1)) * (f[j] - s[j]))
-            for j in range(3)
-        ]
-        # Add it to our list of output colors
-        RGB_list.append(curr_vector)
-
-    return color_dict(RGB_list)
-
-
-def colorgradient(colornameStart, colornameEnd='dark blue', n=10):
-    # return linear_gradient(matplotlib.colors.cnames[colornameStart],matplotlib.colors.cnames[colornameStart],n)
-    return linear_gradient(mplcolors.cnames[colornameStart], mplcolors.cnames[colornameEnd], n)

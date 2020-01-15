@@ -20,7 +20,6 @@ import dash_table as dt
 import dash_core_components as dcc
 import dash_html_components as html
 
-#**************************
 oracles = html.Div([
             html.Div([
             html.A(id='collapse-oracle-link',children='Collapse/Expand Oracle table:', n_clicks=0,n_clicks_timestamp=0,style = {'font-size': 12}, href="javascript:toggle1(document.getElementById('oracle-area'))" ),
@@ -39,7 +38,6 @@ oracles = html.Div([
             html.Button(id='apply-oracle_style-button', n_clicks=0, n_clicks_timestamp=0, children='Apply Style',
                             style={'display': 'inline-block'}),
 
-                #html.Button(id='show-selected-oracle-button', n_clicks=0,n_clicks_timestamp=0, children='Show Selected Path', style={'display': 'inline-block'}),
             dcc.Loading(
                     id="loading-oracletable",
                     children=[
@@ -80,12 +78,7 @@ oracles = html.Div([
 
             ],style={'display': 'none'})
                 ], style={'border-width': '1','border-color':'grey','border-style': 'dashed','width': '100%'}),
-                       
-#             ], style={ 'font-size': '10'})
-#
-# #######################################################
-#
-# baselineoracles = html.Div([
+
             html.Div([
             html.A(id='collapse-baseline-oracle-link', children='Collapse/Expand Base Line Oracle table:', n_clicks=0,
                    n_clicks_timestamp=0, style = {'font-size': 12},href="javascript:toggle1(document.getElementById('baseline-oracle-area'))"),
@@ -104,7 +97,6 @@ oracles = html.Div([
                             children='Apply Style',
                             style={'display': 'inline-block'}),
 
-                # html.Button(id='show-selected-oracle-button', n_clicks=0,n_clicks_timestamp=0, children='Show Selected Path', style={'display': 'inline-block'}),
                 dcc.Loading(
                     id="loading-baseline-oracletable",
                     children=[

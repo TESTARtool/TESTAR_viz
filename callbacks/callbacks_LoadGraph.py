@@ -12,7 +12,7 @@ import sys
 from dash.dependencies import Input, Output, State
 from appy import app
 import utils.globals as glob
-import utils.utlis as tu
+import utils.graphcomputing as tu
 
 ##############################################
 

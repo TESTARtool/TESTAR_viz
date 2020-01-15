@@ -1,35 +1,27 @@
 import json
-
 import networkx as nx
-from dash.exceptions import PreventUpdate
 
-import utils.utlis as tu
+import utils.gradient
+import utils.gui
+import utils.graphcomputing as tu
 import utils.globals as glob
 from utils import styler
 
-
-def updateCytoStyleSheet(button, selectedoracles, oracledata, selectedbaselineoracles,
-    baselineoracledata,selectedexecutions, executionsdata,
-    layerview,selectedadvancedproperties,advancedpropertiesdata,selectedcentralities,centralitiesdata,selectednodedata ):
+def updateCytoStyleSheet(button, selectedoracles, oracledata, selectedbaselineoracles,baselineoracledata,
+                    selectedexecutions, executionsdata,layerview,selectedadvancedproperties,advancedpropertiesdata,
+                    selectedcentralities,centralitiesdata,selectednodedata ):
 
     stylesheet = []
     oracleconditionalstyle = [{
           'if': {'row_index': 'odd'},
           'backgroundColor': 'AliceBlue'}]  # a comma <,> at the end of this line cost me a day
-
     baselineoracleconditionalstyle = [{
         'if': {'row_index': 'odd'},
         'backgroundColor': 'AliceBlue'}]  # a comma <,> at the end of this line cost me a day
-    executionstyle = [{
-        'if': {'row_index': 'odd'},
-        'backgroundColor': 'AliceBlue'}]  # a comma <,> at the end of this line cost me a day
-
 
     data = glob.dfdisplayprops.to_dict('records');
+
     for row in data:
-        styledict = dict()
-        stylepropdict = dict()
-        selectordict = dict()
         if row[glob.elementtype] == 'node':
             dsp = 'element'
             if not row.get('hide') is None:
@@ -91,7 +83,6 @@ def updateCytoStyleSheet(button, selectedoracles, oracledata, selectedbaselineor
                  'line-style': row['edgefill'],
                  'text-rotation':'autorotate',
                  'text-margin-y' : -5,
-
                  })
             legenda = styler.stylelegenda(row[glob.elementtype], row[glob.elementsubtype], itemstyle,glob.label_edgeelement)
             stylesheet.append(legenda[0])
@@ -111,26 +102,18 @@ def updateCytoStyleSheet(button, selectedoracles, oracledata, selectedbaselineor
                    condition='['+ row['hide_conditionally']+']'
                    legenda = styler.stylelegenda(row[glob.elementtype], row[glob.elementsubtype]+condition, itemstyle,glob.label_edgeelement)
                    stylesheet.append(legenda[0])
-
         else:
             selectorfilter = ""  # should not happen
 
-
 #######  oracles
-    # if selectedoracles is None:   selectedoracles = []
-    # selectedrows=[i['row'] for i in selectedoracles]
-    # selectedrows=list(set(selectedrows))  #ascending order?
     selectedrows=selectedoracles
     if not (oracledata is None) and len(oracledata)>0 and not(selectedrows is None) and len(selectedrows)>0:
-        rowsdata = [oracledata[i] for i in range(len(oracledata)) if i in selectedrows]
         prefixcolor = ''
         cyclecolor = ''
         i=-1
         for r in oracledata:
             i=i+1
             if i in selectedrows:
-                #piggyback the oracle table stylesheet
-
                 if r['ORACLE_VERDICT']== 'FAIL' :
                     prefixcolor = 'brown'
                     cyclecolor = 'red'
@@ -138,7 +121,6 @@ def updateCytoStyleSheet(button, selectedoracles, oracledata, selectedbaselineor
                          "if": {"row_index": i},
                          "backgroundColor": "red",
                          'color': 'white'})
-
                 elif r['ORACLE_VERDICT']== 'PASS' :
                     prefixcolor = 'lightgreen'
                     cyclecolor = 'green'
@@ -166,8 +148,6 @@ def updateCytoStyleSheet(button, selectedoracles, oracledata, selectedbaselineor
             for r in baselineoracledata:
                 i = i + 1
                 if i in selectedbaselinerows:
-                    # piggyback the oracle table stylesheet
-
                     if r['ORACLE_VERDICT'] == 'FAIL':
                         prefixcolor = 'plum'
                         cyclecolor = 'deeppink'
@@ -175,7 +155,6 @@ def updateCytoStyleSheet(button, selectedoracles, oracledata, selectedbaselineor
                             "if": {"row_index": i},
                             "backgroundColor": "red",
                             'color': 'white'})
-
                     elif r['ORACLE_VERDICT'] == 'PASS':
                         prefixcolor = 'gold'
                         cyclecolor = 'goldenrod'
@@ -225,61 +204,35 @@ def updateCytoStyleSheet(button, selectedoracles, oracledata, selectedbaselineor
 
 
     #######  testexecutions
-
     selectedrows = selectedexecutions
     if not (executionsdata is None) and len(executionsdata) > 0 and len(selectedrows) > 0:
-        rowsdata = [executionsdata[i] for i in range(len(executionsdata)) if i in selectedrows]
-        prefixcolor = ''
-        cyclecolor = ''
-
         i = -1
-        styledict = dict()
-        stylepropdict = dict()
-        selectordict = dict()
-        nodeselectorfilters = ''
-        edgeselectorfilters = ''
+        nodeselectorfilters = []
+        edgeselectorfilters = []
         for r in executionsdata:
             i = i + 1
             if not i in selectedrows:
                 createdattribute = 'createdby_sequenceid'
-                # executionstyle.append({
-                #     "if": {"row_index": i},
-                #     "backgroundColor": "royalblue ",
-                #     'color': 'white'})
-                nodeselectorfilter = "node[labelV = 'ConcreteState'][" + createdattribute + " = " + "'" + r['sequenceId'] + "'" + "]"
-                edgeselectorfilter = "edge[labelE = 'ConcreteAction'][" + createdattribute + " = " + "'" + r['sequenceId'] + "'" + "]"
-                #nodeselectorfilter = "node[nodeid = '#159:8']"
+                nodeselectorfilter = "node["+ glob.label_nodeelement+" = 'ConcreteState'][" + createdattribute + " = " + "'" + r['sequenceId'] + "'" + "]"
+                edgeselectorfilter = "edge["+ glob.label_edgeelement+" = 'ConcreteAction'][" + createdattribute + " = " + "'" + r['sequenceId'] + "'" + "]"
+                nodeselectorfilters.append(nodeselectorfilter)
+                edgeselectorfilters.append(edgeselectorfilter)
 
-
-                if len(nodeselectorfilters) == 0:
-                    nodeselectorfilters = nodeselectorfilter
-                    edgeselectorfilters = edgeselectorfilter
-                else:
-                    nodeselectorfilters = nodeselectorfilter + ',' + nodeselectorfilters
-                    edgeselectorfilters = edgeselectorfilter + ',' + edgeselectorfilters
-
-        selectordict.update({'selector': nodeselectorfilters})
-        #stylepropdict = {'shape':'octagon','background-color': 'red'}#, 'border-style': 'dotted', 'opacity': 0.1, 'border-color': 'fuchsia'}
+        selectordict={'selector': ','.join(nodeselectorfilters)}
         stylepropdict = {'shape': 'octagon',
                          'background-color': 'red' , 'border-style': 'dotted', 'opacity': 0.1, 'border-color': 'fuchsia'}
-
-        styledict.update({'style': stylepropdict})
-        tmpstyle = dict()
-        tmpstyle.update(selectordict)
+        styledict={'style': stylepropdict}
+        tmpstyle = selectordict
         tmpstyle.update(styledict)
         stylesheet.append(tmpstyle)
 
-        selectordict.update({'selector': edgeselectorfilters})
+        selectordict={'selector': ','.join(edgeselectorfilters)}
         stylepropdict = {'line-style': 'dotted', 'opacity': 0.4, 'mid-target-arrow-color': 'fuchsia'}
-        styledict.update({'style': stylepropdict})
-        tmpstyle = dict()
-        tmpstyle.update(selectordict)
+        styledict={'style': stylepropdict}
+        tmpstyle = selectordict
         tmpstyle.update(styledict)
         stylesheet.append(tmpstyle)
     #######  testexecutions
-
-
-    ## update experiment
 
     ########centralities
     selectedcentralitiesrows = selectedcentralities
@@ -292,33 +245,23 @@ def updateCytoStyleSheet(button, selectedoracles, oracledata, selectedbaselineor
                 if i in selectedcentralitiesrows:
                     styledict = dict()
                     selectordict = dict()
-                    # piggyback the oracle table stylesheet
-                    #: 'loadcentrality
-                    nodeselectorfilter=''
                     bins=json.loads(r['binning'])  # convert string back to dict
                     minwidth=20
                     minheight=20
-                    colorlist=tu.colorgradient(colornameStart='red', colornameEnd='green', n=len(bins))['hex']
+                    colorlist= utils.gradient.colorgradient(colornameStart='red', colornameEnd='green', n=len(bins))['hex']
                     j=0
                     for k,v in bins.items():
-
                         nodeselectorfilter = "node[" + r['measure'] + " >= " + "'" + str(v) + "'" + "]"
                         selectordict.update({'selector': nodeselectorfilter})
                         stylepropdict = {'shape': 'ellipse','width': int(minwidth*pow(1.25,(j))),'height': int(minheight*pow(1.25,(j))),'background-color': colorlist[j],  'border-color': colorlist[j]}
-
-                        styledict.update({'style': stylepropdict})
-                        tmpstyle = dict()
-                        tmpstyle.update(selectordict)
-                        tmpstyle.update(styledict)
-                        stylesheet.append(tmpstyle)
+                        legenda = styler.stylelegenda('node',  str(v), stylepropdict, r['measure'], '', ">=")
+                        stylesheet.append(legenda[0])
                         j=j+1
-    # else: no special handling for display oracles
-
-
     ########centralities
+
     selectedadvancedrows = selectedadvancedproperties
     if not (advancedpropertiesdata is None) and len(advancedpropertiesdata) > 0 and not (selectedadvancedrows is None) and len(selectedadvancedrows) > 0:
-        subgraph = tu.updatesubgraph('Concrete')  # regard only itemsthat are NOT in ABSTRACT and NOT in WIDGET and NOT in TEST
+        subgraph = utils.gui.updatesubgraph('Concrete')  # regard only itemsthat are NOT in ABSTRACT and NOT in WIDGET and NOT in TEST
         i = -1
         for r in advancedpropertiesdata:
             i = i + 1
@@ -343,13 +286,13 @@ def updateCytoStyleSheet(button, selectedoracles, oracledata, selectedbaselineor
                 stylesheet.extend(updatestyleoftrace(csvlspedges, 'edge', stylepropdict))
 
     shortestpatherror=''
-    ## update expiriment
+
     ##Sp between 2 nodes
     if not (selectednodedata is None) and len(selectednodedata) > 0:
         if not (len(selectednodedata) == 2):
             shortestpatherror = '(shortestpath error: select exactly 2 nodes in current view)'
         else:
-            tmpgrh = tu.updatesubgraph(layerview)
+            tmpgrh = utils.gui.updatesubgraph(layerview)
             sourcenode=selectednodedata[0]['nodeid']
             targetnode = selectednodedata[1]['nodeid']
             try:
@@ -387,13 +330,6 @@ def updatestyleoftrace(csvlistofelements,elementype,stylepropdict):
         return tmpstylesheet
     elementlist.extend(csvlistofelements.split(';'))
     for graphid in elementlist:
-        styledict = dict()
-        selectordict = dict()
-        selectorfilter = "[" + elementype+"id" + " = " + "'" + graphid + "'" + "]"
-        selectordict.update({'selector': elementype + selectorfilter}) # {'selector': "node[nodeid='#143:9']"})
-        styledict.update({'style': stylepropdict})
-        tmpstyle = dict()
-        tmpstyle.update(selectordict)
-        tmpstyle.update(styledict)
-        tmpstylesheet.append(tmpstyle)
+        legenda = styler.stylelegenda(elementype, graphid, stylepropdict)
+        tmpstylesheet.append(legenda[0])
     return tmpstylesheet

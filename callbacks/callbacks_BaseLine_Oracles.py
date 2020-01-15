@@ -8,9 +8,11 @@ Created on Wed Apr  3 18:27:03 2019
 
 import dash
 from dash.dependencies import Input, Output,State
+
+import utils.filehandling
 from appy import app
 import utils.globals as glob
-import utils.utlis as utils
+import utils.graphcomputing as utils
 import networkx as nx
 ##############################################
 
@@ -30,7 +32,7 @@ def loadbaselineoracles( contents, filename,date):
     ctx = dash.callback_context
     if ctx.triggered:
        if contents is not None:
-          glob.dfbaselineoracles = utils.loadoracles( contents, filename)
+          glob.dfbaselineoracles = utils.filehandling.loadoracles(contents, filename)
        else:
           return [{'id': 'dummy', 'name': 'dummy'}],[{'dummy':''}]
           # CSS: if the above code between [] [] is  left-out, the table will not rendered at first hit of load button

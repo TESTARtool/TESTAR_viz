@@ -9,11 +9,11 @@ import os
 import dash
 from dash.dependencies import Input, Output,State
 import dash_html_components as html
-from dash.exceptions import PreventUpdate
 
+import utils.filehandling
 from appy import app
 import utils.globals as glob
-import utils.utlis as tu
+import utils.graphcomputing as tu
 import callbacks.callback_helpers as ch
 import pandas as pd
 
@@ -32,69 +32,64 @@ def update_layout(hit0,  canvasheight, layout, fenced, layerview):
 
     ctx = dash.callback_context
     trigger = ctx.triggered[0]['prop_id'].split('.')[0]
-    subelements=[]
-    if ctx.triggered:
-        if  (trigger=='submit-button' and  hit0 >= 1):
-            if glob.grh.size() != 0:
-                if len(fenced)>0 : parenting=True
-                else: parenting=False
-                tu.setCytoElements(False, parenting, layerview)
-        # infer screenshots
-        h = 600 * canvasheight
-        return glob.cytoelements, {'name': layout, 'animate': False} , {'height': '' + str(h) + 'px'},
+    if  (trigger=='submit-button' and  hit0 >= 1):
+        if glob.grh.size() != 0:
+            if len(fenced)>0 : parenting=True
+            else: parenting=False
+            tu.setCytoElements(False, parenting, layerview)
+    h = 600 * canvasheight
+    return glob.cytoelements, {'name': layout, 'animate': False} , {'height': '' + str(h) + 'px'},
 
 
  #############################
 
 @app.callback(
     [ Output('dummycytospinner','children'),
-        Output('cytoscape-update-layout', 'stylesheet'),
-     Output('oracletable', 'style_data_conditional'),
-     Output('baseline-oracletable', 'style_data_conditional'),
+    Output('cytoscape-update-layout', 'stylesheet'),
+    Output('oracletable', 'style_data_conditional'),
+    Output('baseline-oracletable', 'style_data_conditional'),
     Output('shortestpathlog','children')],
 
     [Input('apply-viz_style-button', 'n_clicks'),
     Input('apply-oracle_style-button', 'n_clicks'),
-     Input('apply-baseline-oracle_style-button', 'n_clicks'),
-     Input('apply-executions-button', 'n_clicks'),
-     Input('loading-logtext', 'children'),
-     Input('apply-advancedproperties-button', 'n_clicks'),# was 'children'.. cost me 1/2 day to debug
+    Input('apply-baseline-oracle_style-button', 'n_clicks'),
+    Input('apply-executions-button', 'n_clicks'),
+    Input('loading-logtext', 'children'),
+    Input('apply-advancedproperties-button', 'n_clicks'),# was 'children'.. cost me 1/2 day to debug
     Input('apply-centralities-button', 'n_clicks'),
-     Input('apply-shortestpath-button', 'n_clicks'),
+    Input('apply-shortestpath-button', 'n_clicks'),
      ],
 
-    [State('oracletable',"derived_virtual_selected_rows"),
+    [State('viz-settings-table',"data"),
+    State('oracletable',"derived_virtual_selected_rows"),
     State('oracletable', "data"),
-     State('baseline-oracletable',"derived_virtual_selected_rows"),
+    State('baseline-oracletable',"derived_virtual_selected_rows"),
     State('baseline-oracletable', "data"),
-     State('executions-table', "derived_virtual_selected_rows"),
-     State('executions-table', "data"),
+    State('executions-table', "derived_virtual_selected_rows"),
+    State('executions-table', "data"),
     State('checkbox-layerview-options','value'),
-     State('advancedproperties-table', "derived_virtual_selected_rows"),
-     State('advancedproperties-table', "data"),
-     State('centralities-table', "derived_virtual_selected_rows"),
-     State('centralities-table', "data"),
+    State('advancedproperties-table', "derived_virtual_selected_rows"),
+    State('advancedproperties-table', "data"),
+    State('centralities-table', "derived_virtual_selected_rows"),
+    State('centralities-table', "data"),
     State('selectednodetable', 'data')
      ]
     )
 
 def updateCytoStyleSheet(button, oraclebutton,baselineoraclebutton,executionsbutton,log,advancedpropertiesbutton,
-            centralitiesbutton,shortestpathbutton,selectedoracles, oracledata,
+            centralitiesbutton,shortestpathbutton,visualsdata,selectedoracles, oracledata,
             selectedbaselineoracles, baselineoracledata,selectedexecutions, executionsdata,
             layerview,selectedadvancedproperties,advancedpropertiesdata,selectedcentralities,centralitiesdata,selectednodedata):
     ctx = dash.callback_context
     trigger = ctx.triggered[0]['prop_id'].split('.')[0]
-    if ctx.triggered:
-        returndata= ch.updateCytoStyleSheet(button, selectedoracles, oracledata,selectedbaselineoracles,
-                    baselineoracledata,selectedexecutions, executionsdata,layerview,selectedadvancedproperties,
-                    advancedpropertiesdata,selectedcentralities,centralitiesdata,selectednodedata)
-        if not ('error' in returndata[-1]): #shortestpatherror
-            return returndata
-        else:
-            if trigger=='apply-shortestpath-button':
-                return dash.no_update,dash.no_update,dash.no_update,dash.no_update,returndata[-1]
-            else:
-                return  returndata
+
+    returndata= ch.updateCytoStyleSheet(button, selectedoracles, oracledata,selectedbaselineoracles,
+                baselineoracledata,selectedexecutions, executionsdata,layerview,selectedadvancedproperties,
+                advancedpropertiesdata,selectedcentralities,centralitiesdata,selectednodedata)
+    if ('error' in returndata[-1]) and trigger=='apply-shortestpath-button': #shortestpatherror
+        return dash.no_update, dash.no_update, dash.no_update, dash.no_update, returndata[-1]
+    else:
+        return  returndata
 
 
 
@@ -122,7 +117,7 @@ def update_selectednodestabletest(selnodes):
 
         screens = []
         for c in selnodes:
-            fname = glob.outputfolder + tu.imagefilename(c['id'])
+            fname = glob.outputfolder + utils.filehandling.imagefilename(c['id'])
             screens.append(html.P(children='Screenprint of node: ' + c['id']))
             imgname = fname if  os.path.exists(glob.scriptfolder + glob.assetfolder + fname) else glob.no_image_file
             screens.append(

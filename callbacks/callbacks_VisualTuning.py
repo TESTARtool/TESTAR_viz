@@ -5,64 +5,17 @@ Created on Wed Apr  3 18:27:03 2019
 
 @author: cseng
 """
-import base64
-
 import urllib
 import pandas as pd
 import dash
 from dash.dependencies import Input, Output,State
+
+import utils.gui
 from appy import app
 import utils.globals as glob
-import utils.utlis as utils
+import utils.graphcomputing as utils
 ##############################################
 
-
-#tab5
-
-
-@app.callback(
-    [Output('attributetable', 'columns'),
-    Output('attributetable', 'data')],
-    [ Input('loading-logtext', 'children'),Input( 'infer-attrib-from-source-button', 'n_clicks'),
-    Input('upload-attrib-from-file', 'contents')],
-    [State('upload-attrib-from-file', 'filename'),
-    State('upload-attrib-from-file', 'last_modified')])
-
-
-def getattributes(loadlog,hitsb0,  contents, filename, date):
-
-    ctx = dash.callback_context
-    trigger = ctx.triggered[0]['prop_id'].split('.')[0]
-    if ctx.triggered:
-        if  trigger=='infer-attrib-from-source-button'  : #infer from graph
-            utils.setgraphattributes(True, None, '')
-        elif contents is not None:  # load file  trigger=='upload-button-viz-file':
-            utils.setgraphattributes(False, contents, filename)
-        # else # via loadlog. this gets updated via the load graph button
-        columns=[{'id': c, 'name': c, 'hideable': True} for c in  glob.dfattributes.columns]
-        data= glob.dfattributes.to_dict("rows")
-        return columns, data
-#    else:
-#        return [{'id': '', 'name': ''}],{}
-########################################
-
-@app.callback(
-    Output('save-attributes', 'href'),
-    [Input( 'attributetable','derived_virtual_data')],
-    [State( 'attributetable','columns')])
-
-def save_att_table(data,cols):
-    if data!=None:
-        pdcol= [i['id'] for i in cols]
-        glob.dfattributes=pd.DataFrame(data,columns = pdcol)
-        csvstr = glob.dfattributes.to_csv(index=False,encoding='utf-8',sep = ';')
-        csvstr = "data:text/csv;charset=utf-8," + urllib.parse.quote(csvstr)
-        return  csvstr
-#    else:
-#        return ''
-#######################################
-
-########################################
 
 @app.callback(    
     [Output('viz-settings-table', 'columns'),
@@ -72,60 +25,41 @@ def save_att_table(data,cols):
     Input('upload-visual-from-file', 'contents')],
     [State('upload-visual-from-file', 'filename'),
     State('upload-visual-from-file', 'last_modified')])
-def update_viz_table(loadlog,hitsb0,contents,filename, date):
+def load_viz_table(loadlog, hitsb0, contents, filename, date):
 
-    infer=False
     ctx = dash.callback_context
-
     trigger = ctx.triggered[0]['prop_id'].split('.')[0]
-
-    if ctx.triggered:
-        if  trigger=='load-visual-defaults-button' or infer : #load defaults
-            utils.setvizproperties(True, None, '')
-
-        elif  contents is not None: #load file  trigger=='upload-button-viz-file': 
-            utils.setvizproperties(False, contents, filename)
-        # else # via loadlog. this gets updated via the load graph button
+    triggervalue=ctx.triggered[0]['value']
+    if (trigger=='loading-logtext' and triggervalue=='') or hitsb0==0:
+        return dash.no_update,dash.no_update
+    else:
+        if  contents is  None: #load defaults or loading log trigger
+            utils.gui.setvizproperties(True, None, '')
+        else: #load file  trigger=='upload-button-viz-file':
+            utils.gui.setvizproperties(False, contents, filename)
         cols= [{'id': c, 'name': c, 'hideable': True} for c in  glob.dfdisplayprops.columns]
         data= glob.dfdisplayprops.to_dict("rows")
         return cols, data#, csvstr
-#    else:
-#        return [{'id': '', 'name': ''}],{}
- 
-@app.callback(    
-    Output('save-visual-settings', 'href'),
-    [Input( 'viz-settings-table','derived_virtual_data')],
-    [State( 'viz-settings-table','columns')])
 
-def save_viz_table(data,cols):
-    if data!=None:
-        pdcol= [i['id'] for i in cols]
-        df=pd.DataFrame(data,columns = pdcol)
-        csvstr = df.to_csv(index=False,encoding='utf-8',sep = ';')
-        csvstr = "data:text/csv;charset=utf-8," + urllib.parse.quote(csvstr)  
-        return  csvstr
+
 
 ########################################
 
 @app.callback(
     [Output('executions-table', 'columns'),
-    Output('executions-table', 'data')
-        ,
+    Output('executions-table', 'data'),
      Output('advancedproperties-table', 'columns'),
-     Output('advancedproperties-table', 'data')
-        ,
+     Output('advancedproperties-table', 'data'),
      Output('centralities-table', 'columns'),
-     Output('centralities-table', 'data')
-     ],
+     Output('centralities-table', 'data')],
     [Input('loading-logtext', 'children'),
-     Input('load-executions-table-button','n_clicks')],   #dash table does not load nicely on initial load
-    )
-def update_execandadvanced_table(loadlog, dummybutton):
+     Input('load-executions-table-button','n_clicks')])
+def update_exec_advanced_UItable(loadlog, dummybutton):
     ctx = dash.callback_context
     trigger = ctx.triggered[0]['prop_id'].split('.')[0]
     dummycol={'id': 'dummy', 'name': 'dummy'}
     dummydata={'dummy': 'NA'}
-    cols = [dummycol]# CSS: if the above code between [] [] is  left-out, the table will not rendered at first hit of load button
+    cols = [dummycol]
     data = [dummydata]
     cols1 = [dummycol]
     data1 = [dummydata]
@@ -147,29 +81,28 @@ def update_execandadvanced_table(loadlog, dummybutton):
 
 ########################################
 @app.callback(
+    Output('save-visual-settings', 'href'),
+    [Input( 'viz-settings-table','derived_virtual_data')],
+    [State( 'viz-settings-table','columns')])
+def save_viz_table(data,cols):
+    return save_UItable(data, cols)
+
+@app.callback(
     Output('save-testexecutions-settings', 'href'),
     [Input( 'executions-table','derived_virtual_data')],
     [State( 'executions-table','columns')])
-
 def save_exec_table(data,cols):
-    csvstr=''
-    if not data is None:
-        pdcol= [i['id'] for i in cols]
-        df=pd.DataFrame(data,columns = pdcol)
-        csvstr =df.to_csv(index=False,encoding='utf-8',sep = ';')
-        csvstr = "data:text/csv;charset=utf-8," + urllib.parse.quote(csvstr)
-    return  csvstr
+    return save_UItable(data, cols)
 
-########################################
-
-
-########################################
 @app.callback(
     Output('save-advproperties-table', 'href'),
     [Input( 'advancedproperties-table','derived_virtual_data')],
     [State( 'advancedproperties-table','columns')])
-
 def save_properties_table(data,cols):
+    return save_UItable(data, cols)
+
+
+def save_UItable(data,cols):
     csvstr = ''
     if not data is None:
         pdcol= [i['id'] for i in cols]
@@ -177,6 +110,31 @@ def save_properties_table(data,cols):
         csvstr = df.to_csv(index=False,encoding='utf-8',sep = ';')
         csvstr = "data:text/csv;charset=utf-8," + urllib.parse.quote(csvstr)
     return  csvstr
-
 ########################################
 
+#@app.callback(
+#     [Output('attributetable', 'columns'),
+#     Output('attributetable', 'data')],
+#     [ Input('loading-logtext', 'children'),Input( 'infer-attrib-from-source-button', 'n_clicks'),
+#     Input('upload-attrib-from-file', 'contents')],
+#     [State('upload-attrib-from-file', 'filename'),
+#     State('upload-attrib-from-file', 'last_modified')])
+# def getattributes(loadlog,hitsb0,  contents, filename, date):
+#     ctx = dash.callback_context
+#     trigger = ctx.triggered[0]['prop_id'].split('.')[0]
+#     if ctx.triggered:
+#         if  trigger=='infer-attrib-from-source-button'  : #infer from graph
+#             utils.setgraphattributes(True, None, '')
+#         elif contents is not None:  # load file  trigger=='upload-button-viz-file':
+#             utils.setgraphattributes(False, contents, filename)
+#         # else # via loadlog. this gets updated via the load graph button
+#         columns=[{'id': c, 'name': c, 'hideable': True} for c in  glob.dfattributes.columns]
+#         data= glob.dfattributes.to_dict("rows")
+#         return columns, data
+#
+# @app.callback(
+#     Output('save-attributes', 'href'),
+#     [Input( 'attributetable','derived_virtual_data')],
+#     [State( 'attributetable','columns')])
+# def save_att_table(data,cols):
+#     return save_UItable(data, cols)

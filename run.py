@@ -19,7 +19,7 @@ This example is partial based on the script from https://dash.plot.ly/cytoscape/
 ##############
 # this file must be placed in the parent folder
 ##############
-
+import utils.filehandling
 from appy import app
 
 from dash import __version__ as dashversion
@@ -29,7 +29,7 @@ import dash_cytoscape as cyto
 import sys
 import os
 import utils.globals as glob
-import utils.utlis as tu
+import utils.graphcomputing as tu
 import platform
 from layouts.layout import testarlayout
 
@@ -95,7 +95,7 @@ elif (len(sys.argv) >1 and sys.argv[1]=='--port'):
 
 
 print ('use commandline option --port to run an instance other than',port)
-tu.clearassetsfolder()
+utils.filehandling.clearassetsfolder()
 if __name__ == '__main__':
     app.title = 'TESTAR Temporal Visualizer'
     app.run_server(port=port, debug=False)
