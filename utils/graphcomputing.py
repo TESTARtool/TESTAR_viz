@@ -71,14 +71,15 @@ def processgraphmlfile(details=True, advanced=False):
                 sequenceid = getConcreteActionSequenceid(edict['actionId'])
                 glob.grh[source][target][n]['createdby_sequenceid'] = sequenceid  # is syntax for multidi graph edges
 
-        print('updating all ConcreteStates & Actions with ''createdby-testsequence'' attribute  done', "--- %s seconds ---" % (time.time() - start_time))
+        print('updating all ConcreteStates & Actions with ''createdby-testsequence'' attribute  done',
+              "--- %s seconds ---" % (time.time() - start_time))
 
     centralitymeasure = [{'measure': 'N/A', 'binning': 'N/A'}]
     V = len(subgraph)
     E = subgraph.size()
     #     d = nx.betweenness_centrality(subgraph) # not implemented in networkx for MultiDigraph
     if (V * E) < (2000 * 20000):  # 40.000.000 will take 60 seconds??
-         #  this must be caluculate before the call setcytoelements.
+        #  this must be caluculate before the call setcytoelements.
         centralitymeasure = []
         d = nx.in_degree_centrality(subgraph)
         ############
@@ -163,7 +164,6 @@ def processgraphmlfile(details=True, advanced=False):
 
         ##############
 
-
         d = nx.load_centrality(subgraph)
         ############
         bindf = pd.DataFrame(list(d.items()), columns=['node', 'loadcentrality'])
@@ -210,8 +210,8 @@ def processgraphmlfile(details=True, advanced=False):
     print('updating graph centralities attributes  done', "--- %s seconds ---" % (time.time() - start_time))
 
     ######## part 2
-   # glob.elements = setCytoElements(glob.grh)
-   # print('transferring graph to cytoscape structure done', "--- %s seconds ---" % (time.time() - start_time))
+    # glob.elements = setCytoElements(glob.grh)
+    # print('transferring graph to cytoscape structure done', "--- %s seconds ---" % (time.time() - start_time))
     ######## part 3
     glob.elementcreationdistri = []
     if advanced:
@@ -237,7 +237,7 @@ def processgraphmlfile(details=True, advanced=False):
         print('updating execution statistics  done', "--- %s seconds ---" % (time.time() - start_time))
     glob.testexecutions = pd.DataFrame(glob.elementcreationdistri)
 
-        ##########advanced properties
+    ##########advanced properties
 
     lspbyinitial = [{'initialNode': 'N/A', 'LSP length': '-1', 'LSP': 'N/A'}]
     if True or advanced:
@@ -260,7 +260,7 @@ def processgraphmlfile(details=True, advanced=False):
         pass
         print('updating shortestpaths from initalnodes  done', "--- %s seconds ---" % (time.time() - start_time))
     glob.lsptraces = pd.DataFrame(lspbyinitial)
-        ##########advanced properties
+    ##########advanced properties
 
     masterlog = {}
     log = []
@@ -305,8 +305,6 @@ def setCytoElements(usecache=False, parenting=False, layerview=[]):
     TestSequenceKey = ''
     nodes = []
     edges = []
-    parentnodes = {}
-    grantparentnodes = {}
     allnodes = []
     Cparentnode = {}
     Wparentnode = {}
@@ -323,22 +321,24 @@ def setCytoElements(usecache=False, parenting=False, layerview=[]):
 
                 tempdict = dict(ndict)
                 tempdict.update({'label': ndict[glob.label_nodeelement]})  # copy as cyto wants the 'label' tag
-                tempdict.update({'id': n});
+                tempdict.update({'id': n})
                 tempdict.update({'nodeid': n})
 
                 if parenting:
                     if 'Concrete' in layerview and ndict[glob.label_nodeelement] == 'ConcreteState':
                         tempdict.update({'parent': 'ConcreteLayer'})
-                        Cparentnode = {'data': {'id': 'ConcreteLayer', glob.label_nodeelement: glob.parent_subtypeelement,
-                                                'nodeid': 'ConcreteLayer'}}
+                        Cparentnode = {
+                            'data': {'id': 'ConcreteLayer', glob.label_nodeelement: glob.parent_subtypeelement,
+                                     'nodeid': 'ConcreteLayer'}}
                     if 'Widget' in layerview and ndict[glob.label_nodeelement] == 'Widget':
                         tempdict.update({'parent': 'WidgetLayer'})
                         Wparentnode = {'data': {'id': 'WidgetLayer', glob.label_nodeelement: glob.parent_subtypeelement,
                                                 'nodeid': 'WidgetLayer'}}
                     if 'Abstract' in layerview and ndict[glob.label_nodeelement] == 'AbstractState':
                         tempdict.update({'parent': 'AbstractLayer'})
-                        Aparentnode = {'data': {'id': 'AbstractLayer', glob.label_nodeelement: glob.parent_subtypeelement,
-                                                'nodeid': 'AbstractLayer'}}
+                        Aparentnode = {
+                            'data': {'id': 'AbstractLayer', glob.label_nodeelement: glob.parent_subtypeelement,
+                                     'nodeid': 'AbstractLayer'}}
                     if ('Test Executions' in layerview) and ((ndict[glob.label_nodeelement] == 'SequenceNode') or (
                             ndict[glob.label_nodeelement] == 'TestSequence')):
                         TestSequenceKey = 'TestTrace_' + ndict['sequenceId']
@@ -381,11 +381,9 @@ def setCytoElements(usecache=False, parenting=False, layerview=[]):
         print('*  There was an error processing : ' + str(e))
 
 
-
 def getConcreteStateSequenceid(concretestate):
     sequenceid = ''
     neighbors = glob.grh.predecessors(concretestate)
-    # testsequence_nodesdict=nx.get_node_attributes(glob.grh,'TestSequence')
     # use the global graph object .. to ensure that TestSequence is always included
     sequenceids = set()
     for n in neighbors:
@@ -416,7 +414,3 @@ def getConcreteActionSequenceid(concreteaction):
         if index == 0: break
     sequenceid = glob.sortedsequenceids[index]
     return sequenceid
-
-
-
-

@@ -13,11 +13,8 @@ from  layouts.layout_tab_LoadGraph import loadGraph
 from  layouts.layout_tab_VisualTuning import visualTuning
 from  layouts.layout_tab_Cyto import cytolayout
 from  layouts.layout_tab_CytoLegenda import cytolegendalayout
-
 from  layouts.layout_tab_SelectedData import selectedData
 from  layouts.layout_tab_Oracles import oracles
-#from  layouts.layout_tab_BaseLine_Oracles import baselineoracles
-
 
 #**************************
 testarlayout = html.Div(id='main',children=[
@@ -54,14 +51,6 @@ testarlayout = html.Div(id='main',children=[
                                     'border-color': 'yellow',
                                     'border-style': 'solid'
                                     }),
-                    # html.Hr(),
-                    # html.Div(baselineoracles,
-                    #          style={'width': '100%',
-                    #                 'padding': '2',
-                    #                 'border-width': '2',
-                    #                 'border-color': 'yellow',
-                    #                 'border-style': 'solid'
-                    #                 }),
                     html.Hr(),
                     html.Div('Visual tuning',
                              style={'width': '100%',
