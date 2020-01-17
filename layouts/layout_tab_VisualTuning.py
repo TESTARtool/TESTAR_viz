@@ -15,9 +15,10 @@ import dash_core_components as dcc
 import dash_html_components as html
 
 
-def tableblock(ident='name', mincolumnwidth='30px', rowselectable='', tablemaxwidth='70%', tablemaxheigth='100px'):
+def tableblock(ident='name', mincolumnwidth='30px', edit=False, rowselectable='', tablemaxwidth='70%',
+               tablemaxheigth='100px'):
     fixedcolumns = {'headers': False, 'data': 0},
-    if rowselectable != 'single' and rowselectable != 'multi' and rowselectable!=False:
+    if rowselectable != 'single' and rowselectable != 'multi' and rowselectable != False:
         fixedcolumns = {'headers': True, 'data': 2},
     return dcc.Loading(
         id="loading-" + ident + "table",
@@ -43,6 +44,7 @@ def tableblock(ident='name', mincolumnwidth='30px', rowselectable='', tablemaxwi
                         'if': {'row_index': 'odd'},
                         'backgroundColor': 'AliceBlue'
                     }],
+                editable=edit,
                 sort_action='native',
                 sort_mode="multi",
                 page_action='none'
@@ -51,6 +53,15 @@ def tableblock(ident='name', mincolumnwidth='30px', rowselectable='', tablemaxwi
         type="circle",
         style={'font-size': '12'},
     )
+
+def savebutton(ident='save-dataid',buttontitle='Save to File'):
+    return html.A(html.Button(id='btn-' + ident, n_clicks=0, n_clicks_timestamp=0, children=buttontitle),
+                  id=ident,
+                  download='testar-viz-' + ident + '.csv',
+                  href="",
+                  target="_blank", style={'display': 'inline-block'}
+                  )
+
 
 
 visualTuning = html.Div([
@@ -68,22 +79,13 @@ visualTuning = html.Div([
                               contents=None,
                               multiple=False),
                    style={'display': 'inline-block'}),
-            html.A(
-                html.Button(id='save-visual-to-file-button', n_clicks=0, n_clicks_timestamp=0, children='Save to File'),
-                id='save-visual-settings',
-                download="testar-graph-viz-settings-nodes-edges.csv",
-                href="",
-                target="_blank",
-                style={'display': 'inline-block'}
-                ),
+            savebutton('save-visual-settings'),
+
             html.Button(id='apply-viz_style-button', n_clicks=0, n_clicks_timestamp=0, children='Apply Style',
                         style={'display': 'inline-block'}),
-            tableblock('viz-settings', '130px', '', '100%', '600px'),
+            tableblock('viz-settings', '130px', True, '', '100%', '600px'),
         ], style={'display': 'none', 'margin': '5px'})
     ], style={'border-width': '1', 'border-color': 'grey', 'border-style': 'dashed'}),
-
-    #######################################################
-
     html.Div([
         html.A(id='collapse-testsequence-link', children='Collapse/Expand Executions table:', n_clicks=0,
                n_clicks_timestamp=0, style={'font-size': 12},
@@ -92,60 +94,41 @@ visualTuning = html.Div([
             html.P(),
             html.Button(id='load-executions-table-button', n_clicks=0, n_clicks_timestamp=0, children='reload',
                         style={'display': 'none'}),  # style={'display': 'inline-block'}),
-
-            html.A(html.Button(id='save-executions-to-file-button', n_clicks=0, n_clicks_timestamp=0,
-                               children='Save to File'),
-                   id='save-testexecutions-settings',
-                   download="testar-graph-testexecutions.csv",
-                   href="",
-                   target="_blank",
-                   style={'display': 'inline-block'}
-                   ),
+            savebutton('save-testexecutions-settings'),
             html.Button(id='apply-executions-button', n_clicks=0, n_clicks_timestamp=0, children='Apply Style',
                         style={'display': 'inline-block'}),
-            tableblock('executions', '130px', 'multi', '70%', '600px'),
+            tableblock('executions', '130px', False, 'multi', '70%', '600px'),
 
         ], style={'display': 'none', 'margin': '5px'})
     ], style={'border-width': '1', 'border-color': 'grey', 'border-style': 'dashed'}),
-    #######################################################
     html.Div([
-        html.A(id='collapse-advancedproperties-link', children='Collapse/Expand Advanced section:', n_clicks=0,
+        html.A(id='collapse-pathproperties-link', children='Collapse/Expand Path section:', n_clicks=0,
                n_clicks_timestamp=0, style={'font-size': 12},
-               href="javascript:toggle1(document.getElementById('advancedproperties-area'))"),
-        html.Div(id='advancedproperties-area', children=[
+               href="javascript:toggle1(document.getElementById('pathproperties-area'))"),
+        html.Div(id='pathproperties-area', children=[
             html.P(),
-            html.A(html.Button(id='save-advancedproperties-table-button', n_clicks=0, n_clicks_timestamp=0,
-                               children='Save to File'),
-                   id='save-advproperties-table',
-                   download="testar-graph-advancedproperties.csv",
-                   href="",
-                   target="_blank",
-                   style={'display': 'inline-block'}
-                   ),
-
+            savebutton('save-advproperties-table'),
             html.Button(id='apply-advancedproperties-button', n_clicks=0, n_clicks_timestamp=0,
                         children='Apply Style',
                         style={'display': 'inline-block'}),
 
-            tableblock('advancedproperties', '130px', 'multi', '70%', '600px'),
+            tableblock('advancedproperties', '130px', False, 'multi', '70%', '600px'),
 
+        ], style={'display': 'none', 'margin': '5px'}),
+    ], style={'border-width': '1', 'border-color': 'grey', 'border-style': 'dashed'}),
+    html.Div([
+        html.A(id='collapse-measurement-link', children='Collapse/Expand measurement section:', n_clicks=0,
+               n_clicks_timestamp=0, style={'font-size': 12},
+               href="javascript:toggle1(document.getElementById('measurement-area'))"),
+        html.Div(id='measurement-area', children=[
             html.P(),
-            html.A(html.Button(id='button-save-centralities', n_clicks=0, n_clicks_timestamp=0,
-                               children='Save to File'),
-                   id='save-centrality-table',
-                   download="testar-graph-centralities.csv",
-                   href="",
-                   target="_blank",
-                   style={'display': 'inline-block'}
-                   ),
+            savebutton('save-centrality-table'),
             html.Button(id='apply-centralities-button', n_clicks=0, n_clicks_timestamp=0,
                         children='Apply Style',
                         style={'display': 'inline-block'}),
-            tableblock('centralities', '130px', 'multi', '70%', '600px'),
-
+            tableblock('centralities', '130px', False, 'multi', '70%', '600px'),
         ], style={'display': 'none', 'margin': '5px'})
     ], style={'border-width': '1', 'border-color': 'grey', 'border-style': 'dashed'}),
-
 ], style={'font-size': '12'})
 
 #######################################################

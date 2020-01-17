@@ -11,7 +11,6 @@ exploring UI features of rendered graphs with dash-cytoscape integration.
 import dash_html_components as html
 import dash_cytoscape as cyto
 
-
 def cytolegendablock(title='legenda', id='id-legenda:', width='300px', height='100px'):
     return html.Div(children=[
         html.P(title),
@@ -27,7 +26,6 @@ def cytolegendablock(title='legenda', id='id-legenda:', width='300px', height='1
             elements=[],
             stylesheet=[],
         )], style={'padding': '5px', 'width': width, 'display': 'inline-block'})
-
 
 cytolegendalayout = html.Div([
     html.Div([

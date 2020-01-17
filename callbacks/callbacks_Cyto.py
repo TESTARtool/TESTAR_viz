@@ -143,5 +143,3 @@ def update_seledgetabletest(seledges):
     cols = [{'id': c, 'name': c, 'hideable': True} for c in df.columns]
     data = df.to_dict("rows")
     return cols, data
-
-########################################

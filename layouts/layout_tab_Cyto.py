@@ -41,8 +41,6 @@ cytolayout =  html.Div([
                             for name in ['random', 'grid',  'circle', 'cose', 'concentric','breadthfirst','cose-bilkent',
                                 'dagre','cola','klay','spread','euler']
                             ]),
-
-
                     ],style={'max-width': '300px', 'margin-top':'5px','height': '25px', 'border-style': 'solid', 'padding': '5px',
                              'display': 'inline-block','vertical-align':'top'}),
                 html.Div([
@@ -95,10 +93,8 @@ cytolayout =  html.Div([
                 minZoom=0.05,
                 zoom=1,
                 zoomingEnabled=True,
-
-                elements=[],  # glob.elements,
-                stylesheet=[],  # adding a default stylesheet--->new styles seems to be not applied always
+                elements=[],
+                stylesheet=[],
             )
-       ])    
- 
+       ])
 #######################################################

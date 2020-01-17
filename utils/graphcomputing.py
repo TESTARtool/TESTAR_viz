@@ -81,128 +81,135 @@ def processgraphmlfile(details=True, advanced=False):
     if (V * E) < (2000 * 20000):  # 40.000.000 will take 60 seconds??
         #  this must be caluculate before the call setcytoelements.
         centralitymeasure = []
-        d = nx.in_degree_centrality(subgraph)
-        ############
-        bindf = pd.DataFrame(list(d.items()), columns=['node', 'indegreecentrality'])
-        # cut_labels_7=[v for k,v in  colorgradient(colornameStart='red', colornameEnd='blue', n=6).items() if k=='hex']
-        ditemvaluelist = list(d.values())
-        ditemvaluelist.sort()
-        maxvalplus = ditemvaluelist[-1]
-        cut_bins = []
-        for i in range(7):
-            cut_bins.append(maxvalplus * pow(2, -i))
-        cut_bins.append(-0.00001)  # include zero as actual value
-        cut_bins.sort()
-        cut_labels = [str(i + 1) for i in range(len(cut_bins) - 1)]
-        bindf['indegree'] = pd.cut(bindf['indegreecentrality'], bins=cut_bins, labels=cut_labels)
-        newd = bindf.set_index('node')['indegree'].to_dict()
-        nx.set_node_attributes(glob.grh, d, 'indegree')
-        nx.set_node_attributes(glob.grh, newd, 'indegree_class')
-        dicy = dict(zip(cut_labels, cut_bins))
-        centralitymeasure.append({'measure': 'indegree', 'binning': json.dumps(dicy)})
-        ##############
+        centralitymeasure.append(setcentralitymeasure(subgraph,'indegree'))
+        centralitymeasure.append(setcentralitymeasure(noselfloopssubgraph, 'indegree_noselfloops'))
+        centralitymeasure.append(setcentralitymeasure(subgraph, 'outdegree'))
+        centralitymeasure.append(setcentralitymeasure(noselfloopssubgraph, 'outdegree_noselfloops'))
+        centralitymeasure.append(setcentralitymeasure(subgraph, 'loadcentrality'))
+        centralitymeasure.append(setcentralitymeasure(noselfloopssubgraph, 'loadcentrality_noselfloops'))
 
-        d = nx.in_degree_centrality(noselfloopssubgraph)
-        bindf = pd.DataFrame(list(d.items()), columns=['node', 'indegreecentrality_noselfloops'])
-        # cut_labels_7=[v for k,v in  colorgradient(colornameStart='red', colornameEnd='blue', n=6).items() if k=='hex']
-        ditemvaluelist = list(d.values())
-        ditemvaluelist.sort()
-        maxvalplus = ditemvaluelist[-1]
-        cut_bins = []
-        for i in range(7):
-            cut_bins.append(maxvalplus * pow(2, -i))
-        cut_bins.append(-0.00001)  # include zero as actual value
-        cut_bins.sort()
-        cut_labels = [str(i + 1) for i in range(len(cut_bins) - 1)]
-        bindf['indegree_noselfloops'] = pd.cut(bindf['indegreecentrality_noselfloops'], bins=cut_bins,
-                                               labels=cut_labels)
-        newd = bindf.set_index('node')['indegree_noselfloops'].to_dict()
-        nx.set_node_attributes(glob.grh, d, 'indegree_noselfloops')
-        nx.set_node_attributes(glob.grh, newd, 'indegree_noselfloops_class')
-        dicy = dict(zip(cut_labels, cut_bins))
-        centralitymeasure.append({'measure': 'indegree_noselfloops', 'binning': json.dumps(dicy)})
-        ##############
-
-        d = nx.out_degree_centrality(subgraph)
-        ############
-        bindf = pd.DataFrame(list(d.items()), columns=['node', 'outdegreecentrality'])
-        ditemvaluelist = list(d.values())
-        ditemvaluelist.sort()
-        maxvalplus = ditemvaluelist[-1]
-        cut_bins = []
-        for i in range(7):
-            cut_bins.append(maxvalplus * pow(2, -i))
-        cut_bins.append(-0.00001)  # include zero as actual value
-        cut_bins.sort()
-        cut_labels = [str(i + 1) for i in range(len(cut_bins) - 1)]
-        bindf['outdegree'] = pd.cut(bindf['outdegreecentrality'], bins=cut_bins, labels=cut_labels)
-        newd = bindf.set_index('node')['outdegree'].to_dict()
-        nx.set_node_attributes(glob.grh, d, 'outdegree')
-        nx.set_node_attributes(glob.grh, newd, 'outdegree_class')
-        dicy = dict(zip(cut_labels, cut_bins))
-        centralitymeasure.append({'measure': 'outdegree', 'binning': json.dumps(dicy)})
-
-        d = nx.out_degree_centrality(noselfloopssubgraph)
-        ############
-        bindf = pd.DataFrame(list(d.items()), columns=['node', 'outdegreecentrality_noselfloops'])
-        ditemvaluelist = list(d.values())
-        ditemvaluelist.sort()
-        maxvalplus = ditemvaluelist[-1]
-        cut_bins = []
-        for i in range(7):
-            cut_bins.append(maxvalplus * pow(2, -i))
-        cut_bins.append(-0.00001)  # include zero as actual value
-        cut_bins.sort()
-        cut_labels = [str(i + 1) for i in range(len(cut_bins) - 1)]
-        bindf['outdegree_noselfloops'] = pd.cut(bindf['outdegreecentrality_noselfloops'], bins=cut_bins,
-                                                labels=cut_labels)
-        newd = bindf.set_index('node')['outdegree_noselfloops'].to_dict()
-        nx.set_node_attributes(glob.grh, d, 'outdegree_noselfloops')
-        nx.set_node_attributes(glob.grh, newd, 'outdegree_noselfloops_class')
-        dicy = dict(zip(cut_labels, cut_bins))
-        centralitymeasure.append({'measure': 'outdegree_noselfloops', 'binning': json.dumps(dicy)})
-
-        ##############
-
-        d = nx.load_centrality(subgraph)
-        ############
-        bindf = pd.DataFrame(list(d.items()), columns=['node', 'loadcentrality'])
-        # cut_labels_7=[v for k,v in  colorgradient(colornameStart='red', colornameEnd='blue', n=6).items() if k=='hex']
-        ditemvaluelist = list(d.values())
-        ditemvaluelist.sort()
-        maxvalplus = ditemvaluelist[-1]
-        cut_bins = []
-        for i in range(7):
-            cut_bins.append(maxvalplus * pow(2, -i))
-        cut_bins.append(-0.00001)  # include zero as actual value
-        cut_bins.sort()
-        cut_labels = [str(i + 1) for i in range(len(cut_bins) - 1)]
-        bindf['loadcentrality'] = pd.cut(bindf['loadcentrality'], bins=cut_bins, labels=cut_labels)
-        newd = bindf.set_index('node')['loadcentrality'].to_dict()
-        nx.set_node_attributes(glob.grh, d, 'loadcentrality')
-        nx.set_node_attributes(glob.grh, newd, 'loadcentrality_class')
-        dicy = dict(zip(cut_labels, cut_bins))
-        centralitymeasure.append({'measure': 'loadcentrality', 'binning': json.dumps(dicy)})
-
-        d = nx.load_centrality(noselfloopssubgraph)
-        ############
-        bindf = pd.DataFrame(list(d.items()), columns=['node', 'loadcentrality_discarded_selfloops'])
-        ditemvaluelist = list(d.values())
-        ditemvaluelist.sort()
-        maxvalplus = ditemvaluelist[-1]
-        cut_bins = []
-        for i in range(7):
-            cut_bins.append(maxvalplus * pow(2, -i))
-        cut_bins.append(-0.00001)  # include zero as actual value
-        cut_bins.sort()
-        cut_labels = [str(i + 1) for i in range(len(cut_bins) - 1)]
-        bindf['loadcentrality_discarded_selfloops'] = pd.cut(bindf['loadcentrality_discarded_selfloops'],
-                                                             bins=cut_bins, labels=cut_labels)
-        newd = bindf.set_index('node')['loadcentrality_discarded_selfloops'].to_dict()
-        nx.set_node_attributes(glob.grh, d, 'loadcentrality_discarded_selfloops')
-        nx.set_node_attributes(glob.grh, newd, 'loadcentrality_discarded_selfloops_class')
-        dicy = dict(zip(cut_labels, cut_bins))
-        centralitymeasure.append({'measure': 'loadcentrality_discarded_selfloops', 'binning': json.dumps(dicy)})
+        # d = nx.in_degree_centrality(subgraph)
+        # ############
+        # bindf = pd.DataFrame(list(d.items()), columns=['node', 'indegreecentrality'])
+        # # cut_labels_7=[v for k,v in  colorgradient(colornameStart='red', colornameEnd='blue', n=6).items() if k=='hex']
+        # ditemvaluelist = list(d.values())
+        # ditemvaluelist.sort()
+        # maxvalplus = ditemvaluelist[-1]
+        # cut_bins = []
+        # for i in range(7):
+        #     cut_bins.append(maxvalplus * pow(2, -i))
+        # cut_bins.append(-0.00001)  # include zero as actual value
+        # cut_bins.sort()
+        # cut_labels = [str(i + 1) for i in range(len(cut_bins) - 1)]
+        # bindf['indegree'] = pd.cut(bindf['indegreecentrality'], bins=cut_bins, labels=cut_labels)
+        # newd = bindf.set_index('node')['indegree'].to_dict()
+        # nx.set_node_attributes(glob.grh, d, 'indegree')
+        # nx.set_node_attributes(glob.grh, newd, 'indegree_class')
+        # dicy = dict(zip(cut_labels, cut_bins))
+        # centralitymeasure.append({'measure': 'indegree', 'binning': json.dumps(dicy)})
+        # ##############
+        #
+        # d = nx.in_degree_centrality(noselfloopssubgraph)
+        # bindf = pd.DataFrame(list(d.items()), columns=['node', 'indegreecentrality_noselfloops'])
+        # # cut_labels_7=[v for k,v in  colorgradient(colornameStart='red', colornameEnd='blue', n=6).items() if k=='hex']
+        # ditemvaluelist = list(d.values())
+        # ditemvaluelist.sort()
+        # maxvalplus = ditemvaluelist[-1]
+        # cut_bins = []
+        # for i in range(7):
+        #     cut_bins.append(maxvalplus * pow(2, -i))
+        # cut_bins.append(-0.00001)  # include zero as actual value
+        # cut_bins.sort()
+        # cut_labels = [str(i + 1) for i in range(len(cut_bins) - 1)]
+        # bindf['indegree_noselfloops'] = pd.cut(bindf['indegreecentrality_noselfloops'], bins=cut_bins,
+        #                                        labels=cut_labels)
+        # newd = bindf.set_index('node')['indegree_noselfloops'].to_dict()
+        # nx.set_node_attributes(glob.grh, d, 'indegree_noselfloops')
+        # nx.set_node_attributes(glob.grh, newd, 'indegree_noselfloops_class')
+        # dicy = dict(zip(cut_labels, cut_bins))
+        # centralitymeasure.append({'measure': 'indegree_noselfloops', 'binning': json.dumps(dicy)})
+        # ##############
+        #
+        # d = nx.out_degree_centrality(subgraph)
+        # ############
+        # bindf = pd.DataFrame(list(d.items()), columns=['node', 'outdegreecentrality'])
+        # ditemvaluelist = list(d.values())
+        # ditemvaluelist.sort()
+        # maxvalplus = ditemvaluelist[-1]
+        # cut_bins = []
+        # for i in range(7):
+        #     cut_bins.append(maxvalplus * pow(2, -i))
+        # cut_bins.append(-0.00001)  # include zero as actual value
+        # cut_bins.sort()
+        # cut_labels = [str(i + 1) for i in range(len(cut_bins) - 1)]
+        # bindf['outdegree'] = pd.cut(bindf['outdegreecentrality'], bins=cut_bins, labels=cut_labels)
+        # newd = bindf.set_index('node')['outdegree'].to_dict()
+        # nx.set_node_attributes(glob.grh, d, 'outdegree')
+        # nx.set_node_attributes(glob.grh, newd, 'outdegree_class')
+        # dicy = dict(zip(cut_labels, cut_bins))
+        # centralitymeasure.append({'measure': 'outdegree', 'binning': json.dumps(dicy)})
+        #
+        # d = nx.out_degree_centrality(noselfloopssubgraph)
+        # ############
+        # bindf = pd.DataFrame(list(d.items()), columns=['node', 'outdegreecentrality_noselfloops'])
+        # ditemvaluelist = list(d.values())
+        # ditemvaluelist.sort()
+        # maxvalplus = ditemvaluelist[-1]
+        # cut_bins = []
+        # for i in range(7):
+        #     cut_bins.append(maxvalplus * pow(2, -i))
+        # cut_bins.append(-0.00001)  # include zero as actual value
+        # cut_bins.sort()
+        # cut_labels = [str(i + 1) for i in range(len(cut_bins) - 1)]
+        # bindf['outdegree_noselfloops'] = pd.cut(bindf['outdegreecentrality_noselfloops'], bins=cut_bins,
+        #                                         labels=cut_labels)
+        # newd = bindf.set_index('node')['outdegree_noselfloops'].to_dict()
+        # nx.set_node_attributes(glob.grh, d, 'outdegree_noselfloops')
+        # nx.set_node_attributes(glob.grh, newd, 'outdegree_noselfloops_class')
+        # dicy = dict(zip(cut_labels, cut_bins))
+        # centralitymeasure.append({'measure': 'outdegree_noselfloops', 'binning': json.dumps(dicy)})
+        #
+        # ##############
+        #
+        # d = nx.load_centrality(subgraph)
+        # ############
+        # bindf = pd.DataFrame(list(d.items()), columns=['node', 'loadcentrality'])
+        # # cut_labels_7=[v for k,v in  colorgradient(colornameStart='red', colornameEnd='blue', n=6).items() if k=='hex']
+        # ditemvaluelist = list(d.values())
+        # ditemvaluelist.sort()
+        # maxvalplus = ditemvaluelist[-1]
+        # cut_bins = []
+        # for i in range(7):
+        #     cut_bins.append(maxvalplus * pow(2, -i))
+        # cut_bins.append(-0.00001)  # include zero as actual value
+        # cut_bins.sort()
+        # cut_labels = [str(i + 1) for i in range(len(cut_bins) - 1)]
+        # bindf['loadcentrality'] = pd.cut(bindf['loadcentrality'], bins=cut_bins, labels=cut_labels)
+        # newd = bindf.set_index('node')['loadcentrality'].to_dict()
+        # nx.set_node_attributes(glob.grh, d, 'loadcentrality')
+        # nx.set_node_attributes(glob.grh, newd, 'loadcentrality_class')
+        # dicy = dict(zip(cut_labels, cut_bins))
+        # centralitymeasure.append({'measure': 'loadcentrality', 'binning': json.dumps(dicy)})
+        #
+        # d = nx.load_centrality(noselfloopssubgraph)
+        # ############
+        # bindf = pd.DataFrame(list(d.items()), columns=['node', 'loadcentrality_discarded_selfloops'])
+        # ditemvaluelist = list(d.values())
+        # ditemvaluelist.sort()
+        # maxvalplus = ditemvaluelist[-1]
+        # cut_bins = []
+        # for i in range(7):
+        #     cut_bins.append(maxvalplus * pow(2, -i))
+        # cut_bins.append(-0.00001)  # include zero as actual value
+        # cut_bins.sort()
+        # cut_labels = [str(i + 1) for i in range(len(cut_bins) - 1)]
+        # bindf['loadcentrality_discarded_selfloops'] = pd.cut(bindf['loadcentrality_discarded_selfloops'],
+        #                                                      bins=cut_bins, labels=cut_labels)
+        # newd = bindf.set_index('node')['loadcentrality_discarded_selfloops'].to_dict()
+        # nx.set_node_attributes(glob.grh, d, 'loadcentrality_discarded_selfloops')
+        # nx.set_node_attributes(glob.grh, newd, 'loadcentrality_discarded_selfloops_class')
+        # dicy = dict(zip(cut_labels, cut_bins))
+        # centralitymeasure.append({'measure': 'loadcentrality_discarded_selfloops', 'binning': json.dumps(dicy)})
 
         ##############
 
@@ -210,8 +217,7 @@ def processgraphmlfile(details=True, advanced=False):
     print('updating graph centralities attributes  done', "--- %s seconds ---" % (time.time() - start_time))
 
     ######## part 2
-    # glob.elements = setCytoElements(glob.grh)
-    # print('transferring graph to cytoscape structure done', "--- %s seconds ---" % (time.time() - start_time))
+
     ######## part 3
     glob.elementcreationdistri = []
     if advanced:
@@ -237,7 +243,7 @@ def processgraphmlfile(details=True, advanced=False):
         print('updating execution statistics  done', "--- %s seconds ---" % (time.time() - start_time))
     glob.testexecutions = pd.DataFrame(glob.elementcreationdistri)
 
-    ##########advanced properties
+    ########## simple path to farest node
 
     lspbyinitial = [{'initialNode': 'N/A', 'LSP length': '-1', 'LSP': 'N/A'}]
     if True or advanced:
@@ -260,7 +266,7 @@ def processgraphmlfile(details=True, advanced=False):
         pass
         print('updating shortestpaths from initalnodes  done', "--- %s seconds ---" % (time.time() - start_time))
     glob.lsptraces = pd.DataFrame(lspbyinitial)
-    ##########advanced properties
+    ########## simple path to farest node
 
     masterlog = {}
     log = []
@@ -269,9 +275,9 @@ def processgraphmlfile(details=True, advanced=False):
     if details:
         labels = {}
         for n, d in glob.grh.nodes(data=True):
-            l = d[glob.label_nodeelement]
-            labels[l] = 1 + labels.get(l, 0)
-            if l == glob.elementwithmetadata:
+            lvalue = d[glob.label_nodeelement]
+            labels[lvalue] = 1 + labels.get(lvalue, 0)
+            if lvalue == glob.elementwithmetadata:
                 metadata = [('  * ' + k + ' : ' + v.replace('[', '\[').replace(']', '\]')) for k, v in d.items() if
                             k != glob.label_nodeelement]
 
@@ -284,8 +290,8 @@ def processgraphmlfile(details=True, advanced=False):
         log.append('* Edge count in ' + glob.graphmlfile + " is: " + str(glob.grh.number_of_edges()))
         labels = {}
         for s, t, d in glob.grh.edges(data=True):
-            l = d[glob.label_edgeelement]
-            labels[l] = 1 + labels.get(l, 0)
+            lvalue = d[glob.label_edgeelement]
+            labels[lvalue] = 1 + labels.get(lvalue, 0)
         detaillog = [('  * ' + k + ' : ' + str(v)) for k, v in labels.items()]
         log.extend(detaillog)
 
@@ -301,15 +307,42 @@ def processgraphmlfile(details=True, advanced=False):
     return masterlog
 
 
+def setcentralitymeasure(graph=None,centralityname='indegree_noselfloops'):
+        if 'indegree' in centralityname :
+            d = nx.in_degree_centrality(graph)
+        elif 'outdegree'  in centralityname:
+             d = nx.out_degree_centrality(graph)
+        elif 'loadcentrality'  in centralityname:
+            d = nx.load_centrality(graph)
+        else:
+            return {'measure': 'error', 'binning': json.dumps('error')}
+
+        ditemvaluelist = list(d.values())
+        ditemvaluelist.sort()
+        maxvalplus = ditemvaluelist[-1]
+        cut_bins = []
+        for i in range(glob.centrality_bins):
+            cut_bins.append(maxvalplus * pow(2, -i))
+        cut_bins.append(-1)  # zero has to fall in the first bin/bucket.
+        cut_bins.sort()
+        cut_labels = [str(i + 1) for i in range(len(cut_bins) - 1)]
+        # bindf = pd.DataFrame(list(d.items()), columns=['node', 'tmp'+centralityname])
+        # bindf[centralityname] = pd.cut(bindf['tmp'+centralityname], bins=cut_bins,  labels=cut_labels)
+        # newd = bindf.set_index('node')[centralityname].to_dict()
+        # nx.set_node_attributes(glob.grh, newd, centralityname+'_class')
+        nx.set_node_attributes(glob.grh, d, centralityname)
+        dicy = dict(zip(cut_labels, cut_bins))
+        return {'measure': centralityname, 'binning': json.dumps(dicy)}
+
 def setCytoElements(usecache=False, parenting=False, layerview=[]):
     TestSequenceKey = ''
     nodes = []
     edges = []
     allnodes = []
-    Cparentnode = {}
-    Wparentnode = {}
-    Aparentnode = {}
-    Tparentnode = {}
+    c_parentnode = {}
+    w_parentnode = {}
+    a_parentnode = {}
+    t_parentnode = {}
     TestSequencekeylist = set()
     try:
         copydefaultimagetoasset()  # optimize: do only once:-)
@@ -323,20 +356,20 @@ def setCytoElements(usecache=False, parenting=False, layerview=[]):
                 tempdict.update({'label': ndict[glob.label_nodeelement]})  # copy as cyto wants the 'label' tag
                 tempdict.update({'id': n})
                 tempdict.update({'nodeid': n})
-
                 if parenting:
                     if 'Concrete' in layerview and ndict[glob.label_nodeelement] == 'ConcreteState':
                         tempdict.update({'parent': 'ConcreteLayer'})
-                        Cparentnode = {
+                        c_parentnode = {
                             'data': {'id': 'ConcreteLayer', glob.label_nodeelement: glob.parent_subtypeelement,
                                      'nodeid': 'ConcreteLayer'}}
                     if 'Widget' in layerview and ndict[glob.label_nodeelement] == 'Widget':
                         tempdict.update({'parent': 'WidgetLayer'})
-                        Wparentnode = {'data': {'id': 'WidgetLayer', glob.label_nodeelement: glob.parent_subtypeelement,
-                                                'nodeid': 'WidgetLayer'}}
+                        w_parentnode = {
+                            'data': {'id': 'WidgetLayer', glob.label_nodeelement: glob.parent_subtypeelement,
+                                     'nodeid': 'WidgetLayer'}}
                     if 'Abstract' in layerview and ndict[glob.label_nodeelement] == 'AbstractState':
                         tempdict.update({'parent': 'AbstractLayer'})
-                        Aparentnode = {
+                        a_parentnode = {
                             'data': {'id': 'AbstractLayer', glob.label_nodeelement: glob.parent_subtypeelement,
                                      'nodeid': 'AbstractLayer'}}
                     if ('Test Executions' in layerview) and ((ndict[glob.label_nodeelement] == 'SequenceNode') or (
@@ -349,14 +382,14 @@ def setCytoElements(usecache=False, parenting=False, layerview=[]):
                 tempdict.update({glob.elementimgurl: app.get_asset_url(fname)})  # pointer to the image
                 nodes.append({'data': tempdict, 'position': {'x': 0, 'y': 0}})
             if parenting:
-                if Cparentnode != {}: allnodes.append(Cparentnode)
-                if Wparentnode != {}: allnodes.append(Wparentnode)
-                if Aparentnode != {}: allnodes.append(Aparentnode)
+                if c_parentnode != {}: allnodes.append(c_parentnode)
+                if w_parentnode != {}: allnodes.append(w_parentnode)
+                if a_parentnode != {}: allnodes.append(a_parentnode)
 
                 for TestSequenceKey in TestSequencekeylist:
-                    Tparentnode = {'data': {'id': TestSequenceKey, glob.label_nodeelement: glob.parent_subtypeelement,
-                                            'nodeid': TestSequenceKey}}
-                    allnodes.append(Tparentnode)
+                    t_parentnode = {'data': {'id': TestSequenceKey, glob.label_nodeelement: glob.parent_subtypeelement,
+                                             'nodeid': TestSequenceKey}}
+                    allnodes.append(t_parentnode)
             glob.parentingincache = parenting
             allnodes.extend(nodes)
             # next line can raise an error while initializing: just ignore. no negative impact
