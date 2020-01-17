@@ -36,7 +36,7 @@ def update_legenda(hit0,  newlog):
             'background-color': 'grey'}
     legenda = styler.stylelegenda('node', '', itemstyle)
     stylesheet.append(legenda[0])
-
+    alreadydonedeadstate = False
     for row in displayproperties:
         if row[glob.elementtype] == 'node':
             itemstyle=    {
@@ -70,6 +70,25 @@ def update_legenda(hit0,  newlog):
         legenda=styler.stylelegenda(row[glob.elementtype], row[glob.elementsubtype], itemstyle)
         stylesheet.append(legenda[0])
         celements.extend(legenda[1])
+
+        if  row[glob.elementtype] == 'node' and 'State' in row[glob.elementsubtype] and not alreadydonedeadstate:
+            itemstyle = {
+                'font-size':  row['label_fontsize'],
+                'shape': row[ 'shape_if_deadstate'],
+                'width': row['width'],
+                'height': row['height'],
+                'opacity': row['opacity'],
+                'label': 'DeadState',
+                'border-width': row['border-width'],
+                'border-style': row['border-style'],
+                'border-color': row['border-color'],
+                'background-color': row[ 'color_if_deadstate'],
+                'background-fit': 'contain'}
+            alreadydonedeadstate=True
+            legenda = styler.stylelegenda('node', 'DeadState', itemstyle)
+            stylesheet.append(legenda[0])
+            celements.extend(legenda[1])
+
     return celements,stylesheet
 
 
