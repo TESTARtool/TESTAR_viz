@@ -43,7 +43,6 @@ def savebutton(ident='save-dataid',buttontitle='Save to File'):
                   target="_blank", style={'display': 'inline-block'}
                   )
 
-
 selectedData = html.Div([
     html.Div([
 

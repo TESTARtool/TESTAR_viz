@@ -51,8 +51,8 @@ def update_layout(hit0, canvasheight, layout, fenced, layerview):
      Output('oracletable', 'style_data_conditional'),
      Output('baseline-oracletable', 'style_data_conditional'),
      Output('shortestpathlog', 'children')],
-
-    [Input('apply-viz_style-button', 'n_clicks'),
+   # [Input('apply-viz_style-button', 'n_clicks'),
+     [Input('cytoscape-legenda', 'elements'),  #cascaded trigger
      Input('apply-oracle_style-button', 'n_clicks'),
      Input('apply-baseline-oracle_style-button', 'n_clicks'),
      Input('apply-executions-button', 'n_clicks'),
@@ -73,19 +73,20 @@ def update_layout(hit0, canvasheight, layout, fenced, layerview):
      State('advancedproperties-table', "data"),
      State('centralities-table', "derived_virtual_selected_rows"),
      State('centralities-table', "data"),
-     State('selectednodetable', 'data')
+     State('selectednodetable', 'data'),
+     State('execution-details', 'value')
      ]
 )
 def updateCytoStyleSheet(button, oraclebutton, baselineoraclebutton, executionsbutton, log, advancedpropertiesbutton,
                          centralitiesbutton, shortestpathbutton, visualsdata, selectedoracles, oracledata,
                          selectedbaselineoracles, baselineoracledata, selectedexecutions, executionsdata,
                          layerview, selectedadvancedproperties, advancedpropertiesdata, selectedcentralities,
-                         centralitiesdata, selectednodedata):
+                         centralitiesdata, selectednodedata,executiondetails):
     returndata = ch.updateCytoStyleSheet(button, selectedoracles, oracledata, selectedbaselineoracles,
                                          baselineoracledata, selectedexecutions, executionsdata, layerview,
                                          selectedadvancedproperties,
                                          advancedpropertiesdata, selectedcentralities, centralitiesdata,
-                                         selectednodedata)
+                                         selectednodedata,executiondetails)
     ctx = dash.callback_context
     trigger = ctx.triggered[0]['prop_id'].split('.')[0]
     if ('error' in returndata[-1]) and trigger == 'apply-shortestpath-button':  # shortestpatherror

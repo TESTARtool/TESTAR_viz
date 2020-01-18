@@ -39,6 +39,8 @@ elementtype = 'node/edge'
 elementsubtype ='subtype'
 elementimgurl ='imgurl'
 elementwithmetadata = 'AbstractStateModel'
+createdby='createdby_sequenceid'
+updatedby='updatedby_sequenceid'
 
 dfattributes=pd.DataFrame()
 dforacles=pd.DataFrame()
@@ -120,19 +122,15 @@ prefix_transitions_fail  = {'width': 4, 'line-style': 'dashed', 'mid-target-arro
 
 trace_node_unselected = {'shape': 'octagon','background-color': 'red','border-style': 'dotted',
                 'opacity': 0.1, 'border-color': 'fuchsia'}
-trace_edge_unselected  = {  'line-style': 'dotted', 'opacity': 0.4,'mid-target-arrow-color': 'fuchsia'}
+trace_edge_unselected  = {'line-style': 'dotted', 'opacity': 0.4,'mid-target-arrow-color': 'fuchsia'}
 
 path_allnodes = {'border-width': 3, 'border-color': 'brown', 'background-color': 'white'}
 path_firstnodes = {'border-width': 3, 'border-color': 'blue', 'background-color': 'blue'}
 path_lastnodes = {'border-width': 3, 'border-color': 'black', 'background-color': 'black'}
 path_alledges = {'width': 3, 'mid-target-arrow-color': 'brown', 'arrow-scale': 2, 'line-color': 'blue'}
 
-centrality_shape = {'shape': 'ellipse'}
-centrality_width={ 'width': ''}
-centrality_height={ 'height':''}
-centrality_bgcolordict={'background-color': ''}
-centrality_bordercolordict={'border-color': ''}
-centrality_colorStart='red'
+centrality_shape = {'shape': 'ellipse','opacity': 1}
+centrality_colornameStart= 'red'
 centrality_colornameEnd='green'
 centrality_bins=7
 centrality_minwidth=20

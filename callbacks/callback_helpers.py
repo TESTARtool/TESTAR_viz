@@ -6,12 +6,13 @@ import utils.gui
 import utils.graphcomputing as tu
 import utils.globals as glob
 from utils import styler
+from utils.styler import nodestyler, edgestyler
 
 
 def updateCytoStyleSheet(button, selectedoracles, oracledata, selectedbaselineoracles, baselineoracledata,
                          selectedexecutions, executionsdata, layerview, selectedadvancedproperties,
                          advancedpropertiesdata,
-                         selectedcentralities, centralitiesdata, selectednodedata):
+                         selectedcentralities, centralitiesdata, selectednodedata, executiondetails):
     stylesheet = []
     oracleconditionalstyle = [{
         'if': {'row_index': 'odd'},
@@ -27,26 +28,10 @@ def updateCytoStyleSheet(button, selectedoracles, oracledata, selectedbaselineor
             dsp = 'element'
             if not row.get('hide') is None:
                 if int(row['hide']) == 1:  dsp = 'none'
-            itemstyle = {}
-            if not row[glob.image_attrib_key] is None:
-                if row[glob.image_attrib_key] != '':
-                    itemstyle = {'background-image': 'data(' + glob.elementimgurl + ')'}
-            itemstyle.update({
-                'display': dsp,  # non deterministic syntax
-                'font-size': row['label_fontsize'],
-                'shape': row['shape'],
-                'width': row['width'],
-                'height': row['height'],
-                'opacity': row['opacity'],
-                'label': ('data(' + row['label'] + ')' if row['label'] != '' else ''),
-                'border-width': row['border-width'],
-                'border-style': row['border-style'],
-                'border-color': row['border-color'],
-                'background-color': row['color'],
-                'background-fit': 'contain',
-            })
-            legenda = styler.stylelegenda(row[glob.elementtype], row[glob.elementsubtype], itemstyle,
+
+            legenda = styler.stylelegenda(row[glob.elementtype], row[glob.elementsubtype], nodestyler(row, dsp),
                                           glob.label_nodeelement)
+
             stylesheet.append(legenda[0])
             itemstyle = {
                 'width': int((glob.nodeonselectmultiplier) * (int(row['width'] if row['width'] != '' else 0))),
@@ -69,26 +54,10 @@ def updateCytoStyleSheet(button, selectedoracles, oracledata, selectedbaselineor
             dsp = 'element'
             if not row.get('hide') is None:
                 if int(row['hide']) == 1:  dsp = 'none'
-            dsplabel = {'label': ''}
-            if not row['label'] is None:
-                if row['label'] != '':
-                    dsplabel = {'label': 'data(' + row['label'] + ')'}
-            itemstyle = dsplabel
-            itemstyle.update({'display': dsp,
-                              'font-size': row['label_fontsize'],
-                              'mid-target-arrow-shape': row['arrow-shape'],
-                              'mid-target-arrow-color': row['arrow-color'],
-                              'arrow-scale': row['arrow-scale'],
-                              'width': row['line-width'],
-                              'opacity': row['opacity'],
-                              'line-color': row['color'],
-                              'curve-style': row['edgestyle'],
-                              'line-style': row['edgefill'],
-                              'text-rotation': 'autorotate',
-                              'text-margin-y': -5,
-                              })
-            legenda = styler.stylelegenda(row[glob.elementtype], row[glob.elementsubtype], itemstyle,
+
+            legenda = styler.stylelegenda(row[glob.elementtype], row[glob.elementsubtype], edgestyler(row, dsp),
                                           glob.label_edgeelement)
+
             stylesheet.append(legenda[0])
 
             itemstyle = {
@@ -208,37 +177,38 @@ def updateCytoStyleSheet(button, selectedoracles, oracledata, selectedbaselineor
         if len(properties) > 0:  # take first row
             stylepropdict.update({'background-color': properties[0]['color_if_deadstate']})
             stylepropdict.update({'shape': properties[0]['shape_if_deadstate']})
+        # next line is candidate for refactirong, if centralities are calculated at initial load
         deadstates = (node for node, out_degree in tmpgrh.out_degree() if out_degree == 0)
         for stateid in deadstates: stylesheet.extend(updatestyleoftrace(stateid, 'node', stylepropdict))
 
     #######  testexecutions
     selectedrows = selectedexecutions
+    if executiondetails:
+        attribute = glob.updatedby
+    else:
+        attribute = glob.createdby
     if not (executionsdata is None) and len(executionsdata) > 0 and len(selectedrows) > 0:
         i = -1
-        nodeselectorfilters = []
-        edgeselectorfilters = []
+        nodeselectors = []
+        edgeselectors = []
         for r in executionsdata:
             i = i + 1
             if not i in selectedrows:
-                createdattribute = 'createdby_sequenceid'
-                nodeselectorfilter = "node[" + glob.label_nodeelement + " = 'ConcreteState'][" + createdattribute + " = " + "'" + \
-                                     r['sequenceId'] + "'" + "]"
-                edgeselectorfilter = "edge[" + glob.label_edgeelement + " = 'ConcreteAction'][" + createdattribute + " = " + "'" + \
-                                     r['sequenceId'] + "'" + "]"
-                nodeselectorfilters.append(nodeselectorfilter)
-                edgeselectorfilters.append(edgeselectorfilter)
+                nodeselector = "node[" + glob.label_nodeelement + " = 'ConcreteState'][" + attribute + \
+                    " = " + "'" + r['sequenceId'] + "'" + "]"
+                edgeselector = "edge[" + glob.label_edgeelement + " = 'ConcreteAction'][" + attribute + \
+                    " = " + "'" + r['sequenceId'] + "'" + "]"
+                nodeselectors.append(nodeselector)
+                edgeselectors.append(edgeselector)
 
-        selectordict = {'selector': ','.join(nodeselectorfilters)}
-        stylepropdict = {'shape': 'octagon',
-                         'background-color': 'red', 'border-style': 'dotted', 'opacity': 0.1, 'border-color': 'fuchsia'}
-        styledict = {'style': stylepropdict}
+        selectordict = {'selector': ','.join(nodeselectors)}
+        styledict = {'style': glob.trace_node_unselected}
         tmpstyle = selectordict
         tmpstyle.update(styledict)
         stylesheet.append(tmpstyle)
 
-        selectordict = {'selector': ','.join(edgeselectorfilters)}
-        stylepropdict = {'line-style': 'dotted', 'opacity': 0.4, 'mid-target-arrow-color': 'fuchsia'}
-        styledict = {'style': stylepropdict}
+        selectordict = {'selector': ','.join(edgeselectors)}
+        styledict = {'style': glob.trace_edge_unselected}
         tmpstyle = selectordict
         tmpstyle.update(styledict)
         stylesheet.append(tmpstyle)
@@ -258,14 +228,16 @@ def updateCytoStyleSheet(button, selectedoracles, oracledata, selectedbaselineor
                     bins = json.loads(r['binning'])  # convert string back to dict
                     minwidth = 20
                     minheight = 20
-                    colorlist = utils.gradient.colorgradient(colornameStart='red', colornameEnd='green', n=len(bins))[
+                    colorlist = utils.gradient.colorgradient(colornameStart=glob.centrality_colornameStart, colornameEnd=glob.centrality_colornameEnd, n=len(bins))[
                         'hex']
                     j = 0
                     for k, v in bins.items():
-                        nodeselectorfilter = "node[" + r['measure'] + " >= " + "'" + str(v) + "'" + "]"
-                        selectordict.update({'selector': nodeselectorfilter})
-                        stylepropdict = {'shape': 'ellipse', 'width': int(minwidth * pow(1.25, (j))),
-                                         'height': int(minheight * pow(1.25, (j))), 'background-color': colorlist[j],
+                        nodeselector = "node[" + r['measure'] + " >= " + "'" + str(v) + "'" + "]"
+                        selectordict.update({'selector': nodeselector})
+                        stylepropdict = {'shape': 'ellipse',
+                                         'width': int(minwidth * pow(1.25, (j))),
+                                         'height': int(minheight * pow(1.25, (j))),
+                                         'background-color': colorlist[j],
                                          'border-color': colorlist[j]}
                         legenda = styler.stylelegenda('node', str(v), stylepropdict, r['measure'], '', ">=")
                         stylesheet.append(legenda[0])

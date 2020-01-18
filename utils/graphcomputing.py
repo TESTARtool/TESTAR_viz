@@ -17,6 +17,7 @@ import networkx as nx
 import pandas as pd
 import time
 
+from utils import globals as glob
 from utils.filehandling import imagefilename, savescreenshottodisk, copydefaultimagetoasset
 from utils.gui import updatesubgraph, setgraphattributes, setvizproperties
 
@@ -24,19 +25,16 @@ from utils.gui import updatesubgraph, setgraphattributes, setvizproperties
 def processgraphmlfile(details=True, advanced=False):
     start_time = time.time()
 
-    print('start ', "--- %s seconds ---" % (time.time() - start_time))
+    print('start ', "--- %.3f seconds ---" % (time.time() - start_time))
     glob.grh = nx.read_graphml(glob.graphmlfile)
     subgraph = updatesubgraph('Concrete')  # regard only items: NOT in ABSTRACT and NOT in WIDGET and NOT in TEST
     noselfloopssubgraph = subgraph.copy()
-
-    # we now reduce the subgraph even further, we do not need it for anythin else
     edgelist = []
     for s, t, k in subgraph.edges(keys=True):
         if s == t:
             edgelist.append((s, t))
-
     noselfloopssubgraph.remove_edges_from(list(edgelist))
-    print('copying graphs done', "--- %s seconds ---" % (time.time() - start_time))
+    print('copying graphs done', "--- %.3f seconds ---" % (time.time() - start_time))
     ######## part 1
     sequencetuples = []
 
@@ -60,24 +58,26 @@ def processgraphmlfile(details=True, advanced=False):
     glob.sortedsequenceids = [s for s, d, l, i in glob.sortedsequencetuples]
 
     print('determining the initial ConcreteState for all test sequences done',
-          "--- %s seconds ---" % (time.time() - start_time))
+          "--- %.3f seconds ---" % (time.time() - start_time))
     if advanced:
         for n, ndict in glob.grh.nodes(data=True):
             if ndict[glob.label_nodeelement] == 'ConcreteState':
-                sequenceid = getConcreteStateSequenceid(n)
-                glob.grh.nodes[n]['createdby_sequenceid'] = sequenceid
+                sequenceid,allsequenceids = getConcreteStateSequenceid(n)
+                glob.grh.nodes[n][glob.createdby] = sequenceid
+                glob.grh.nodes[n][glob.updatedby] = allsequenceids
+
         for source, target, n, edict in glob.grh.edges(data=True, keys=True):
             if edict[glob.label_edgeelement] == 'ConcreteAction':
-                sequenceid = getConcreteActionSequenceid(edict['actionId'])
-                glob.grh[source][target][n]['createdby_sequenceid'] = sequenceid  # is syntax for multidi graph edges
-
-        print('updating all ConcreteStates & Actions with ''createdby-testsequence'' attribute  done',
-              "--- %s seconds ---" % (time.time() - start_time))
+                sequenceid,allsequenceids = getConcreteActionSequenceid(edict['actionId'])
+                glob.grh[source][target][n][glob.createdby] = sequenceid  # is syntax for multidi graph edges
+                glob.grh[source][target][n][glob.updatedby]= allsequenceids
+        print('updating all ConcreteStates & Actions with "'+glob.createdby+'" done',
+              "--- %.3f seconds ---" % (time.time() - start_time))
 
     centralitymeasure = [{'measure': 'N/A', 'binning': 'N/A'}]
     V = len(subgraph)
     E = subgraph.size()
-    #     d = nx.betweenness_centrality(subgraph) # not implemented in networkx for MultiDigraph
+    #     d = nx.betweenness_centrality(subgraph) # this is not implemented in networkx for MultiDigraph
     if (V * E) < (2000 * 20000):  # 40.000.000 will take 60 seconds??
         #  this must be caluculate before the call setcytoelements.
         centralitymeasure = []
@@ -86,135 +86,9 @@ def processgraphmlfile(details=True, advanced=False):
         centralitymeasure.append(setcentralitymeasure(subgraph, 'outdegree'))
         centralitymeasure.append(setcentralitymeasure(noselfloopssubgraph, 'outdegree_noselfloops'))
         centralitymeasure.append(setcentralitymeasure(subgraph, 'loadcentrality'))
-        centralitymeasure.append(setcentralitymeasure(noselfloopssubgraph, 'loadcentrality_noselfloops'))
-
-        # d = nx.in_degree_centrality(subgraph)
-        # ############
-        # bindf = pd.DataFrame(list(d.items()), columns=['node', 'indegreecentrality'])
-        # # cut_labels_7=[v for k,v in  colorgradient(colornameStart='red', colornameEnd='blue', n=6).items() if k=='hex']
-        # ditemvaluelist = list(d.values())
-        # ditemvaluelist.sort()
-        # maxvalplus = ditemvaluelist[-1]
-        # cut_bins = []
-        # for i in range(7):
-        #     cut_bins.append(maxvalplus * pow(2, -i))
-        # cut_bins.append(-0.00001)  # include zero as actual value
-        # cut_bins.sort()
-        # cut_labels = [str(i + 1) for i in range(len(cut_bins) - 1)]
-        # bindf['indegree'] = pd.cut(bindf['indegreecentrality'], bins=cut_bins, labels=cut_labels)
-        # newd = bindf.set_index('node')['indegree'].to_dict()
-        # nx.set_node_attributes(glob.grh, d, 'indegree')
-        # nx.set_node_attributes(glob.grh, newd, 'indegree_class')
-        # dicy = dict(zip(cut_labels, cut_bins))
-        # centralitymeasure.append({'measure': 'indegree', 'binning': json.dumps(dicy)})
-        # ##############
-        #
-        # d = nx.in_degree_centrality(noselfloopssubgraph)
-        # bindf = pd.DataFrame(list(d.items()), columns=['node', 'indegreecentrality_noselfloops'])
-        # # cut_labels_7=[v for k,v in  colorgradient(colornameStart='red', colornameEnd='blue', n=6).items() if k=='hex']
-        # ditemvaluelist = list(d.values())
-        # ditemvaluelist.sort()
-        # maxvalplus = ditemvaluelist[-1]
-        # cut_bins = []
-        # for i in range(7):
-        #     cut_bins.append(maxvalplus * pow(2, -i))
-        # cut_bins.append(-0.00001)  # include zero as actual value
-        # cut_bins.sort()
-        # cut_labels = [str(i + 1) for i in range(len(cut_bins) - 1)]
-        # bindf['indegree_noselfloops'] = pd.cut(bindf['indegreecentrality_noselfloops'], bins=cut_bins,
-        #                                        labels=cut_labels)
-        # newd = bindf.set_index('node')['indegree_noselfloops'].to_dict()
-        # nx.set_node_attributes(glob.grh, d, 'indegree_noselfloops')
-        # nx.set_node_attributes(glob.grh, newd, 'indegree_noselfloops_class')
-        # dicy = dict(zip(cut_labels, cut_bins))
-        # centralitymeasure.append({'measure': 'indegree_noselfloops', 'binning': json.dumps(dicy)})
-        # ##############
-        #
-        # d = nx.out_degree_centrality(subgraph)
-        # ############
-        # bindf = pd.DataFrame(list(d.items()), columns=['node', 'outdegreecentrality'])
-        # ditemvaluelist = list(d.values())
-        # ditemvaluelist.sort()
-        # maxvalplus = ditemvaluelist[-1]
-        # cut_bins = []
-        # for i in range(7):
-        #     cut_bins.append(maxvalplus * pow(2, -i))
-        # cut_bins.append(-0.00001)  # include zero as actual value
-        # cut_bins.sort()
-        # cut_labels = [str(i + 1) for i in range(len(cut_bins) - 1)]
-        # bindf['outdegree'] = pd.cut(bindf['outdegreecentrality'], bins=cut_bins, labels=cut_labels)
-        # newd = bindf.set_index('node')['outdegree'].to_dict()
-        # nx.set_node_attributes(glob.grh, d, 'outdegree')
-        # nx.set_node_attributes(glob.grh, newd, 'outdegree_class')
-        # dicy = dict(zip(cut_labels, cut_bins))
-        # centralitymeasure.append({'measure': 'outdegree', 'binning': json.dumps(dicy)})
-        #
-        # d = nx.out_degree_centrality(noselfloopssubgraph)
-        # ############
-        # bindf = pd.DataFrame(list(d.items()), columns=['node', 'outdegreecentrality_noselfloops'])
-        # ditemvaluelist = list(d.values())
-        # ditemvaluelist.sort()
-        # maxvalplus = ditemvaluelist[-1]
-        # cut_bins = []
-        # for i in range(7):
-        #     cut_bins.append(maxvalplus * pow(2, -i))
-        # cut_bins.append(-0.00001)  # include zero as actual value
-        # cut_bins.sort()
-        # cut_labels = [str(i + 1) for i in range(len(cut_bins) - 1)]
-        # bindf['outdegree_noselfloops'] = pd.cut(bindf['outdegreecentrality_noselfloops'], bins=cut_bins,
-        #                                         labels=cut_labels)
-        # newd = bindf.set_index('node')['outdegree_noselfloops'].to_dict()
-        # nx.set_node_attributes(glob.grh, d, 'outdegree_noselfloops')
-        # nx.set_node_attributes(glob.grh, newd, 'outdegree_noselfloops_class')
-        # dicy = dict(zip(cut_labels, cut_bins))
-        # centralitymeasure.append({'measure': 'outdegree_noselfloops', 'binning': json.dumps(dicy)})
-        #
-        # ##############
-        #
-        # d = nx.load_centrality(subgraph)
-        # ############
-        # bindf = pd.DataFrame(list(d.items()), columns=['node', 'loadcentrality'])
-        # # cut_labels_7=[v for k,v in  colorgradient(colornameStart='red', colornameEnd='blue', n=6).items() if k=='hex']
-        # ditemvaluelist = list(d.values())
-        # ditemvaluelist.sort()
-        # maxvalplus = ditemvaluelist[-1]
-        # cut_bins = []
-        # for i in range(7):
-        #     cut_bins.append(maxvalplus * pow(2, -i))
-        # cut_bins.append(-0.00001)  # include zero as actual value
-        # cut_bins.sort()
-        # cut_labels = [str(i + 1) for i in range(len(cut_bins) - 1)]
-        # bindf['loadcentrality'] = pd.cut(bindf['loadcentrality'], bins=cut_bins, labels=cut_labels)
-        # newd = bindf.set_index('node')['loadcentrality'].to_dict()
-        # nx.set_node_attributes(glob.grh, d, 'loadcentrality')
-        # nx.set_node_attributes(glob.grh, newd, 'loadcentrality_class')
-        # dicy = dict(zip(cut_labels, cut_bins))
-        # centralitymeasure.append({'measure': 'loadcentrality', 'binning': json.dumps(dicy)})
-        #
-        # d = nx.load_centrality(noselfloopssubgraph)
-        # ############
-        # bindf = pd.DataFrame(list(d.items()), columns=['node', 'loadcentrality_discarded_selfloops'])
-        # ditemvaluelist = list(d.values())
-        # ditemvaluelist.sort()
-        # maxvalplus = ditemvaluelist[-1]
-        # cut_bins = []
-        # for i in range(7):
-        #     cut_bins.append(maxvalplus * pow(2, -i))
-        # cut_bins.append(-0.00001)  # include zero as actual value
-        # cut_bins.sort()
-        # cut_labels = [str(i + 1) for i in range(len(cut_bins) - 1)]
-        # bindf['loadcentrality_discarded_selfloops'] = pd.cut(bindf['loadcentrality_discarded_selfloops'],
-        #                                                      bins=cut_bins, labels=cut_labels)
-        # newd = bindf.set_index('node')['loadcentrality_discarded_selfloops'].to_dict()
-        # nx.set_node_attributes(glob.grh, d, 'loadcentrality_discarded_selfloops')
-        # nx.set_node_attributes(glob.grh, newd, 'loadcentrality_discarded_selfloops_class')
-        # dicy = dict(zip(cut_labels, cut_bins))
-        # centralitymeasure.append({'measure': 'loadcentrality_discarded_selfloops', 'binning': json.dumps(dicy)})
-
-        ##############
-
+        #centralitymeasure.append(setcentralitymeasure(noselfloopssubgraph, 'loadcentrality_noselfloops'))
     glob.centralitiemeasures = pd.DataFrame(centralitymeasure)
-    print('updating graph centralities attributes  done', "--- %s seconds ---" % (time.time() - start_time))
+    print('updating graph centralities attributes  done', "--- %.3f seconds ---" % (time.time() - start_time))
 
     ######## part 2
 
@@ -240,7 +114,7 @@ def processgraphmlfile(details=True, advanced=False):
             glob.elementcreationdistri.append(
                 {'sequenceId': tup[0], 'startDateTime': tup[1], 'statescreated': nodecount,
                  'initialNode': tup[3], 'actionsperformed': edgecount, 'nrofteststeps': tup[2]})
-        print('updating execution statistics  done', "--- %s seconds ---" % (time.time() - start_time))
+        print('updating execution statistics  done', "--- %.3f seconds ---" % (time.time() - start_time))
     glob.testexecutions = pd.DataFrame(glob.elementcreationdistri)
 
     ########## simple path to farest node
@@ -264,7 +138,7 @@ def processgraphmlfile(details=True, advanced=False):
             lspbyinitial.append(
                 {'initialNode': inode, 'LSP length': str(len(longestshortestpath)), 'LSP': csvlspallnodes})
         pass
-        print('updating shortestpaths from initalnodes  done', "--- %s seconds ---" % (time.time() - start_time))
+        print('updating shortestpaths from initalnodes  done', "--- %.3f seconds ---" % (time.time() - start_time))
     glob.lsptraces = pd.DataFrame(lspbyinitial)
     ########## simple path to farest node
 
@@ -303,7 +177,7 @@ def processgraphmlfile(details=True, advanced=False):
 
     setgraphattributes(True, None, '')
     setvizproperties(True, None, '')
-    print('validating graph  done', "--- %s seconds ---" % (time.time() - start_time))
+    print('validating graph  done', "--- %.3f seconds ---" % (time.time() - start_time))
     return masterlog
 
 
@@ -429,7 +303,7 @@ def getConcreteStateSequenceid(concretestate):
         index = min(index, glob.sortedsequenceids.index(s))
         if index == 0: break
     sequenceid = glob.sortedsequenceids[index]
-    return sequenceid
+    return sequenceid,';'.join(sequenceids)
 
 
 def getConcreteActionSequenceid(concreteaction):
@@ -446,4 +320,12 @@ def getConcreteActionSequenceid(concreteaction):
         index = min(index, glob.sortedsequenceids.index(s))
         if index == 0: break
     sequenceid = glob.sortedsequenceids[index]
-    return sequenceid
+    return sequenceid,';'.join(sequenceids)
+
+
+def centralitywidth(index=0,size=glob.centrality_minwidth):
+    return  int(size * pow(1.25, index))
+
+
+def centralityheight(index=0,size=glob.centrality_minheight):
+    return  int(size * pow(1.25, index))

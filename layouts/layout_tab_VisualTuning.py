@@ -86,11 +86,21 @@ visualTuning = html.Div([
             tableblock('viz-settings', '130px', True, '', '100%', '600px'),
         ], style={'display': 'none', 'margin': '5px'})
     ], style={'border-width': '1', 'border-color': 'grey', 'border-style': 'dashed'}),
+
     html.Div([
         html.A(id='collapse-testsequence-link', children='Collapse/Expand Executions table:', n_clicks=0,
                n_clicks_timestamp=0, style={'font-size': 12},
                href="javascript:toggle1(document.getElementById('executions-area'))"),
+
+
         html.Div(id='executions-area', children=[
+            dcc.Checklist(
+            id='execution-details',
+            options=[
+                {'label': 'Show "updated_by" instead of "created by"', 'value': 'Updated'}],
+            value=['Updated'],  # hidden and default  is set
+            style={'width': '75', 'color': 'black', 'display': 'inline-block', 'fontSize': 12},
+        ),
             html.P(),
             html.Button(id='load-executions-table-button', n_clicks=0, n_clicks_timestamp=0, children='reload',
                         style={'display': 'none'}),  # style={'display': 'inline-block'}),
@@ -101,8 +111,9 @@ visualTuning = html.Div([
 
         ], style={'display': 'none', 'margin': '5px'})
     ], style={'border-width': '1', 'border-color': 'grey', 'border-style': 'dashed'}),
+
     html.Div([
-        html.A(id='collapse-pathproperties-link', children='Collapse/Expand Path section:', n_clicks=0,
+        html.A(id='collapse-path-link', children='Collapse/Expand Path section:', n_clicks=0,
                n_clicks_timestamp=0, style={'font-size': 12},
                href="javascript:toggle1(document.getElementById('pathproperties-area'))"),
         html.Div(id='pathproperties-area', children=[
@@ -116,8 +127,9 @@ visualTuning = html.Div([
 
         ], style={'display': 'none', 'margin': '5px'}),
     ], style={'border-width': '1', 'border-color': 'grey', 'border-style': 'dashed'}),
+
     html.Div([
-        html.A(id='collapse-measurement-link', children='Collapse/Expand measurement section:', n_clicks=0,
+        html.A(id='collapse-measurement-link', children='Collapse/Expand Measurement section:', n_clicks=0,
                n_clicks_timestamp=0, style={'font-size': 12},
                href="javascript:toggle1(document.getElementById('measurement-area'))"),
         html.Div(id='measurement-area', children=[
