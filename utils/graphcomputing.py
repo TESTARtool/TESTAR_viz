@@ -117,7 +117,7 @@ def processgraphmlfile(details=True, advanced=False):
         print('updating execution statistics  done', "--- %.3f seconds ---" % (time.time() - start_time))
     glob.testexecutions = pd.DataFrame(glob.elementcreationdistri)
 
-    ########## simple path to farest node
+    ########## shortest simple path to farest node
 
     lspbyinitial = [{'initialNode': 'N/A', 'LSP length': '-1', 'LSP': 'N/A'}]
     if True or advanced:
@@ -140,7 +140,7 @@ def processgraphmlfile(details=True, advanced=False):
         pass
         print('updating shortestpaths from initalnodes  done', "--- %.3f seconds ---" % (time.time() - start_time))
     glob.lsptraces = pd.DataFrame(lspbyinitial)
-    ########## simple path to farest node
+    ########## shortest simple path to farest node
 
     masterlog = {}
     log = []
@@ -190,7 +190,6 @@ def setcentralitymeasure(graph=None,centralityname='indegree_noselfloops'):
             d = nx.load_centrality(graph)
         else:
             return {'measure': 'error', 'binning': json.dumps('error')}
-
         ditemvaluelist = list(d.values())
         ditemvaluelist.sort()
         maxvalplus = ditemvaluelist[-1]
@@ -200,10 +199,6 @@ def setcentralitymeasure(graph=None,centralityname='indegree_noselfloops'):
         cut_bins.append(-1)  # zero has to fall in the first bin/bucket.
         cut_bins.sort()
         cut_labels = [str(i + 1) for i in range(len(cut_bins) - 1)]
-        # bindf = pd.DataFrame(list(d.items()), columns=['node', 'tmp'+centralityname])
-        # bindf[centralityname] = pd.cut(bindf['tmp'+centralityname], bins=cut_bins,  labels=cut_labels)
-        # newd = bindf.set_index('node')[centralityname].to_dict()
-        # nx.set_node_attributes(glob.grh, newd, centralityname+'_class')
         nx.set_node_attributes(glob.grh, d, centralityname)
         dicy = dict(zip(cut_labels, cut_bins))
         return {'measure': centralityname, 'binning': json.dumps(dicy)}

@@ -1,6 +1,5 @@
 import json
 import networkx as nx
-
 import utils.gradient
 import utils.gui
 import utils.graphcomputing as tu
@@ -14,12 +13,8 @@ def updateCytoStyleSheet(button, selectedoracles, oracledata, selectedbaselineor
                          advancedpropertiesdata,
                          selectedcentralities, centralitiesdata, selectednodedata, executiondetails):
     stylesheet = []
-    oracleconditionalstyle = [{
-        'if': {'row_index': 'odd'},
-        'backgroundColor': 'AliceBlue'}]  # a comma <,> at the end of this line cost me a day
-    baselineoracleconditionalstyle = [{
-        'if': {'row_index': 'odd'},
-        'backgroundColor': 'AliceBlue'}]  # a comma <,> at the end of this line cost me a day
+    oracleconditionalstyle = [glob.tableoddrowstyle]  # a comma <,> at the end of this line cost me a day
+    baselineoracleconditionalstyle = [glob.tableoddrowstyle]  # a comma <,> at the end of this line cost me a day
 
     data = glob.dfdisplayprops.to_dict('records')
 
@@ -82,82 +77,62 @@ def updateCytoStyleSheet(button, selectedoracles, oracledata, selectedbaselineor
     #######  oracles
     selectedrows = selectedoracles
     if not (oracledata is None) and len(oracledata) > 0 and not (selectedrows is None) and len(selectedrows) > 0:
-        prefixcolor = ''
-        cyclecolor = ''
         i = -1
         for r in oracledata:
             i = i + 1
             if i in selectedrows:
                 if r['ORACLE_VERDICT'] == 'FAIL':
-                    prefixcolor = 'brown'
-                    cyclecolor = 'red'
                     oracleconditionalstyle.append({
-                        "if": {"row_index": i},
-                        "backgroundColor": "red",
-                        'color': 'white'})
+                        "if": {"row_index": i},"backgroundColor": "red", 'color': 'white'})
+                    stylesheet.extend(updatestyleoftrace(r['EXAMPLERUN_CYCLE_STATES'], 'node',
+                        glob.latestoracle_fail_cycle_states))
+                    stylesheet.extend(updatestyleoftrace(r['EXAMPLERUN_PREFIX_STATES'], 'node',
+                        glob.latestoracle_fail_prefix_states))
+                    stylesheet.extend( updatestyleoftrace(r['EXAMPLERUN_CYCLE_TRANSITIONS'], 'edge',
+                        glob.latestoracle_fail_cycle_transitions))
+                    stylesheet.extend(updatestyleoftrace(r['EXAMPLERUN_PREFIX_TRANSITIONS'], 'edge',
+                        glob.latestoracle_fail_prefix_transitions))
                 elif r['ORACLE_VERDICT'] == 'PASS':
-                    prefixcolor = 'lightgreen'
-                    cyclecolor = 'green'
                     oracleconditionalstyle.append({
-                        "if": {"row_index": i},
-                        "backgroundColor": "green",
-                        'color': 'white'})
-
-                stylepropdict = {'border-width': 2, 'border-color': prefixcolor, 'background-color': prefixcolor}
-                stylesheet.extend(updatestyleoftrace(r['EXAMPLERUN_PREFIX_STATES'], 'node', stylepropdict))
-                stylepropdict = {'border-width': 2, 'border-color': cyclecolor, 'background-color': cyclecolor}
-                stylesheet.extend(updatestyleoftrace(r['EXAMPLERUN_CYCLE_STATES'], 'node', stylepropdict))
-                stylepropdict = {'width': 2, 'line-color': prefixcolor, 'background-color': prefixcolor,
-                                 'mid-target-arrow-color': prefixcolor}
-                stylesheet.extend(updatestyleoftrace(r['EXAMPLERUN_PREFIX_TRANSITIONS'], 'edge', stylepropdict))
-                stylepropdict = {'width': 2, 'line-color': cyclecolor, 'background-color': cyclecolor,
-                                 'mid-target-arrow-color': cyclecolor}
-                stylesheet.extend(updatestyleoftrace(r['EXAMPLERUN_CYCLE_TRANSITIONS'], 'edge', stylepropdict))
+                        "if": {"row_index": i},"backgroundColor": "green",'color': 'white'})
+                    stylesheet.extend(updatestyleoftrace(r['EXAMPLERUN_CYCLE_STATES'], 'node',
+                        glob.latestoracle_pass_cycle_states))
+                    stylesheet.extend(updatestyleoftrace(r['EXAMPLERUN_PREFIX_STATES'], 'node',
+                        glob.latestoracle_pass_prefix_states))
+                    stylesheet.extend(updatestyleoftrace(r['EXAMPLERUN_CYCLE_TRANSITIONS'], 'edge',
+                        glob.latestoracle_pass_cycle_transitions))
+                    stylesheet.extend(updatestyleoftrace(r['EXAMPLERUN_PREFIX_TRANSITIONS'], 'edge',
+                        glob.latestoracle_pass_prefix_transitionss))
     #######  oracles
     ###### baseline oracles
     selectedbaselinerows = selectedbaselineoracles
     if not (baselineoracledata is None):
         if not (baselineoracledata is None) and len(baselineoracledata) > 0 and not (
                 selectedbaselinerows is None) and len(selectedbaselinerows) > 0:
-            prefixcolor = ''
-            cyclecolor = ''
             i = -1
             for r in baselineoracledata:
                 i = i + 1
                 if i in selectedbaselinerows:
                     if r['ORACLE_VERDICT'] == 'FAIL':
-                        prefixcolor = 'plum'
-                        cyclecolor = 'deeppink'
+                        stylesheet.extend(updatestyleoftrace(r['EXAMPLERUN_CYCLE_STATES'], 'node', glob.baselineoracle_fail_cycle_states))
+                        stylesheet.extend(updatestyleoftrace(r['EXAMPLERUN_PREFIX_STATES'], 'node',  glob.baselineoracle_fail_prefix_states))
+                        stylesheet.extend(updatestyleoftrace(r['EXAMPLERUN_CYCLE_TRANSITIONS'], 'edge', glob.baselineoracle_fail_cycle_transitions))
+                        stylesheet.extend(updatestyleoftrace(r['EXAMPLERUN_PREFIX_TRANSITIONS'], 'edge', glob.baselineoracle_fail_prefix_transitions))
                         baselineoracleconditionalstyle.append({
-                            "if": {"row_index": i},
-                            "backgroundColor": "red",
-                            'color': 'white'})
+                            "if": {"row_index": i}, "backgroundColor": "red",'color': 'white'})
                     elif r['ORACLE_VERDICT'] == 'PASS':
-                        prefixcolor = 'gold'
-                        cyclecolor = 'goldenrod'
+                        stylesheet.extend(updatestyleoftrace(r['EXAMPLERUN_CYCLE_STATES'], 'node', glob.baselineoracle_pass_cycle_states))
+                        stylesheet.extend(updatestyleoftrace(r['EXAMPLERUN_PREFIX_STATES'], 'node',glob.baselineoracle_pass_prefix_states ))
+                        stylesheet.extend(updatestyleoftrace(r['EXAMPLERUN_CYCLE_TRANSITIONS'], 'edge', glob.baseineoracle_pass_cycle_transitions))
+                        stylesheet.extend(updatestyleoftrace(r['EXAMPLERUN_PREFIX_TRANSITIONS'], 'edge', glob.baselineoracle_pass_prefix_transitionss))
                         baselineoracleconditionalstyle.append({
-                            "if": {"row_index": i},
-                            "backgroundColor": "green",
-                            'color': 'white'})
-                    stylepropdict = {'border-width': 2, 'border-color': cyclecolor, 'border-style': 'dashed'}
-                    stylesheet.extend(updatestyleoftrace(r['EXAMPLERUN_CYCLE_STATES'], 'node', stylepropdict))
-                    stylepropdict = {'border-width': 2, 'border-color': prefixcolor, 'border-style': 'dashed'}
-                    stylesheet.extend(updatestyleoftrace(r['EXAMPLERUN_PREFIX_STATES'], 'node', stylepropdict))
-                    stylepropdict = {'width': 4, 'line-style': 'dashed', 'mid-target-arrow-color': cyclecolor}
-                    stylesheet.extend(updatestyleoftrace(r['EXAMPLERUN_CYCLE_TRANSITIONS'], 'edge', stylepropdict))
-                    stylepropdict = {'width': 4, 'line-style': 'dashed', 'mid-target-arrow-color': prefixcolor}
-                    stylesheet.extend(updatestyleoftrace(r['EXAMPLERUN_PREFIX_TRANSITIONS'], 'edge', stylepropdict))
+                            "if": {"row_index": i},"backgroundColor": "green",'color': 'white'})
     ###### baseline oracles
     # else: no special handling for display oracles
 
     ######color deadAbstractState/actions and then ConcreteStates/Actions
     if glob.grh.size() != 0:
-        tmpgrh = glob.grh.copy()
-        removenodelist = [n for n, v in glob.grh.nodes(data=True) if v[glob.label_nodeelement] != 'AbstractState']
-        removeedgelist = [(s, t) for s, t, n, v in glob.grh.edges(data=True, keys=True) if
-                          v[glob.label_edgeelement] != 'AbstractAction']
-        tmpgrh.remove_nodes_from(removenodelist)
-        tmpgrh.remove_edges_from(removeedgelist)
+        tmpgrh= utils.gui.updatesubgraph('Abstract')
         properties = [r for r in data if r[glob.elementtype] == 'node' and r[glob.elementsubtype] == 'AbstractState']
         stylepropdict = dict()
         if len(properties) > 0:  # take first row
@@ -166,18 +141,13 @@ def updateCytoStyleSheet(button, selectedoracles, oracledata, selectedbaselineor
         deadstates = (node for node, out_degree in tmpgrh.out_degree() if out_degree == 0)
         for stateid in deadstates: stylesheet.extend(updatestyleoftrace(stateid, 'node', stylepropdict))
 
-        tmpgrh = glob.grh.copy()
-        removenodelist = [n for n, v in glob.grh.nodes(data=True) if v[glob.label_nodeelement] != 'ConcreteState']
-        removeedgelist = [(s, t) for s, t, n, v in glob.grh.edges(data=True, keys=True) if
-                          v[glob.label_edgeelement] != 'ConcreteAction']
-        tmpgrh.remove_edges_from(removeedgelist)
-        tmpgrh.remove_nodes_from(removenodelist)
+        tmpgrh = utils.gui.updatesubgraph('Concrete')
         properties = [r for r in data if r[glob.elementtype] == 'node' and r[glob.elementsubtype] == 'ConcreteState']
         stylepropdict = dict()
         if len(properties) > 0:  # take first row
             stylepropdict.update({'background-color': properties[0]['color_if_deadstate']})
             stylepropdict.update({'shape': properties[0]['shape_if_deadstate']})
-        # next line is candidate for refactirong, if centralities are calculated at initial load
+        # next line is candidate for refactirong, as centralities like outdegree  are calculated at initial load
         deadstates = (node for node, out_degree in tmpgrh.out_degree() if out_degree == 0)
         for stateid in deadstates: stylesheet.extend(updatestyleoftrace(stateid, 'node', stylepropdict))
 
@@ -223,11 +193,8 @@ def updateCytoStyleSheet(button, selectedoracles, oracledata, selectedbaselineor
             for r in centralitiesdata:
                 i = i + 1
                 if i in selectedcentralitiesrows:
-                    styledict = dict()
                     selectordict = dict()
                     bins = json.loads(r['binning'])  # convert string back to dict
-                    minwidth = 20
-                    minheight = 20
                     colorlist = utils.gradient.colorgradient(colornameStart=glob.centrality_colornameStart, colornameEnd=glob.centrality_colornameEnd, n=len(bins))[
                         'hex']
                     j = 0
@@ -235,8 +202,8 @@ def updateCytoStyleSheet(button, selectedoracles, oracledata, selectedbaselineor
                         nodeselector = "node[" + r['measure'] + " >= " + "'" + str(v) + "'" + "]"
                         selectordict.update({'selector': nodeselector})
                         stylepropdict = {'shape': 'ellipse',
-                                         'width': int(minwidth * pow(1.25, (j))),
-                                         'height': int(minheight * pow(1.25, (j))),
+                                         'width': tu.centralitywidth(j),
+                                         'height': tu.centralityheight(j),
                                          'background-color': colorlist[j],
                                          'border-color': colorlist[j]}
                         legenda = styler.stylelegenda('node', str(v), stylepropdict, r['measure'], '', ">=")
@@ -247,31 +214,15 @@ def updateCytoStyleSheet(button, selectedoracles, oracledata, selectedbaselineor
     selectedadvancedrows = selectedadvancedproperties
     if not (advancedpropertiesdata is None) and len(advancedpropertiesdata) > 0 and not (
             selectedadvancedrows is None) and len(selectedadvancedrows) > 0:
-        subgraph = utils.gui.updatesubgraph(
-            'Concrete')  # regard only itemsthat are NOT in ABSTRACT and NOT in WIDGET and NOT in TEST
+        # regard only items that are NOT in ABSTRACT and NOT in WIDGET and NOT in TEST
+        subgraph = utils.gui.updatesubgraph('Concrete')
         i = -1
         for r in advancedpropertiesdata:
             i = i + 1
             if i in selectedadvancedrows:  # multiple rows selected: some node style become updated!!
-                csvlspfirstnode = r['initialNode']
-                csvlsplastnode = r['LSP'].split(';')[-1]
-                csvlspallnodes = r['LSP']
-                stylepropdict = {'border-width': 3, 'border-color': 'brown', 'background-color': 'white'}
-                stylesheet.extend(updatestyleoftrace(csvlspallnodes, 'node', stylepropdict))  # default
-                stylepropdict = {'border-width': 3, 'border-color': 'blue', 'background-color': 'blue'}
-                stylesheet.extend(
-                    updatestyleoftrace(csvlspfirstnode, 'node', stylepropdict))  # after default, so prevails
-                stylepropdict = {'border-width': 3, 'border-color': 'black', 'background-color': 'black'}
-                stylesheet.extend(updatestyleoftrace(csvlsplastnode, 'node', stylepropdict))
-                edgelist = []
-                longestshortestpath = r['LSP'].split(';')
-                for i in range(len(longestshortestpath) - 1):
-                    e = subgraph.get_edge_data(longestshortestpath[i], longestshortestpath[i + 1])
-                    edgelist.append(list(e.keys())[0])  # just take the first
-                csvlspedges = ';'.join(edgelist)
-                stylepropdict = {'width': 3, 'mid-target-arrow-color': 'brown', 'arrow-scale': 2, 'line-color': 'blue'}
-                stylesheet.extend(updatestyleoftrace(csvlspedges, 'edge', stylepropdict))
-
+                nlist=r['LSP'].split(';')
+                ret=pathstylesheet(nlist,subgraph)
+                stylesheet.extend(ret)
     shortestpatherror = ''
 
     ##Sp between 2 nodes
@@ -290,22 +241,8 @@ def updateCytoStyleSheet(button, selectedoracles, oracledata, selectedbaselineor
             except nx.NodeNotFound as e:
                 shortestpatherror = '(shortestpath error:  ' + sourcenode + ' or target node ' + targetnode + ' not in current view)'
                 spnodelist = []
-            if len(spnodelist) > 0:
-                stylepropdict = {'border-width': 3, 'border-color': 'brown', 'background-color': 'white'}
-                stylesheet.extend(updatestyleoftrace(';'.join(spnodelist), 'node', stylepropdict))  # default
-                stylepropdict = {'border-width': 3, 'border-color': 'blue', 'background-color': 'blue'}
-                stylesheet.extend(updatestyleoftrace(sourcenode, 'node', stylepropdict))  # after default, so prevails
-                stylepropdict = {'border-width': 3, 'border-color': 'black', 'background-color': 'black'}
-                stylesheet.extend(updatestyleoftrace(targetnode, 'node', stylepropdict))
-                shortestpatherror = '(' + ';'.join(spnodelist) + ')'
-                edgelist = []
-                for i in range(len(spnodelist) - 1):
-                    e = tmpgrh.get_edge_data(spnodelist[i], spnodelist[i + 1])
-                    edgelist.append(list(e.keys())[0])  # just take the first
-                csvlspedges = ';'.join(edgelist)
-                stylepropdict = {'width': 3, 'mid-target-arrow-color': 'brown', 'arrow-scale': 2, 'line-color': 'blue'}
-                stylesheet.extend(updatestyleoftrace(csvlspedges, 'edge', stylepropdict))
-
+            ret = pathstylesheet(spnodelist, tmpgrh)
+            stylesheet.extend(ret)
     ## SP between 2 nodes
     return '', stylesheet, oracleconditionalstyle, baselineoracleconditionalstyle, shortestpatherror
 
@@ -320,4 +257,22 @@ def updatestyleoftrace(csvlistofelements, elementype, stylepropdict):
     for graphid in elementlist:
         legenda = styler.stylelegenda(elementype, graphid, stylepropdict)
         tmpstylesheet.append(legenda[0])
+    return tmpstylesheet
+
+def pathstylesheet(nodelist=[], graph=None):
+    if len(nodelist) == 0:
+        return []
+    tmpstylesheet=[]
+    style = glob.path_allnodes
+    tmpstylesheet.extend(updatestyleoftrace(';'.join(nodelist), 'node', style))  # default
+    style = glob.path_firstnodes
+    tmpstylesheet.extend(updatestyleoftrace(nodelist[0], 'node', style))  # after default, so prevails
+    style = glob.path_lastnodes
+    tmpstylesheet.extend(updatestyleoftrace(nodelist[-1], 'node', style))
+    edgelist = []
+    for i in range(len(nodelist) - 1):
+        e = graph.get_edge_data(nodelist[i], nodelist[i + 1])
+        edgelist.append(list(e.keys())[0])  # just take the first
+    style = glob.path_alledges
+    tmpstylesheet.extend(updatestyleoftrace(';'.join(edgelist), 'edge', style))
     return tmpstylesheet

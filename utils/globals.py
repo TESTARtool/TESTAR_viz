@@ -110,15 +110,43 @@ edgedisplayprop={
                 'opacity': 1
                 }
 
-cycle_states_pass = {'border-width': 2, 'border-color': 'goldenrod', 'border-style': 'dashed'}
-prefix_states_pass = {'border-width': 2, 'border-color':'gold', 'border-style': 'dashed'}
-cycle_transitions_pass = {'width': 4, 'line-style': 'dashed', 'mid-target-arrow-color':'goldenrod'}
-prefix_transitions_pass  = {'width': 4, 'line-style': 'dashed', 'mid-target-arrow-color':'gold'}
+tableoddrowstyle = {
+                'if': {'row_index': 'odd'},
+                'backgroundColor': 'AliceBlue'}
+oraclefailstyle={
+                "backgroundColor": "red",
+                'color': 'white'}
+oraclepassstyle={
+                "backgroundColor": "green",
+                'color': 'white'}
 
-cycle_states_fail = {'border-width': 2, 'border-color': 'deeppink', 'border-style': 'dashed'}
-prefix_states_fail = {'border-width': 2, 'border-color': 'plum', 'border-style': 'dashed'}
-cycle_transitions_fail = {'width': 4, 'line-style': 'dashed', 'mid-target-arrow-color':'deeppink'}
-prefix_transitions_fail  = {'width': 4, 'line-style': 'dashed', 'mid-target-arrow-color': 'plum'}
+baselineoracle_pass_cycle_states = {'border-width': 2, 'border-color': 'goldenrod', 'background-color': 'goldenrod','border-style': 'dashed'}
+baselineoracle_pass_prefix_states = {'border-width': 2, 'border-color':'gold','background-color': 'gold', 'border-style': 'dashed'}
+baseineoracle_pass_cycle_transitions = {'width': 4, 'line-style': 'dashed','line-color': 'goldenrod', 'mid-target-arrow-color':'goldenrod'}
+baselineoracle_pass_prefix_transitionss  = {'width': 4, 'line-style': 'dashed','line-color': 'gold', 'mid-target-arrow-color':'gold'}
+
+baselineoracle_fail_cycle_states = {'border-width': 2, 'border-color': 'deeppink', 'background-color': 'deeppink','border-style': 'dashed'}
+baselineoracle_fail_prefix_states = {'border-width': 2, 'border-color': 'plum', 'background-color': 'plum', 'border-style': 'dashed'}
+baselineoracle_fail_cycle_transitions = {'width': 4, 'line-style': 'dashed','line-color': 'deeppink', 'mid-target-arrow-color':'deeppink'}
+baselineoracle_fail_prefix_transitions  = {'width': 4, 'line-style': 'dashed','line-color': 'plum', 'mid-target-arrow-color': 'plum'}
+
+
+latestoracle_pass_cycle_states = {'border-width': 2, 'border-color':'green', 'background-color': 'green','border-style': 'dashed'}
+latestoracle_pass_prefix_states = {'border-width': 2, 'border-color':'lightgreen','background-color': 'lightgreen', 'border-style': 'dashed'}
+latestoracle_pass_cycle_transitions = {'width': 4, 'line-style': 'dashed','line-color': 'green', 'mid-target-arrow-color':'green'}
+latestoracle_pass_prefix_transitionss  = {'width': 4, 'line-style': 'dashed','line-color': 'lightgreen', 'mid-target-arrow-color':'lightgreen'}
+
+latestoracle_fail_cycle_states = {'border-width': 2, 'border-color': 'red', 'background-color': 'red','border-style': 'dashed'}
+latestoracle_fail_prefix_states = {'border-width': 2, 'border-color': 'brown', 'background-color': 'brown', 'border-style': 'dashed'}
+latestoracle_fail_cycle_transitions = {'width': 4, 'line-style': 'dashed','line-color': 'red', 'mid-target-arrow-color':'red'}
+latestoracle_fail_prefix_transitions  = {'width': 4, 'line-style': 'dashed','line-color': 'brown', 'mid-target-arrow-color': 'brown'}
+
+
+
+
+
+
+
 
 trace_node_unselected = {'shape': 'octagon','background-color': 'red','border-style': 'dotted',
                 'opacity': 0.1, 'border-color': 'fuchsia'}

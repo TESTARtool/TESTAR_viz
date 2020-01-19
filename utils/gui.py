@@ -8,29 +8,36 @@ import pandas as pd
 from utils import globals as glob
 
 
-def updatesubgraph(layerview):
-    if glob.layerviewincache==layerview:
+def updatesubgraph(layerview, removeactionedges=False,forcecopy=False):
+    if glob.layerviewincache==(layerview, removeactionedges,forcecopy):
         return glob.subgraph
-    glob.layerviewincache = layerview
-    glob.subgraph = glob.grh.copy()
+    graphcopy = glob.grh.copy()
 
     removenodelist = []
     if not 'Abstract' in layerview:
         removenodelist = [n for n, v in glob.grh.nodes(data=True) if
                           v[glob.label_nodeelement] == 'AbstractState' or v[
                               glob.label_nodeelement] == 'AbstractStateModel']
-        glob.subgraph.remove_nodes_from(removenodelist)
+        if removeactionedges:
+            removeedgelist = [(s, t) for s, t, n, v in glob.grh.edges(data=True, keys=True) if
+                              v[glob.label_edgeelement] != 'AbstractAction']
+            graphcopy.remove_edges_from(removeedgelist)
+        graphcopy.remove_nodes_from(removenodelist)
     if not 'Incl Blackhole' in layerview:
         removenodelist = [n for n, v in glob.grh.nodes(data=True) if v[glob.label_nodeelement] == 'BlackHole']
-        glob.subgraph.remove_nodes_from(removenodelist)
+        graphcopy.remove_nodes_from(removenodelist)
 
     if not 'Widget' in layerview:
         removenodelist = [n for n, v in glob.grh.nodes(data=True) if v[glob.label_nodeelement] == 'Widget']
-        glob.subgraph.remove_nodes_from(removenodelist)
+        graphcopy.remove_nodes_from(removenodelist)
 
     if not 'Concrete' in layerview:
         removenodelist = [n for n, v in glob.grh.nodes(data=True) if v[glob.label_nodeelement] == 'ConcreteState']
-        glob.subgraph.remove_nodes_from(removenodelist)
+        if removeactionedges:
+            removeedgelist = [(s, t) for s, t, n, v in glob.grh.edges(data=True, keys=True) if
+                              v[glob.label_edgeelement] != 'ConcreteAction']
+            graphcopy.remove_edges_from(removeedgelist)
+        graphcopy.remove_nodes_from(removenodelist)
 
     if not 'Test Executions' in layerview:
         # removeedgelist = [(s,t) for s,t,n, v in glob.grh.edges(data=True,keys=True) if v['glob.label_edgeelement'] == 'Accessed']
@@ -38,11 +45,14 @@ def updatesubgraph(layerview):
         removenodelist = [n for n, v in glob.grh.nodes(data=True) if
                           (v[glob.label_nodeelement] == 'SequenceNode' or v[
                               glob.label_nodeelement] == 'TestSequence')]
-        glob.subgraph.remove_nodes_from(removenodelist)
+        graphcopy.remove_nodes_from(removenodelist)
 
     else:
         pass  # subgraph = 'all' # tmpgrh=glob.grh.copy
-    return glob.subgraph
+    if not forcecopy:
+        glob.subgraph=graphcopy
+        glob.layerviewincache = (layerview, removeactionedges, False)
+    return graphcopy
 
 
 def prettytime(timestamp=None):
