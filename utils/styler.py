@@ -5,7 +5,7 @@ def stylelegenda(elementtype, legendaitem, styling, filteredattribute='id', subs
     cytonodes = []
     cytoedges = []
     selectorfilter = '[' + filteredattribute + ' ' + comparator + ' ' + '\'' + legendaitem + '\'' + ']' + subselector
-    # concrete example  => '[LabelV = ConcreteAction]:selected' or '[id = #153:0]'
+    # concrete example  => [LabelV = 'ConcreteAction']:selected' or '[id = '#153:0']
     if legendaitem == '':
         selectordict = {'selector': elementtype}
     else:
