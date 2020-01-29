@@ -21,8 +21,7 @@ def updateCytoStyleSheet(button, selectedoracles, oracledata, selectedbaselineor
     for row in data:
         if row[glob.elementtype] == 'node':
             dsp = 'element'
-            if not row.get('hide') is None:
-                if int(row['hide']) == 1:  dsp = 'none'
+
 
             legenda = styler.stylelegenda(row[glob.elementtype], row[glob.elementsubtype], nodestyler(row, dsp),
                                           glob.label_nodeelement)
@@ -35,14 +34,27 @@ def updateCytoStyleSheet(button, selectedoracles, oracledata, selectedbaselineor
             legenda = styler.stylelegenda(row[glob.elementtype], row[glob.elementsubtype], itemstyle,
                                           glob.label_nodeelement, ':selected')
             stylesheet.append(legenda[0])
-
-            if not row['hide_conditionally'] is None:
-                if row['hide_conditionally'] != '':
+            if not row['hide_cond1'] is None:
+                if row['hide_cond1'] != '':
                     itemstyle = {'display': 'none'}
-                    condition = '[' + row['hide_conditionally'] + ']'
-                    legenda = styler.stylelegenda(row[glob.elementtype], row[glob.elementsubtype] + condition,
-                                                  itemstyle, glob.label_nodeelement)
+                    if row['hide_cond1']  == '1':
+                        condition=''
+                    else:
+                        condition = '[' + row['hide_cond1'] + ']'
+                    legenda = styler.stylelegenda(row[glob.elementtype], row[glob.elementsubtype],
+                                                  itemstyle,glob.label_nodeelement, condition)
                     stylesheet.append(legenda[0])
+            if not row['hide_cond2'] is None:
+                if row['hide_cond2'] != '':
+                    itemstyle = {'display': 'none'}
+                    if row['hide_cond2']  == '1':
+                        condition=''
+                    else:
+                        condition = '[' + row['hide_cond2'] + ']'
+                    legenda = styler.stylelegenda(row[glob.elementtype], row[glob.elementsubtype],
+                                                  itemstyle,glob.label_nodeelement, condition)
+                    stylesheet.append(legenda[0])
+
 
         elif row[glob.elementtype] == 'edge':
 
@@ -63,13 +75,25 @@ def updateCytoStyleSheet(button, selectedoracles, oracledata, selectedbaselineor
             legenda = styler.stylelegenda(row[glob.elementtype], row[glob.elementsubtype], itemstyle,
                                           glob.label_edgeelement, ':selected')
             stylesheet.append(legenda[0])
-
-            if not row['hide_conditionally'] is None:
-                if row['hide_conditionally'] != '':
+            if not row['hide_cond1'] is None:
+                if row['hide_cond1'] != '':
                     itemstyle = {'display': 'none'}
-                    condition = '[' + row['hide_conditionally'] + ']'
-                    legenda = styler.stylelegenda(row[glob.elementtype], row[glob.elementsubtype] + condition,
-                                                  itemstyle, glob.label_edgeelement)
+                    if row['hide_cond1'] == '1':
+                        condition = ''
+                    else:
+                        condition = '[' + row['hide_cond1'] + ']'
+                    legenda = styler.stylelegenda(row[glob.elementtype], row[glob.elementsubtype],
+                                                  itemstyle, glob.label_edgeelement,  condition)
+                    stylesheet.append(legenda[0])
+            if not row['hide_cond2'] is None:
+                if row['hide_cond2'] != '':
+                    itemstyle = {'display': 'none'}
+                    if row['hide_cond2'] == '1':
+                        condition = ''
+                    else:
+                        condition = '[' + row['hide_cond2'] + ']'
+                    legenda = styler.stylelegenda(row[glob.elementtype], row[glob.elementsubtype],
+                                                  itemstyle, glob.label_edgeelement,  condition)
                     stylesheet.append(legenda[0])
         else:
             selectorfilter = ""  # should not happen
