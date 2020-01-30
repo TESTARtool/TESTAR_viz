@@ -48,10 +48,15 @@ def processgraphmlfile(details=True, advanced=False):
         for tn, tndict in glob.grh.nodes(data=True):
             if tndict[glob.label_nodeelement] == 'SequenceNode' and tndict['sequenceId'] == d['sequenceId']:
                 i = i + 1
-                if i == 1:
-                    initialnode = [x for x, y in glob.grh.nodes(data=True) if
-                                   y[glob.label_nodeelement] == 'ConcreteState' and y['ConcreteIDCustom'] == tndict[
-                                       'concreteStateId']]
+                if initialnode=='':
+                    neighbors = glob.grh.predecessors(tn)
+                    for predec in neighbors:  # should be only 1 entry. :-)
+                        if predec == n: # this node is successor of the testsequence, thus pointer to firstnode
+                            initialnode = [x for x, y in glob.grh.nodes(data=True) if
+                                           y[glob.label_nodeelement] == 'ConcreteState' and
+                                           y['ConcreteIDCustom'] == tndict['concreteStateId']]
+                if initialnode !='':
+                    break
         testlength = i  # len(ts)-1 # substrct testsequencenode
         sequencetuples.append((d['sequenceId'], date_time_obj, testlength, initialnode[0]))
     glob.sortedsequencetuples = sorted(sequencetuples, key=lambda x: x[1])

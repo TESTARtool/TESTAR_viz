@@ -6,21 +6,15 @@ Created on Wed Apr  3 18:27:03 2019
 @author: cseng
 """
 import json
-
 from dash.dependencies import Input, Output, State
 import dash
 import pandas as pd
-
 import utils
 from appy import app
 import utils.globals as glob
 import utils.gradient
 from utils import styler
 from utils.graphcomputing import centralitywidth, centralityheight
-
-
-# from utils.styler import nodestyler, edgestyler, stylelegenda
-
 
 @app.callback(
     [Output('cytoscape-legenda', 'elements'),
@@ -30,12 +24,11 @@ from utils.graphcomputing import centralitywidth, centralityheight
      Output('path-legenda', 'elements'),
      Output('path-legenda', 'stylesheet'),
      Output('measurements-legenda', 'elements'),
-     Output('measurements-legenda', 'stylesheet')
-     ],
-    [Input('apply-viz_style-button', 'n_clicks'),
-     Input('loading-logtext', 'children'),
-     Input('viz-settings-table', 'data')],
-    [State('viz-settings-table', 'columns')]
+     Output('measurements-legenda', 'stylesheet')],
+     [Input('apply-viz_style-button', 'n_clicks'),
+     Input('loading-logtext', 'children')],
+     [State('viz-settings-table', 'data'),
+     State('viz-settings-table', 'columns')]
 )
 def update_legenda(hit0, newlog, data, cols):
     ctx = dash.callback_context

@@ -62,7 +62,6 @@ edgeonselectmultiplier=3
 nodedisplayprop={
                 'hide_cond1':'',
                 'hide_cond2':'',
-                'show-tree':0,
                 'label':'nodeid',
                 'label_fontsize' : 14,
                 'shape' :'rectangle',
@@ -82,7 +81,6 @@ nodedisplayprop={
 parentnodedisplayprop={
                 'hide_cond1':'',
                 'hide_cond2': '',
-                #'show-tree': 0,
                 'label':'nodeid',
                 'label_fontsize' : 18,
                 'shape' :'rectangle',
@@ -98,7 +96,6 @@ parentnodedisplayprop={
 edgedisplayprop={
                 'hide_cond1':'',
                 'hide_cond2': '',
-                #'show-tree': 0,
                 'label':'',
                 'label_fontsize' : 10,
                 'label-onselect': 'Desc',
