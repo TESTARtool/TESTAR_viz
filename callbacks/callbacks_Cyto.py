@@ -103,7 +103,7 @@ def updateCytoStyleSheet(button, oraclebutton, baselineoraclebutton, executionsb
     [Input('cytoscape-update-layout', 'selectedNodeData')])
 def update_selnodestabletest(selnodes):
     if selnodes is None or len(selnodes)==0:  # at initial rendering this is None
-        return dash.no_update, dash.no_update, dash.no_update
+        return dash.no_update, dash.no_update, dash.no_update,dash.no_update
     df = pd.DataFrame(selnodes)
     df = df.reindex(sorted(df.columns), axis=1)
     if glob.image_element in df.columns:
@@ -139,7 +139,7 @@ def update_selnodestabletest(selnodes):
     [Input('cytoscape-update-layout', "selectedEdgeData")])
 def update_seledgetabletest(seledges):
     if seledges is None or len(seledges)==0:  # at initial rendering this is None
-        return dash.no_update, dash.no_update
+        return dash.no_update, dash.no_update, dash.no_update
     df = pd.DataFrame(seledges)
     df = df.reindex(sorted(df.columns), axis=1)
     ecolumns = list(df.columns)

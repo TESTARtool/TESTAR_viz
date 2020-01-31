@@ -34,33 +34,51 @@ def updateCytoStyleSheet(button, selectedoracles, oracledata, selectedbaselineor
             legenda = styler.stylelegenda(row[glob.elementtype], row[glob.elementsubtype], itemstyle,
                                           glob.label_nodeelement, ':selected')
             stylesheet.append(legenda[0])
-            if not row['hide_cond1'] is None:
-                if row['hide_cond1'] != '':
+            if not row['hide'] is None:
+                if row['hide'] != '':
                     itemstyle = {'display': 'none'}
-                    if row['hide_cond1']  == '1':
+                    if row['hide']  == '1':
                         condition=''
                     else:
-                        condition = '[' + row['hide_cond1'] + ']'
+                        condition = '[' + str(row['hide']).replace("&&"," ][ ") + ']'
                     legenda = styler.stylelegenda(row[glob.elementtype], row[glob.elementsubtype],
                                                   itemstyle,glob.label_nodeelement, condition)
                     stylesheet.append(legenda[0])
-            if not row['hide_cond2'] is None:
-                if row['hide_cond2'] != '':
-                    itemstyle = {'display': 'none'}
-                    if row['hide_cond2']  == '1':
+            if not row['focus'] is None:
+                if row['focus'] != '':
+                    itemstyle = {
+                        'width': int(1.4 * (int(row['width'] if row['width'] != '' else 0))),
+                        'height': int(1.4 * (int(row['height'] if row['height'] != '' else 0))),
+                        'border-width': int(3 * (int(row['border-width'] if row['border-width'] != '' else 0))),
+                        # 'ghost': 'yes',
+                        # 'ghost-offset-x': 7,
+                        # 'ghost-offset-y':7,
+                        # 'ghost-opacity': 0.25
+                    }
+                    if row['focus']  == '1':
                         condition=''
                     else:
-                        condition = '[' + row['hide_cond2'] + ']'
+                        condition = '[' + str(row['focus']).replace("&&"," ][ ") + ']'
                     legenda = styler.stylelegenda(row[glob.elementtype], row[glob.elementsubtype],
                                                   itemstyle,glob.label_nodeelement, condition)
                     stylesheet.append(legenda[0])
-
+            if not row['cover'] is None:
+                if row['cover'] != '':
+                    itemstyle = {
+                        'width': int(0.7 * (int(row['width'] if row['width'] != '' else 0))),
+                        'height': int(0.7 * (int(row['height'] if row['height'] != '' else 0))),
+                        'opacity':0.25*int((int(row['opacity'] if row['opacity'] != '' else 0))),
+                    }
+                    if row['cover'] == '1':
+                        condition = ''
+                    else:
+                        condition = '[' + str(row['cover']).replace("&&", " ][ ") + ']'
+                    legenda = styler.stylelegenda(row[glob.elementtype], row[glob.elementsubtype],
+                                                  itemstyle, glob.label_nodeelement, condition)
+                    stylesheet.append(legenda[0])
 
         elif row[glob.elementtype] == 'edge':
-
             dsp = 'element'
-            if not row.get('hide') is None:
-                if int(row['hide']) == 1:  dsp = 'none'
 
             legenda = styler.stylelegenda(row[glob.elementtype], row[glob.elementsubtype], edgestyler(row, dsp),
                                           glob.label_edgeelement)
@@ -75,26 +93,41 @@ def updateCytoStyleSheet(button, selectedoracles, oracledata, selectedbaselineor
             legenda = styler.stylelegenda(row[glob.elementtype], row[glob.elementsubtype], itemstyle,
                                           glob.label_edgeelement, ':selected')
             stylesheet.append(legenda[0])
-            if not row['hide_cond1'] is None:
-                if row['hide_cond1'] != '':
+            if not row['hide'] is None:
+                if row['hide'] != '':
                     itemstyle = {'display': 'none'}
-                    if row['hide_cond1'] == '1':
+                    if row['hide'] == '1':
                         condition = ''
                     else:
-                        condition = '[' + row['hide_cond1'] + ']'
+                        condition = '[' + str(row['hide']).replace("&&", " ][ ") + ']'
+                    legenda = styler.stylelegenda(row[glob.elementtype], row[glob.elementsubtype],
+                                          itemstyle, glob.label_edgeelement,  condition)
+                    stylesheet.append(legenda[0])
+            if not row['focus'] is None:
+                if row['focus'] != '':
+                    itemstyle = {'width': int(3 * (int(row['line-width'] if row['line-width'] != '' else 0))),
+
+                    }
+                    if row['focus'] == '1':
+                        condition = ''
+                    else:
+                        condition = '[' + str(row['focus']).replace("&&", " ][ ") + ']'
                     legenda = styler.stylelegenda(row[glob.elementtype], row[glob.elementsubtype],
                                                   itemstyle, glob.label_edgeelement,  condition)
                     stylesheet.append(legenda[0])
-            if not row['hide_cond2'] is None:
-                if row['hide_cond2'] != '':
-                    itemstyle = {'display': 'none'}
-                    if row['hide_cond2'] == '1':
+            if not row['cover'] is None:
+                if row['cover'] != '':
+                    itemstyle = {
+                        'opacity':0.25*int( (int(row['opacity'] if row['opacity'] != '' else 1))),
+                    }
+                    if row['cover'] == '1':
                         condition = ''
                     else:
-                        condition = '[' + row['hide_cond2'] + ']'
+                        condition = '[' + str(row['cover']).replace("&&", " ][ ") + ']'
                     legenda = styler.stylelegenda(row[glob.elementtype], row[glob.elementsubtype],
-                                                  itemstyle, glob.label_edgeelement,  condition)
+                                                  itemstyle, glob.label_edgeelement, condition)
                     stylesheet.append(legenda[0])
+
         else:
             selectorfilter = ""  # should not happen
 

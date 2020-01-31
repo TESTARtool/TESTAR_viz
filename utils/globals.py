@@ -60,8 +60,9 @@ elementcreationdistri=[]
 nodeonselectmultiplier=3
 edgeonselectmultiplier=3
 nodedisplayprop={
-                'hide_cond1':'',
-                'hide_cond2':'',
+                'hide':'',
+                'focus': '',
+                'cover': '',
                 'label':'nodeid',
                 'label_fontsize' : 14,
                 'shape' :'rectangle',
@@ -79,8 +80,9 @@ nodedisplayprop={
                 'opacity': 1
                 }
 parentnodedisplayprop={
-                'hide_cond1':'',
-                'hide_cond2': '',
+                'hide':'',
+                'focus': '',
+                'cover': '',
                 'label':'nodeid',
                 'label_fontsize' : 18,
                 'shape' :'rectangle',
@@ -94,8 +96,9 @@ parentnodedisplayprop={
                 'shape_if_deadstate': ''
                 }
 edgedisplayprop={
-                'hide_cond1':'',
-                'hide_cond2': '',
+                'hide':'',
+                'focus': '',
+                'cover': '',
                 'label':'',
                 'label_fontsize' : 10,
                 'label-onselect': 'Desc',
