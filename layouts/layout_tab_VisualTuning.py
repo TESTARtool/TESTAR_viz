@@ -16,7 +16,7 @@ import dash_html_components as html
 
 
 def tableblock(ident='name', mincolumnwidth='30px', edit=False, rowselectable='', tablemaxwidth='70%',
-               tablemaxheigth='100px'):
+               tablemaxheigth='100px',filter=False):
     fixedcolumns = {'headers': False, 'data': 0},
     if rowselectable != 'single' and rowselectable != 'multi' and rowselectable != False:
         fixedcolumns = {'headers': True, 'data': 2},
@@ -45,6 +45,7 @@ def tableblock(ident='name', mincolumnwidth='30px', edit=False, rowselectable=''
                         'backgroundColor': 'AliceBlue'
                     }],
                 editable=edit,
+                filter_action= 'native' if filter else 'none',
                 sort_action='native',
                 sort_mode="multi",
                 page_action='none'

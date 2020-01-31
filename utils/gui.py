@@ -55,11 +55,11 @@ def updatesubgraph(layerview, removeactionedges=False,forcecopy=False):
     return graphcopy
 
 
-def prettytime(timestamp=None):
+def prettytime(timestamp=None,level="milliseconds"):
     if timestamp != None:
-        return datetime.datetime.fromtimestamp(timestamp).isoformat("_", "milliseconds")
+        return datetime.datetime.fromtimestamp(timestamp).isoformat("_", level)
     else:
-        return datetime.datetime.fromtimestamp(time.time()).isoformat("_", "milliseconds")
+        return datetime.datetime.fromtimestamp(time.time()).isoformat("_", level)
 
 
 def setgraphattributes(infer=True, contents=None, filename=''):

@@ -98,6 +98,7 @@ def updateCytoStyleSheet(button, oraclebutton, baselineoraclebutton, executionsb
 @app.callback(
     [Output('selectednodetable', "columns"),
      Output('selectednodetable', 'data'),
+     Output('selectednodetable', 'style_cell_conditional'),
      Output('screenimage-coll', 'children')],
     [Input('cytoscape-update-layout', 'selectedNodeData')])
 def update_selnodestabletest(selnodes):
@@ -113,6 +114,12 @@ def update_selnodestabletest(selnodes):
         ncolumns.insert(0, ncolumns.pop(ncolumns.index('nodeid')))
         df = df.reindex(ncolumns, axis=1)
     cols = [{'id': c, 'name': c, 'hideable': True} for c in df.columns]
+    style_cell_conditional = []
+    for c in df.columns:
+        style_cell_conditional.append({
+            'if': {'column_id': c},
+            'minWidth': '' + str(len(c) * 9) + 'px'
+        })
     data = df.to_dict("rows")
     screens = []
     for c in selnodes:
@@ -122,12 +129,13 @@ def update_selnodestabletest(selnodes):
         screens.append(
             html.Img(id='screenimage' + c['id'], style={'max-height': '600px', 'display': 'inline-block'},
                      src=app.get_asset_url(imgname)))
-    return cols, data, screens
+    return cols, data, screens,style_cell_conditional
 
 
 @app.callback(
     [Output('selectededgetable', "columns"),
-     Output('selectededgetable', "data")],
+     Output('selectededgetable', "data"),
+     Output('selectededgetable','style_cell_conditional')],
     [Input('cytoscape-update-layout', "selectedEdgeData")])
 def update_seledgetabletest(seledges):
     if seledges is None or len(seledges)==0:  # at initial rendering this is None
@@ -142,5 +150,11 @@ def update_seledgetabletest(seledges):
     ecolumns.insert(0, ecolumns.pop(ecolumns.index('edgeid')))
     df = df.reindex(ecolumns, axis=1)
     cols = [{'id': c, 'name': c, 'hideable': True} for c in df.columns]
+    style_cell_conditional = []
+    for c in df.columns:
+        style_cell_conditional.append({
+            'if': {'column_id': c},
+            'minWidth': '' + str(len(c) * 9) + 'px'
+        })
     data = df.to_dict("rows")
-    return cols, data
+    return cols, data, style_cell_conditional

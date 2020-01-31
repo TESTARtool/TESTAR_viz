@@ -5,7 +5,7 @@ Created on Tue Apr 2 2019
 
 @author: carlo sengers 
 """
-
+from  utils.globals import version
 import dash_html_components as html
 import dash_core_components as dcc
 from  layouts.layout_tab_LoadGraph import loadGraph
@@ -14,6 +14,7 @@ from  layouts.layout_tab_Cyto import cytolayout
 from  layouts.layout_tab_CytoLegenda import cytolegendalayout
 from  layouts.layout_tab_SelectedData import selectedData
 from  layouts.layout_tab_Oracles import oracles
+from utils.gui import prettytime
 
 headerstyle={   'width':'100%',
                 'padding' : '2',
@@ -29,6 +30,8 @@ contentstyle={  'width':'100%',
                 }
 testarlayout = html.Div(id='main',children=[
                     dcc.Location(id='url', refresh=False),
+                    html.Hr(),
+                    html.Div('Run date: '+prettytime(None,'seconds')+'  System version: '+version, style={'font-size' : 10}),
                     html.Hr(),
                     html.Div('Model Input', style=headerstyle),
                     html.Hr(),
