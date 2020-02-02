@@ -2,9 +2,7 @@ import base64
 import os
 import re
 import sys
-
 import pandas as pd
-
 from utils import globals as glob
 
 

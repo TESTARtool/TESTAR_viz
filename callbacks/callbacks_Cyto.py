@@ -9,7 +9,6 @@ import os
 import dash
 from dash.dependencies import Input, Output, State
 import dash_html_components as html
-
 import utils.filehandling
 from appy import app
 import utils.globals as glob
@@ -56,7 +55,7 @@ def update_layout(hit0, canvasheight, layout, fenced, layerview):
      Input('apply-oracle_style-button', 'n_clicks'),
      Input('apply-baseline-oracle_style-button', 'n_clicks'),
      Input('apply-executions-button', 'n_clicks'),
-     Input('loading-logtext', 'children'),
+     #Input('loading-logtext', 'children'),
      Input('apply-advancedproperties-button', 'n_clicks'),  # was 'children'.. cost me 1/2 day to debug
      Input('apply-centralities-button', 'n_clicks'),
      Input('apply-shortestpath-button', 'n_clicks')],
@@ -77,7 +76,7 @@ def update_layout(hit0, canvasheight, layout, fenced, layerview):
      State('execution-details', 'value')
      ]
 )
-def updateCytoStyleSheet(button, oraclebutton, baselineoraclebutton, executionsbutton, log, advancedpropertiesbutton,
+def updateCytoStyleSheet(button, oraclebutton, baselineoraclebutton, executionsbutton, advancedpropertiesbutton, #log, advancedpropertiesbutton,
                          centralitiesbutton, shortestpathbutton, visualsdata, selectedoracles, oracledata,
                          selectedbaselineoracles, baselineoracledata, selectedexecutions, executionsdata,
                          layerview, selectedadvancedproperties, advancedpropertiesdata, selectedcentralities,
@@ -98,8 +97,9 @@ def updateCytoStyleSheet(button, oraclebutton, baselineoraclebutton, executionsb
 @app.callback(
     [Output('selectednodetable', "columns"),
      Output('selectednodetable', 'data'),
-     Output('selectednodetable', 'style_cell_conditional'),
-     Output('screenimage-coll', 'children')],
+     Output('screenimage-coll', 'children'),
+     Output('selectednodetable', 'style_cell_conditional')],
+
     [Input('cytoscape-update-layout', 'selectedNodeData')])
 def update_selnodestabletest(selnodes):
     if selnodes is None or len(selnodes)==0:  # at initial rendering this is None
@@ -126,9 +126,8 @@ def update_selnodestabletest(selnodes):
         fname = glob.outputfolder + utils.filehandling.imagefilename(c['id'])
         screens.append(html.P(children='Screenprint of node: ' + c['id']))
         imgname = fname if os.path.exists(glob.scriptfolder + glob.assetfolder + fname) else glob.no_image_file
-        screens.append(
-            html.Img(id='screenimage' + c['id'], style={'max-height': '600px', 'display': 'inline-block'},
-                     src=app.get_asset_url(imgname)))
+        screens.append(html.Img(id='screenimage' + c['id'], style={'max-height': '600px', 'display': 'inline-block'},
+                        src=app.get_asset_url(imgname)))
     return cols, data, screens,style_cell_conditional
 
 

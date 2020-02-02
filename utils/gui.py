@@ -1,5 +1,7 @@
 import base64
 import datetime
+import re
+import sys
 import time
 
 import networkx as nx
@@ -13,6 +15,23 @@ def updatesubgraph(layerview, removeactionedges=False,forcecopy=False):
         return glob.subgraph
     graphcopy = glob.grh.copy()
 
+    filterlist = []
+    filterparts=[]
+    if filternode is not None and filternode!= '' and filtervalue is not None and filtervalue != '':
+        foundfilter = re.search(glob.filterdisjunctregex, filtervalue)
+        if foundfilter is not None:
+            #groups=foundfilter.groups()
+            filterparts.append(foundfilter.groups()[0])
+            filterparts.append(foundfilter.groups()[2])
+        else:
+            filterparts.append(filtervalue)
+        for filterpart in filterparts:
+            found = re.search(glob.valuefilterregex, filterpart)
+            if found is not None:
+                lhs = found.group(1)
+                comparator = found.group(2)
+                rhs = found.group(3)
+                filterlist.append((lhs, comparator, rhs))
     removenodelist = []
     if not 'Abstract' in layerview:
         removenodelist = [n for n, v in glob.grh.nodes(data=True) if
@@ -33,15 +52,9 @@ def updatesubgraph(layerview, removeactionedges=False,forcecopy=False):
 
     if not 'Concrete' in layerview:
         removenodelist = [n for n, v in glob.grh.nodes(data=True) if v[glob.label_nodeelement] == 'ConcreteState']
-        if removeactionedges:
-            removeedgelist = [(s, t) for s, t, n, v in glob.grh.edges(data=True, keys=True) if
-                              v[glob.label_edgeelement] != 'ConcreteAction']
-            graphcopy.remove_edges_from(removeedgelist)
         graphcopy.remove_nodes_from(removenodelist)
 
     if not 'Test Executions' in layerview:
-        # removeedgelist = [(s,t) for s,t,n, v in glob.grh.edges(data=True,keys=True) if v['glob.label_edgeelement'] == 'Accessed']
-        # tmpgrh.remove_edges_from(removeedgelist)
         removenodelist = [n for n, v in glob.grh.nodes(data=True) if
                           (v[glob.label_nodeelement] == 'SequenceNode' or v[
                               glob.label_nodeelement] == 'TestSequence')]

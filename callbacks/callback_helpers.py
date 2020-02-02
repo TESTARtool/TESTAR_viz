@@ -50,10 +50,6 @@ def updateCytoStyleSheet(button, selectedoracles, oracledata, selectedbaselineor
                         'width': int(1.4 * (int(row['width'] if row['width'] != '' else 0))),
                         'height': int(1.4 * (int(row['height'] if row['height'] != '' else 0))),
                         'border-width': int(3 * (int(row['border-width'] if row['border-width'] != '' else 0))),
-                        # 'ghost': 'yes',
-                        # 'ghost-offset-x': 7,
-                        # 'ghost-offset-y':7,
-                        # 'ghost-opacity': 0.25
                     }
                     if row['focus']  == '1':
                         condition=''
@@ -139,8 +135,9 @@ def updateCytoStyleSheet(button, selectedoracles, oracledata, selectedbaselineor
             i = i + 1
             if i in selectedrows:
                 if r['ORACLE_VERDICT'] == 'FAIL':
-                    oracleconditionalstyle.append({
-                        "if": {"row_index": i},"backgroundColor": "red", 'color': 'white'})
+                    tmpdict={"if": {"row_index": i}}
+                    tmpdict.update(glob.oracletable_showfail)
+                    oracleconditionalstyle.append(tmpdict)
                     stylesheet.extend(updatestyleoftrace(r['EXAMPLERUN_CYCLE_STATES'], 'node',
                         glob.latestoracle_fail_cycle_states))
                     stylesheet.extend(updatestyleoftrace(r['EXAMPLERUN_PREFIX_STATES'], 'node',
@@ -150,8 +147,9 @@ def updateCytoStyleSheet(button, selectedoracles, oracledata, selectedbaselineor
                     stylesheet.extend(updatestyleoftrace(r['EXAMPLERUN_PREFIX_TRANSITIONS'], 'edge',
                         glob.latestoracle_fail_prefix_transitions))
                 elif r['ORACLE_VERDICT'] == 'PASS':
-                    oracleconditionalstyle.append({
-                        "if": {"row_index": i},"backgroundColor": "green",'color': 'white'})
+                    tmpdict = {"if": {"row_index": i}}
+                    tmpdict.update(glob.oracletable_showpass)
+                    oracleconditionalstyle.append(tmpdict)
                     stylesheet.extend(updatestyleoftrace(r['EXAMPLERUN_CYCLE_STATES'], 'node',
                         glob.latestoracle_pass_cycle_states))
                     stylesheet.extend(updatestyleoftrace(r['EXAMPLERUN_PREFIX_STATES'], 'node',
@@ -258,7 +256,7 @@ def updateCytoStyleSheet(button, selectedoracles, oracledata, selectedbaselineor
                     for k, v in bins.items():
                         nodeselector = "node[" + r['measure'] + " >= " + "'" + str(v) + "'" + "]"
                         selectordict.update({'selector': nodeselector})
-                        stylepropdict = {'shape': 'ellipse',
+                        stylepropdict = {'shape': glob.centralitiesshape,
                                          'width': tu.centralitywidth(j),
                                          'height': tu.centralityheight(j),
                                          'background-color': colorlist[j],

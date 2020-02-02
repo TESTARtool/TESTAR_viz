@@ -35,7 +35,9 @@ def update_legenda(hit0, newlog, data, cols):
     trigger = ctx.triggered[0]['prop_id'].split('.')[0]
     triggervalue = ctx.triggered[0]['value']
     if trigger == 'loading-logtext':
-        if triggervalue == '':  return dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update,
+        if triggervalue == '':
+            return dash.no_update, dash.no_update, dash.no_update, dash.no_update, \
+                   dash.no_update, dash.no_update, dash.no_update, dash.no_update #prevents unwanted updates
     else:
         pdcol = [i['id'] for i in cols]
         glob.dfdisplayprops = pd.DataFrame(data, columns=pdcol)

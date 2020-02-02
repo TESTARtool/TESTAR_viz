@@ -8,7 +8,7 @@ Created on Tue Apr 2 2019
 import pandas as pd
 import networkx as nx
 import os
-version = '20191206'
+version = '20200202'
 scriptfolder = ''
 assetfolder = 'assets'+os.sep #20190428 there is a dependency with app.get_asset_url
 outputfolder = 'content'+os.sep
@@ -49,6 +49,7 @@ dfdisplayprops=pd.DataFrame()
 testexecutions=pd.DataFrame()
 lsptraces=pd.DataFrame()
 centralitiemeasures=pd.DataFrame()
+centralitiesshape='ellipse'
 imgfiletemplate ='screenshot_of_node_'
 imgfileextension ='.png'
 
@@ -122,6 +123,8 @@ oraclefailstyle={
 oraclepassstyle={
                 "backgroundColor": "green",
                 'color': 'white'}
+oracletable_showfail={"backgroundColor": "red", 'color': 'white'}
+oracletable_showpass={"backgroundColor": "green",'color': 'white'}
 
 baselineoracle_pass_cycle_states = {'border-width': 2, 'border-color': 'goldenrod', 'background-color': 'goldenrod','border-style': 'dashed'}
 baselineoracle_pass_prefix_states = {'border-width': 2, 'border-color':'gold','background-color': 'gold', 'border-style': 'dashed'}
