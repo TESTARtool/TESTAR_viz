@@ -123,8 +123,8 @@ oraclefailstyle={
 oraclepassstyle={
                 "backgroundColor": "green",
                 'color': 'white'}
-oracletable_showfail={"backgroundColor": "red", 'color': 'white'}
-oracletable_showpass={"backgroundColor": "green",'color': 'white'}
+oracletable_showfail={"backgroundColor": "tomato", 'color': 'white'}
+oracletable_showpass={"backgroundColor": "mediumseagreen",'color': 'white'}
 
 baselineoracle_pass_cycle_states = {'border-width': 2, 'border-color': 'goldenrod', 'background-color': 'goldenrod','border-style': 'dashed'}
 baselineoracle_pass_prefix_states = {'border-width': 2, 'border-color':'gold','background-color': 'gold', 'border-style': 'dashed'}

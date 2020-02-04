@@ -20,7 +20,6 @@ def updatesubgraph(layerview, removeactionedges=False,forcecopy=False):
     if filternode is not None and filternode!= '' and filtervalue is not None and filtervalue != '':
         foundfilter = re.search(glob.filterdisjunctregex, filtervalue)
         if foundfilter is not None:
-            #groups=foundfilter.groups()
             filterparts.append(foundfilter.groups()[0])
             filterparts.append(foundfilter.groups()[2])
         else:
