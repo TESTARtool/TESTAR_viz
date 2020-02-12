@@ -8,11 +8,9 @@ testar graph module
 import json
 import os
 import sys
-
 import dateutil
 
 from appy import app
-import utils.globals as glob
 import networkx as nx
 import pandas as pd
 import time

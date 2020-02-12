@@ -12,7 +12,7 @@ import dash_html_components as html
 import utils.filehandling
 from appy import app
 import utils.globals as glob
-import utils.graphcomputing as tu
+import utils.graphcomputing as graphcomp
 import callbacks.callback_helpers as ch
 import pandas as pd
 
