@@ -37,7 +37,7 @@ def update_layout(hit0, canvasheight, layout, fenced, layerview):
                 parenting = True
             else:
                 parenting = False
-            tu.setCytoElements(False, parenting, layerview)
+            graphcomp.setCytoElements(False, parenting, layerview)
     h = 600 * canvasheight
     return glob.cytoelements, {'name': layout, 'animate': False}, {'height': '' + str(h) + 'px'},
 
