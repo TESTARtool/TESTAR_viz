@@ -8,7 +8,7 @@ Created on Tue Apr 2 2019
 import pandas as pd
 import networkx as nx
 import os
-version = '20200202'
+version = '20200215'
 scriptfolder = ''
 assetfolder = 'assets'+os.sep #20190428 there is a dependency with app.get_asset_url
 outputfolder = 'content'+os.sep
@@ -23,15 +23,14 @@ filternodeincache='--unknown--'
 filtervalueincache='--unknown--'
 graphmlfile = os.path.join(assetfolder+outputfolder,'GraphML.xml')
 screenshotregex='.*\[(.+?)\].*'
-filterpartsregex ="\\s*&&\\s*"
-valuefilterregex='(.*?)\s(>|>=|<|<=|=|!=|\^=|\*=|\$=)\s(.*)' #gui.py depends on this
+
+elementcompositefilter = "(.*?)(\s\|\|\s)(.*)" # allow a disjunct of 2 valuefilters
+elementvaluefilter= "\s*(\S*?)\s(>|>=|<|<=|=|!=|\^=|\*=|\$=)\s'(.*?)'" #gui.py depends on this
 image_attrib_key='image-source'
 image_element = 'screenshot'
 no_image_file= 'no_image.png'
 
-# test if still needed elements = []
 cytoelements=[]
-#initialselectednodeslist=[]
 nodetable = dict()
 edgetable = dict()
 default_nodeelement='labelV'

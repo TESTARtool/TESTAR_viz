@@ -53,7 +53,7 @@ cytolayout =  html.Div([
                     ], style={'max-width': '550px', 'height': '25px', 'margin': '5px', 'border-style': 'solid', 'padding': '5px', 'display': 'inline-block','vertical-align':'top'}),
 
                 html.Div([
-                    html.Div(children='Suppress:', style={'display': 'inline-block','vertical-align': 'top'}),
+                    html.Div(children='Remove:', style={'display': 'inline-block','vertical-align': 'top'}),
                     dcc.Dropdown(
                         id='dropdown-valuefilter-layout',
                         value='',
@@ -71,8 +71,11 @@ cytolayout =  html.Div([
                               placeholder="example: Role!=UIAMenuItem",
                               debounce=True,
                               value='',
-                              size=40,
-                              style={'minwidth': '250px', 'color': 'black', 'display': 'inline-block','vertical-align': 'top','fontSize': 12,'margin-right': '5px'}),
+                              size='40',
+                              style={'minwidth': '175px', 'color': 'black', 'display': 'inline-block','vertical-align': 'top','fontSize': 12,'margin-right': '5px'}),
+
+
+
                 ], style={'max-width': '1100px', 'margin-top': '5px', 'height': '25px', 'border-style': 'solid',
                           'padding': '5px',  'display': 'inline-block', 'vertical-align': 'top'}),
                 html.Div(

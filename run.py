@@ -48,12 +48,16 @@ cyto.load_extra_layouts()  # Load extra layouts
 # callbacks are connected to layout: Keep/remain despite pythonwarnings !!!
 import serverroutes
 import servershutdown
-import callbacks.callbacks_LoadGraph
-import callbacks.callbacks_VisualTuning
-import callbacks.callbacks_Oracles
-import callbacks.callbacks_Cyto
-import callbacks.callbacks_Cytolegenda
-import callbacks.callbacks_SelectedData
+import callbacks.call_LoadGraph
+import callbacks.call_VisualTuning
+import callbacks.call_Oracles
+import callbacks.call_Cyto
+import callbacks.call_Cytolegenda
+import callbacks.call_SelectedData
+
+import logging
+log = logging.getLogger('werkzeug')
+log.setLevel(logging.ERROR)
 
 if __name__ == '__main__':
     app.title = 'TESTAR Temporal Visualizer'

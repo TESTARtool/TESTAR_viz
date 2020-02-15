@@ -8,12 +8,12 @@ Created on Tue Apr 2 2019
 from  utils.globals import version
 import dash_html_components as html
 import dash_core_components as dcc
-from  layouts.layout_tab_LoadGraph import loadGraph
-from  layouts.layout_tab_VisualTuning import visualTuning
-from  layouts.layout_tab_Cyto import cytolayout
-from  layouts.layout_tab_CytoLegenda import cytolegendalayout
-from  layouts.layout_tab_SelectedData import selectedData
-from  layouts.layout_tab_Oracles import oracles
+from  layouts.tab_LoadGraph import loadGraph
+from  layouts.tab_VisualTuning import visualTuning
+from  layouts.tab_Cyto import cytolayout
+from  layouts.tab_CytoLegenda import cytolegendalayout
+from  layouts.tab_SelectedData import selectedData
+from  layouts.tab_Oracles import oracles
 from utils.gui import prettytime
 
 headerstyle={   'width':'100%',

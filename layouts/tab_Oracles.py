@@ -15,14 +15,16 @@ import dash_html_components as html
 
 
 def spinnertable(ident='baseline-oracletable'):
+    dummycol = {'id': 'dummy', 'name': 'dummy'}
+    dummydata = {}
     return dcc.Loading(
         id='loading' + ident,
         children=[
             dt.DataTable(
                 id=ident,
                 style_table={'overflowX': 'scroll', 'width': '100%', 'maxHeight': '150'},
-                columns=[],
-                data=[],
+                columns=[dummycol],
+                data=[dummydata],
                 fixed_rows={'headers': True, 'data': 0},
                 row_selectable='multi',
                 selected_rows=[],

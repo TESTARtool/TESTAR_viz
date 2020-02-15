@@ -14,7 +14,7 @@ import utils.filehandling
 from appy import app
 import utils.globals as glob
 import utils.graphcomputing as tu
-import callbacks.callback_helpers as ch
+import callbacks.call_helpers as ch
 import pandas as pd
 
 
@@ -58,7 +58,7 @@ def update_layout(hit0, canvasheight, layout, fenced, layerview,filternode,filte
      Input('apply-oracle_style-button', 'n_clicks'),
      Input('apply-baseline-oracle_style-button', 'n_clicks'),
      Input('apply-executions-button', 'n_clicks'),
-     Input('loading-logtext', 'children'),
+    # Input('loading-logtext', 'children'),
      Input('apply-advancedproperties-button', 'n_clicks'),  # was 'children'.. cost me 1/2 day to debug
      Input('apply-centralities-button', 'n_clicks'),
      Input('apply-shortestpath-button', 'n_clicks')],
@@ -79,12 +79,12 @@ def update_layout(hit0, canvasheight, layout, fenced, layerview,filternode,filte
      State('execution-details', 'value')
      ]
 )
-def updateCytoStyleSheet(button, oraclebutton, baselineoraclebutton, executionsbutton, log, advancedpropertiesbutton,
+def updateCytoStyleSheet(button, oraclebutton, baselineoraclebutton, executionsbutton, advancedpropertiesbutton,#log, advancedpropertiesbutton,
                          centralitiesbutton, shortestpathbutton, visualsdata, selectedoracles, oracledata,
                          selectedbaselineoracles, baselineoracledata, selectedexecutions, executionsdata,
                          layerview, selectedadvancedproperties, advancedpropertiesdata, selectedcentralities,
                          centralitiesdata, selectednodedata,executiondetails):
-    returndata = ch.updateCytoStyleSheet(button, selectedoracles, oracledata, selectedbaselineoracles,
+    returndata = ch.updateCytoStyleSheet(selectedoracles, oracledata, selectedbaselineoracles,
                                          baselineoracledata, selectedexecutions, executionsdata, layerview,
                                          selectedadvancedproperties,
                                          advancedpropertiesdata, selectedcentralities, centralitiesdata,

@@ -15,11 +15,14 @@ import dash_core_components as dcc
 import dash_html_components as html
 
 
-def tableblock(ident='name', mincolumnwidth='30px', edit=False, rowselectable='', tablemaxwidth='70%',
+def tableblock(ident='name', mincolumnwidth='30px', edit=False, fixcolumns=False,rowselectable=False, tablemaxwidth='70%',
                tablemaxheigth='100px',filter=False):
-    fixedcolumns = {'headers': False, 'data': 0},
-    if rowselectable != 'single' and rowselectable != 'multi' and rowselectable != False:
-        fixedcolumns = {'headers': True, 'data': 2},
+    dummycol = {'id': 'dummy', 'name': 'dummy'}
+    dummydata = {}
+    fixedcolumns = {'headers': False, 'data': 0}
+    if fixcolumns:
+        fixedcolumns = {'headers': True, 'data': 2}
+
     return dcc.Loading(
         id="loading-" + ident + "table",
         children=[
@@ -27,8 +30,8 @@ def tableblock(ident='name', mincolumnwidth='30px', edit=False, rowselectable=''
                 id=ident + '-table',
                 style_table={'overflowX': 'scroll', 'width': '1100', 'maxWidth': tablemaxwidth,
                              'maxHeight': tablemaxheigth},
-                columns=[],
-                data=[],
+                columns=[dummycol],
+                data=[dummydata],
                 fixed_rows={'headers': True, 'data': 0},
                 fixed_columns=fixedcolumns,
                 row_selectable=rowselectable,
@@ -84,7 +87,7 @@ visualTuning = html.Div([
 
             html.Button(id='apply-viz_style-button', n_clicks=0, n_clicks_timestamp=0, children='Apply Style',
                         style={'display': 'inline-block'}),
-            tableblock('viz-settings', '130px', True, '', '100%', '600px'),
+            tableblock('viz-settings', '130px', True, False,False, '100%', '600px'),
         ], style={'display': 'none', 'margin': '5px'})
     ], style={'border-width': '1', 'border-color': 'grey', 'border-style': 'dashed'}),
 
@@ -108,7 +111,7 @@ visualTuning = html.Div([
             savebutton('save-testexecutions-settings'),
             html.Button(id='apply-executions-button', n_clicks=0, n_clicks_timestamp=0, children='Apply Style',
                         style={'display': 'inline-block'}),
-            tableblock('executions', '130px', False, 'multi', '70%', '600px'),
+            tableblock('executions', '130px', False, False,'multi', '70%', '600px'),
 
         ], style={'display': 'none', 'margin': '5px'})
     ], style={'border-width': '1', 'border-color': 'grey', 'border-style': 'dashed'}),
@@ -124,7 +127,7 @@ visualTuning = html.Div([
                         children='Apply Style',
                         style={'display': 'inline-block'}),
 
-            tableblock('advancedproperties', '130px', False, 'multi', '70%', '600px'),
+            tableblock('advancedproperties', '130px', False, False,'multi', '70%', '600px'),
 
         ], style={'display': 'none', 'margin': '5px'}),
     ], style={'border-width': '1', 'border-color': 'grey', 'border-style': 'dashed'}),
@@ -139,7 +142,7 @@ visualTuning = html.Div([
             html.Button(id='apply-centralities-button', n_clicks=0, n_clicks_timestamp=0,
                         children='Apply Style',
                         style={'display': 'inline-block'}),
-            tableblock('centralities', '130px', False, 'multi', '70%', '600px'),
+            tableblock('centralities', '130px', False, False,'multi', '70%', '600px'),
         ], style={'display': 'none', 'margin': '5px'})
     ], style={'border-width': '1', 'border-color': 'grey', 'border-style': 'dashed'}),
 ], style={'font-size': '12'})

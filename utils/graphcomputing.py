@@ -230,20 +230,10 @@ def setCytoElements(parenting=False, layerview=None,filternode=None,filtervalue=
                 glob.filternodeincache == filternode and glob.filtervalueincache == filtervalue):
             pass
         else:
-            filterlist=[]
-            if filternode != '' and filtervalue != '':
-                filterparts = filtervalue.split(glob.filterpartsregex)
-                for filterpart in filterparts:
-                    found = re.search(glob.valuefilterregex, filterpart)
-                    if found is not None:
-                        lhs = found.group(1)
-                        comparator = found.group(2)
-                        rhs = found.group(3)
-                        filterlist.append((lhs, comparator, rhs))
+
+            grh = updatesubgraph(layerview,filternode,filtervalue)
             glob.filtervalueincache = filtervalue
             glob.filternodeincache = filternode
-
-            grh = updatesubgraph(layerview,False,filternode,filterlist)
             for n, ndict in grh.nodes(data=True):
 
                 tempdict = dict(ndict)

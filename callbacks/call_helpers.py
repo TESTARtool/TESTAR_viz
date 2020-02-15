@@ -8,7 +8,7 @@ from utils import styler
 from utils.styler import nodestyler, edgestyler
 
 
-def updateCytoStyleSheet(button, selectedoracles, oracledata, selectedbaselineoracles, baselineoracledata,
+def updateCytoStyleSheet( selectedoracles, oracledata, selectedbaselineoracles, baselineoracledata,
                          selectedexecutions, executionsdata, layerview, selectedadvancedproperties,
                          advancedpropertiesdata,
                          selectedcentralities, centralitiesdata, selectednodedata, executiondetails):
@@ -214,31 +214,32 @@ def updateCytoStyleSheet(button, selectedoracles, oracledata, selectedbaselineor
         attribute = glob.updatedby
     else:
         attribute = glob.createdby
-    if not (executionsdata is None) and len(executionsdata) > 0 and len(selectedrows) > 0:
-        i = -1
-        nodeselectors = []
-        edgeselectors = []
-        for r in executionsdata:
-            i = i + 1
-            if not i in selectedrows:
-                nodeselector = "node[" + glob.label_nodeelement + " = 'ConcreteState'][" + attribute + \
-                    " = " + "'" + r['sequenceId'] + "'" + "]"
-                edgeselector = "edge[" + glob.label_edgeelement + " = 'ConcreteAction'][" + attribute + \
-                    " = " + "'" + r['sequenceId'] + "'" + "]"
-                nodeselectors.append(nodeselector)
-                edgeselectors.append(edgeselector)
+    if (not executionsdata is None) and (not selectedrows is None):
+        if len(executionsdata) > 0 and len(selectedrows) > 0:
+            i = -1
+            nodeselectors = []
+            edgeselectors = []
+            for r in executionsdata:
+                i = i + 1
+                if not i in selectedrows:
+                    nodeselector = "node[" + glob.label_nodeelement + " = 'ConcreteState'][" + attribute + \
+                                   " = " + "'" + r['sequenceId'] + "'" + "]"
+                    edgeselector = "edge[" + glob.label_edgeelement + " = 'ConcreteAction'][" + attribute + \
+                                   " = " + "'" + r['sequenceId'] + "'" + "]"
+                    nodeselectors.append(nodeselector)
+                    edgeselectors.append(edgeselector)
 
-        selectordict = {'selector': ','.join(nodeselectors)}
-        styledict = {'style': glob.trace_node_unselected}
-        tmpstyle = selectordict
-        tmpstyle.update(styledict)
-        stylesheet.append(tmpstyle)
+            selectordict = {'selector': ','.join(nodeselectors)}
+            styledict = {'style': glob.trace_node_unselected}
+            tmpstyle = selectordict
+            tmpstyle.update(styledict)
+            stylesheet.append(tmpstyle)
 
-        selectordict = {'selector': ','.join(edgeselectors)}
-        styledict = {'style': glob.trace_edge_unselected}
-        tmpstyle = selectordict
-        tmpstyle.update(styledict)
-        stylesheet.append(tmpstyle)
+            selectordict = {'selector': ','.join(edgeselectors)}
+            styledict = {'style': glob.trace_edge_unselected}
+            tmpstyle = selectordict
+            tmpstyle.update(styledict)
+            stylesheet.append(tmpstyle)
     #######  testexecutions
 
     ########centralities

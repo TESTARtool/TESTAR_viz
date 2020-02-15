@@ -47,29 +47,31 @@ def load_viz_table(loadlog, hitsb0, contents, filename, date):
      Output('advancedproperties-table', 'data'),
      Output('centralities-table', 'columns'),
      Output('centralities-table', 'data')],
-    [Input('loading-logtext', 'children'),
-     Input('load-executions-table-button', 'n_clicks')])
-def update_exec_advanced_uitable(loadlog, dummybutton):
+    [Input('cytoscape-legenda', 'elements'),  #cascaded trigger #Input('loading-logtext', 'children'),
+    ])
+def update_exec_advanced_uitable(dummy ):
     ctx = dash.callback_context
     dummycol = {'id': 'dummy', 'name': 'dummy'}
-    dummydata = {'dummy': 'NA'}
-    cols = [dummycol]
-    data = [dummydata]
-    cols1 = [dummycol]
-    data1 = [dummydata]
-    cols2 = [dummycol]
-    data2 = [dummydata]
-
-    if ctx.triggered:  # via loadlog. this gets updated via the load graph button
-        if not glob.testexecutions.empty:
-            cols = [{'id': c, 'name': c} for c in glob.testexecutions.columns]
-            data = glob.testexecutions.to_dict("rows")
-        if not glob.lsptraces.empty:
-            cols1 = [{'id': c, 'name': c} for c in glob.lsptraces.columns]
-            data1 = glob.lsptraces.to_dict("rows")
-        if not glob.centralitiemeasures.empty:
-            cols2 = [{'id': c, 'name': c} for c in glob.centralitiemeasures.columns]
-            data2 = glob.centralitiemeasures.to_dict("rows")
+    dummydata = {}
+    #next conditions left intact for the usecase of a NON-TESTAR-GRAPHML sourcefile
+    if not glob.testexecutions.empty: #
+        cols = [{'id': c, 'name': c} for c in glob.testexecutions.columns]
+        data = glob.testexecutions.to_dict("rows")
+    else:
+        cols = [dummycol]
+        data = [dummydata]
+    if not glob.lsptraces.empty:
+        cols1 = [{'id': c, 'name': c} for c in glob.lsptraces.columns]
+        data1 = glob.lsptraces.to_dict("rows")
+    else:
+        cols1 = [dummycol]
+        data1 = [dummydata]
+    if not glob.centralitiemeasures.empty:
+        cols2 = [{'id': c, 'name': c} for c in glob.centralitiemeasures.columns]
+        data2 = glob.centralitiemeasures.to_dict("rows")
+    else:
+        cols2 = [dummycol]
+        data2 = [dummydata]
     return cols, data, cols1, data1, cols2, data2
 
 
