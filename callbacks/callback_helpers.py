@@ -17,12 +17,14 @@ def updateCytoStyleSheet(button, selectedoracles, oracledata, selectedbaselineor
     baselineoracleconditionalstyle = [glob.tableoddrowstyle]  # a comma <,> at the end of this line cost me a day
 
     data = glob.dfdisplayprops.to_dict('records')
+    valuefilter = []
 
     for row in data:
         if row[glob.elementtype] == 'node':
+            valuefilterentry = row[glob.elementsubtype]
+            valuefilter.append({'label': valuefilterentry.capitalize(), 'value': valuefilterentry})
+
             dsp = 'element'
-
-
             legenda = styler.stylelegenda(row[glob.elementtype], row[glob.elementsubtype], nodestyler(row, dsp),
                                           glob.label_nodeelement)
 
@@ -299,7 +301,9 @@ def updateCytoStyleSheet(button, selectedoracles, oracledata, selectedbaselineor
             ret = pathstylesheet(spnodelist, tmpgrh)
             stylesheet.extend(ret)
     ## SP between 2 nodes
-    return '', stylesheet, oracleconditionalstyle, baselineoracleconditionalstyle, shortestpatherror
+
+
+    return '', stylesheet, valuefilter,oracleconditionalstyle, baselineoracleconditionalstyle, shortestpatherror
 
 
 # helper method:
