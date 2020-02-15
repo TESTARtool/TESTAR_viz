@@ -9,10 +9,11 @@ import os
 import dash
 from dash.dependencies import Input, Output, State
 import dash_html_components as html
+
 import utils.filehandling
 from appy import app
 import utils.globals as glob
-import utils.graphcomputing as graphcomp
+import utils.graphcomputing as tu
 import callbacks.callback_helpers as ch
 import pandas as pd
 
@@ -27,17 +28,18 @@ import pandas as pd
     [State('canvas_height', 'value'),
      State('dropdown-update-layout', 'value'),
      State('fenced', 'value'),
-     State('checkbox-layerview-options', 'value')])
-def update_layout(hit0, canvasheight, layout, fenced, layerview):
+     State('checkbox-layerview-options', 'value'),
+     State('dropdown-valuefilter-layout', 'value'),
+     State('filter-input', 'value'),
+
+     ])
+def update_layout(hit0, canvasheight, layout, fenced, layerview,filternode,filtervalue):
     ctx = dash.callback_context
     trigger = ctx.triggered[0]['prop_id'].split('.')[0]
     if (trigger == 'submit-button' and hit0 >= 1):
         if glob.grh.size() != 0:
-            if len(fenced) > 0:
-                parenting = True
-            else:
-                parenting = False
-            graphcomp.setCytoElements(False, parenting, layerview)
+            parenting = (len(fenced) > 0)
+            tu.setCytoElements(parenting, layerview,filternode,filtervalue)
     h = 600 * canvasheight
     return glob.cytoelements, {'name': layout, 'animate': False}, {'height': '' + str(h) + 'px'},
 
@@ -47,6 +49,7 @@ def update_layout(hit0, canvasheight, layout, fenced, layerview):
 @app.callback(
     [Output('dummycytospinner', 'children'),
      Output('cytoscape-update-layout', 'stylesheet'),
+     Output('dropdown-valuefilter-layout','options' ),
      Output('oracletable', 'style_data_conditional'),
      Output('baseline-oracletable', 'style_data_conditional'),
      Output('shortestpathlog', 'children')],
@@ -55,7 +58,7 @@ def update_layout(hit0, canvasheight, layout, fenced, layerview):
      Input('apply-oracle_style-button', 'n_clicks'),
      Input('apply-baseline-oracle_style-button', 'n_clicks'),
      Input('apply-executions-button', 'n_clicks'),
-     #Input('loading-logtext', 'children'),
+     Input('loading-logtext', 'children'),
      Input('apply-advancedproperties-button', 'n_clicks'),  # was 'children'.. cost me 1/2 day to debug
      Input('apply-centralities-button', 'n_clicks'),
      Input('apply-shortestpath-button', 'n_clicks')],
@@ -76,7 +79,7 @@ def update_layout(hit0, canvasheight, layout, fenced, layerview):
      State('execution-details', 'value')
      ]
 )
-def updateCytoStyleSheet(button, oraclebutton, baselineoraclebutton, executionsbutton, advancedpropertiesbutton, #log, advancedpropertiesbutton,
+def updateCytoStyleSheet(button, oraclebutton, baselineoraclebutton, executionsbutton, log, advancedpropertiesbutton,
                          centralitiesbutton, shortestpathbutton, visualsdata, selectedoracles, oracledata,
                          selectedbaselineoracles, baselineoracledata, selectedexecutions, executionsdata,
                          layerview, selectedadvancedproperties, advancedpropertiesdata, selectedcentralities,
@@ -97,9 +100,8 @@ def updateCytoStyleSheet(button, oraclebutton, baselineoraclebutton, executionsb
 @app.callback(
     [Output('selectednodetable', "columns"),
      Output('selectednodetable', 'data'),
-     Output('screenimage-coll', 'children'),
-     Output('selectednodetable', 'style_cell_conditional')],
-
+     Output('selectednodetable', 'style_cell_conditional'),
+     Output('screenimage-coll', 'children')],
     [Input('cytoscape-update-layout', 'selectedNodeData')])
 def update_selnodestabletest(selnodes):
     if selnodes is None or len(selnodes)==0:  # at initial rendering this is None
@@ -126,9 +128,10 @@ def update_selnodestabletest(selnodes):
         fname = glob.outputfolder + utils.filehandling.imagefilename(c['id'])
         screens.append(html.P(children='Screenprint of node: ' + c['id']))
         imgname = fname if os.path.exists(glob.scriptfolder + glob.assetfolder + fname) else glob.no_image_file
-        screens.append(html.Img(id='screenimage' + c['id'], style={'max-height': '600px', 'display': 'inline-block'},
-                        src=app.get_asset_url(imgname)))
-    return cols, data, screens,style_cell_conditional
+        screens.append(
+            html.Img(id='screenimage' + c['id'], style={'max-height': '600px', 'display': 'inline-block'},
+                     src=app.get_asset_url(imgname)))
+    return cols, data,style_cell_conditional, screens
 
 
 @app.callback(

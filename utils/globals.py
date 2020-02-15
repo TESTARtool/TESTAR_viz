@@ -19,8 +19,12 @@ grh = nx.DiGraph()
 subgraph= nx.DiGraph()
 layerviewincache='--unknown--'
 parentingincache='--unknown--'
+filternodeincache='--unknown--'
+filtervalueincache='--unknown--'
 graphmlfile = os.path.join(assetfolder+outputfolder,'GraphML.xml')
 screenshotregex='.*\[(.+?)\].*'
+filterpartsregex ="\\s*&&\\s*"
+valuefilterregex='(.*?)\s(>|>=|<|<=|=|!=|\^=|\*=|\$=)\s(.*)' #gui.py depends on this
 image_attrib_key='image-source'
 image_element = 'screenshot'
 no_image_file= 'no_image.png'

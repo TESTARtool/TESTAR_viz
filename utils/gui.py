@@ -1,7 +1,5 @@
 import base64
 import datetime
-import re
-import sys
 import time
 
 import networkx as nx
@@ -10,34 +8,22 @@ import pandas as pd
 from utils import globals as glob
 
 
-def updatesubgraph(layerview, filternode=None, filtervalue=None):
+def updatesubgraph(layerview, removeactionedges=False,filternode=None,filterlist=None):
 
-    if (glob.layerviewincache == layerview and filternode is None and filtervalue is None):
+    if glob.layerviewincache==(layerview, removeactionedges):
         return glob.subgraph
     graphcopy = glob.grh.copy()
 
-    filterlist = []
-    filterparts=[]
-    if filternode is not None and filternode!= '' and filtervalue is not None and filtervalue != '':
-        foundfilter = re.search(glob.filterdisjunctregex, filtervalue)
-        if foundfilter is not None:
-            filterparts.append(foundfilter.groups()[0])
-            filterparts.append(foundfilter.groups()[2])
-        else:
-            filterparts.append(filtervalue)
-        for filterpart in filterparts:
-            found = re.search(glob.valuefilterregex, filterpart)
-            if found is not None:
-                lhs = found.group(1)
-                comparator = found.group(2)
-                rhs = found.group(3)
-                filterlist.append((lhs, comparator, rhs))
     removenodelist = []
     if not 'Abstract' in layerview:
         removenodelist = [n for n, v in glob.grh.nodes(data=True) if
                           v[glob.label_nodeelement] == 'AbstractState' or v[
                               glob.label_nodeelement] == 'AbstractStateModel']
 
+        if removeactionedges:
+            removeedgelist = [(s, t) for s, t, n, v in glob.grh.edges(data=True, keys=True) if
+                              v[glob.label_edgeelement] != 'AbstractAction']
+            graphcopy.remove_edges_from(removeedgelist)
         graphcopy.remove_nodes_from(removenodelist)
     if not 'Incl Blackhole' in layerview:
         removenodelist = [n for n, v in glob.grh.nodes(data=True) if v[glob.label_nodeelement] == 'BlackHole']
@@ -49,54 +35,46 @@ def updatesubgraph(layerview, filternode=None, filtervalue=None):
 
     if not 'Concrete' in layerview:
         removenodelist = [n for n, v in glob.grh.nodes(data=True) if v[glob.label_nodeelement] == 'ConcreteState']
+        if removeactionedges:
+            removeedgelist = [(s, t) for s, t, n, v in glob.grh.edges(data=True, keys=True) if
+                              v[glob.label_edgeelement] != 'ConcreteAction']
+            graphcopy.remove_edges_from(removeedgelist)
         graphcopy.remove_nodes_from(removenodelist)
 
-    if (len(filterlist)>0):
+    if (filternode !='' and filterlist is not None and len(filterlist)>0):
+        pass
         removenodelist = []
+
         for n, v in graphcopy.nodes(data=True):
             if v[glob.label_nodeelement] == filternode:
                 remove = False
                 for filt in filterlist:
-                    lhs = ''
-                    if str(filt[0]).lower() == 'id' or str(filt[0]).lower() == 'nodeid':
-                        lhs=n
-                    else:
-                        try:
-                            if v[filt[0]] is not None:
-                                lhs = str(v[filt[0]])
-                        except Exception as e:
-                            exc_type, exc_obj, exc_tb = sys.exc_info()
-                            # print(exc_type, "!", exc_tb.tb_lineno)
-                            # print('*  There was an error processing : ' + str(e))
-                            lhs=''
-                    if lhs !='':
-                        remove= lhs < filt[2] if filt[1] == '<' else False
+                    if v[filt[0]] is not None:
+                        remove= str(v[filt[0]]) < filt[2] if filt[1] == '>' else False
                         if not remove:
-                            remove=lhs  <= filt[2] if filt[1] == '<=' else False
+                            remove=str(v[filt[0]]) <= filt[2] if filt[1] == '>=' else False
                         if not remove:
-                            remove = lhs  > filt[2] if filt[1] == '>' else False
+                            remove = str(v[filt[0]]) > filt[2] if filt[1] == '<' else False
                         if not remove:
-                            remove =lhs  >= filt[2] if filt[1] == '>=' else False
+                            remove = str(v[filt[0]]) >= filt[2] if filt[1] == '<=' else False
                         if not remove:
-                            remove = lhs  == filt[2] if filt[1] == '=' else False
+                            remove = str(v[filt[0]]) == filt[2] if filt[1] == '=' else False
                         if not remove:
-                            remove = lhs  != filt[2] if filt[1] == '!=' else False
+                            remove = str(v[filt[0]]) != filt[2] if filt[1] == '!=' else False
                         if not remove:
-                            remove = lhs.startswith(filt[2]) if filt[1] == '^=' else False
+                            remove = str(v[filt[0]]).startswith(filt[2]) if filt[1] == '^=' else False
                         if not remove:
-                            remove = lhs.endswith(filt[2]) == -1 if filt[1] == '$=' else False
+                            remove = (str(v[filt[0]]).endswith(filt[2]) == -1) if filt[1] == '$=' else False
                         if not remove:
-                            remove = lhs.find(filt[2]) != -1 if filt[1] == '*=' else False
+                            remove = (str(v[filt[0]]).find(filt[2]) != -1) if filt[1] == '*=' else False
                         if remove: break
                 if remove:
                     removenodelist.append(n)
         graphcopy.remove_nodes_from(removenodelist)
-    if (filternode is not None and filternode!= '' and
-        filtervalue is not None and filtervalue != '' and len(removenodelist) == 0):
-        print('Graph Filter on key: <'+filternode+'>and value: <'+filtervalue+'> did not match any node')
-
 
     if not 'Test Executions' in layerview:
+        # removeedgelist = [(s,t) for s,t,n, v in glob.grh.edges(data=True,keys=True) if v['glob.label_edgeelement'] == 'Accessed']
+        # tmpgrh.remove_edges_from(removeedgelist)
         removenodelist = [n for n, v in glob.grh.nodes(data=True) if
                           (v[glob.label_nodeelement] == 'SequenceNode' or v[
                               glob.label_nodeelement] == 'TestSequence')]
@@ -105,7 +83,7 @@ def updatesubgraph(layerview, filternode=None, filtervalue=None):
     else:
         pass  # subgraph = 'all' # tmpgrh=glob.grh.copy
     glob.subgraph=graphcopy
-    glob.layerviewincache = layerview
+    glob.layerviewincache = (layerview, removeactionedges)
     return graphcopy
 
 

@@ -39,27 +39,28 @@ def clearassetsfolder():
             print('*  There was an error processing : ' + str(e))
 
 
-def savescreenshottodisk(n, eldict, usecache=False):
+def savescreenshottodisk(n, eldict):
     # testar db in graphml export from orientdb has a screenshot attrbute
     # with format <#00:00><[<byte>,<byte>,...]><v1>
     # action: extract the substring [...], split at the separator, convert the list to a bytelist
     # save the bytelist as bytearray and voila, there is the deserialized png
-    # alternative found=(grh.nodes[n][image_element].split("["))[1].split("]")[0]
+    # alternative for found=(grh.nodes[n][image_element].split("["))[1].split("]")[0]
     fname = '_no_image_for_' + n
     try:
-
         if not (eldict.get(glob.image_element) is None):
             param = eldict.get(glob.image_element)
 
-            if param.split('|')[0] != 'inferin' and param.split('|')[0] != 'inferout':
+            if param.split('|')[0] != 'inferin' and param.split('|')[0] != 'inferout': #future use: for abstractstates/teststeps?
                 fname = imagefilename(n)
-                if usecache:
-                    return fname
                 found = re.search(glob.screenshotregex, eldict[glob.image_element]).group(1)
-                pngintarr = [(int(x) + 256) % 256 for x in found.split(",")]
-                f = open(glob.scriptfolder + glob.assetfolder + glob.outputfolder + fname, 'wb')
-                f.write(bytearray(pngintarr))
-                f.close()
+                if not found:       # or   eldict[glob.image_element]=='' ?
+                    return fname
+                else:
+                    pngintarr = [(int(x) + 256) % 256 for x in found.split(",")]
+                    f = open(glob.scriptfolder + glob.assetfolder + glob.outputfolder + fname, 'wb')
+                    f.write(bytearray(pngintarr))
+                    f.close()
+                    #eldict[glob.image_element]='' # reduce memory allocation.
         else:
             return glob.no_image_file
     except Exception as e:  # AttributeError:	# [ ] not found in the original string

@@ -4,15 +4,7 @@ Created on Tue Apr 2 2019
 
 
 @author: carlo sengers 
-exploring UI features, (brushing & linking) of rendered graphs with dash-cytoscape integration.
-(both come with MIT License).
 
-This example is partial based on the script from https://dash.plot.ly/cytoscape/callbacks
-1. The complete testar graph database is retrieved over the network via a gremlin remote-script
-2. the graph database is in format GRAPHML.XML
-3. networkx library is used to parse the file into nodes and edges.
-4. screenshot (data as arrays) are extracted, encoded and saved as files on local filesystem
-5. nodes and edges are loaded in the dash app during setup.
 """
 
 #######################################################
@@ -60,6 +52,29 @@ cytolayout =  html.Div([
                     )
                     ], style={'max-width': '550px', 'height': '25px', 'margin': '5px', 'border-style': 'solid', 'padding': '5px', 'display': 'inline-block','vertical-align':'top'}),
 
+                html.Div([
+                    html.Div(children='Suppress:', style={'display': 'inline-block','vertical-align': 'top'}),
+                    dcc.Dropdown(
+                        id='dropdown-valuefilter-layout',
+                        value='',
+                        clearable=False,
+                        style={'width': '100px', 'color': 'black', 'fontSize': 12, 'height': '25px',
+                               'display': 'inline-block','margin-right': '5px'},
+                        persistence=True,
+                        options=[
+                            {'label': name.capitalize(), 'value': name}
+                            for name in
+                            ['all']
+                        ]),
+                    dcc.Input(id="filter-input",
+                              type="text",
+                              placeholder="example: Role!=UIAMenuItem",
+                              debounce=True,
+                              value='',
+                              size=40,
+                              style={'minwidth': '250px', 'color': 'black', 'display': 'inline-block','vertical-align': 'top','fontSize': 12,'margin-right': '5px'}),
+                ], style={'max-width': '1100px', 'margin-top': '5px', 'height': '25px', 'border-style': 'solid',
+                          'padding': '5px',  'display': 'inline-block', 'vertical-align': 'top'}),
                 html.Div(
                     children=[
                         html.Div('Canvas height:', style={'display': 'inline-block','width': '2'}),

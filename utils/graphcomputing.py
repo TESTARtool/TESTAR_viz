@@ -7,6 +7,7 @@ testar graph module
 """
 import json
 import os
+import re
 import sys
 import dateutil
 
@@ -206,7 +207,14 @@ def setcentralitymeasure(graph=None,centralityname='indegree_noselfloops'):
         dicy = dict(zip(cut_labels, cut_bins))
         return {'measure': centralityname, 'binning': json.dumps(dicy)}
 
-def setCytoElements(usecache=False, parenting=False, layerview=[]):
+def setCytoElements(parenting=False, layerview=None,filternode=None,filtervalue=None):
+    if layerview is None:
+        layerview = []
+    filterlist=[]
+    if filternode is None: filternode=''
+    if filtervalue is None: filtervalue=''
+
+
     TestSequenceKey = ''
     nodes = []
     edges = []
@@ -218,10 +226,24 @@ def setCytoElements(usecache=False, parenting=False, layerview=[]):
     TestSequencekeylist = set()
     try:
         copydefaultimagetoasset()  # optimize: do only once:-)
-        if (glob.layerviewincache == layerview and glob.parentingincache == parenting):
+        if (glob.layerviewincache == layerview and glob.parentingincache == parenting and
+                glob.filternodeincache == filternode and glob.filtervalueincache == filtervalue):
             pass
         else:
-            grh = updatesubgraph(layerview)
+            filterlist=[]
+            if filternode != '' and filtervalue != '':
+                filterparts = filtervalue.split(glob.filterpartsregex)
+                for filterpart in filterparts:
+                    found = re.search(glob.valuefilterregex, filterpart)
+                    if found is not None:
+                        lhs = found.group(1)
+                        comparator = found.group(2)
+                        rhs = found.group(3)
+                        filterlist.append((lhs, comparator, rhs))
+            glob.filtervalueincache = filtervalue
+            glob.filternodeincache = filternode
+
+            grh = updatesubgraph(layerview,False,filternode,filterlist)
             for n, ndict in grh.nodes(data=True):
 
                 tempdict = dict(ndict)
@@ -250,7 +272,7 @@ def setCytoElements(usecache=False, parenting=False, layerview=[]):
                         TestSequencekeylist.add(TestSequenceKey)
                         tempdict.update({'parent': TestSequenceKey})  # sync with nodeid of the child
 
-                fname = glob.outputfolder + savescreenshottodisk(str(n), tempdict, usecache)
+                fname = glob.outputfolder + savescreenshottodisk(str(n), tempdict)
                 tempdict.update({glob.elementimgurl: app.get_asset_url(fname)})  # pointer to the image
                 nodes.append({'data': tempdict, 'position': {'x': 0, 'y': 0}})
             if parenting:
@@ -272,10 +294,11 @@ def setCytoElements(usecache=False, parenting=False, layerview=[]):
                 tempdict.update({'target': target})
                 tempdict.update({'id': n});
                 tempdict.update({'edgeid': n})
-                if usecache:
-                    fname = glob.outputfolder + imagefilename(n)
-                else:
-                    fname = glob.outputfolder + savescreenshottodisk(str(n), tempdict)  # n was ''+source+target
+                # if usecache:
+                #     fname = glob.outputfolder + imagefilename(n)
+                # else:
+                #actually; there is no screenshot for an edge. :-)
+                fname = glob.outputfolder + savescreenshottodisk(str(n), tempdict)  # n was ''+source+target
                 tempdict.update({glob.elementimgurl: app.get_asset_url(fname)})
                 edges.append({'data': tempdict})
             glob.cytoelements = allnodes + edges
