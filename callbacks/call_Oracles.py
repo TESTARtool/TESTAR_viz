@@ -43,7 +43,7 @@ def loadfile(contents, filename,dframe):
         if contents is not None:
             dframe = utils.filehandling.loadoracles(contents, filename)
         else:
-            return [{'id': 'dummy', 'name': 'dummy'}], [{'dummy': ''},None]
+            return [{'id': 'dummy', 'name': 'dummy'}], [{'dummy': ''}],None
         columns = [{'id': c, 'name': c, 'hideable': True} for c in dframe.columns]
         style_cell_conditional = []
         for c in dframe.columns:
