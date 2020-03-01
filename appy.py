@@ -14,6 +14,16 @@ import dash
 #app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
 
+# DISABLE the next line when creating Sphinx documentation
 app = dash.Dash(__name__,)
 
-
+# ENABLE this section when creating Sphinx documentation
+#inspired by https://github.com/plotly/dash/issues/696
+# class app:
+#     def callback(*argument):
+#         def decorator(function):
+#             def wrapper(*args, **kwargs):
+#                 result = function(*args, **kwargs)
+#                 return result
+#             return wrapper
+#         return decorator

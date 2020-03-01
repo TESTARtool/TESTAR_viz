@@ -14,7 +14,7 @@ import utils.filehandling
 from appy import app
 import utils.globals as glob
 import utils.graphcomputing as tu
-import callbacks.call_helpers as ch
+import callbacks.call_Cyto_StyleManager as ch
 import pandas as pd
 
 
@@ -43,22 +43,20 @@ def update_layout(hit0, canvasheight, layout, fenced, layerview,filternode,filte
     h = 600 * canvasheight
     return glob.cytoelements, {'name': layout, 'animate': False}, {'height': '' + str(h) + 'px'},
 
-
 #############################
 
 @app.callback(
     [Output('dummycytospinner', 'children'),
      Output('cytoscape-update-layout', 'stylesheet'),
+     Output('checkbox-layerview-options','options'),
      Output('dropdown-valuefilter-layout','options' ),
      Output('oracletable', 'style_data_conditional'),
      Output('baseline-oracletable', 'style_data_conditional'),
      Output('shortestpathlog', 'children')],
-   # [Input('apply-viz_style-button', 'n_clicks'),
      [Input('cytoscape-legenda', 'elements'),  #cascaded trigger
      Input('apply-oracle_style-button', 'n_clicks'),
      Input('apply-baseline-oracle_style-button', 'n_clicks'),
      Input('apply-executions-button', 'n_clicks'),
-    # Input('loading-logtext', 'children'),
      Input('apply-advancedproperties-button', 'n_clicks'),  # was 'children'.. cost me 1/2 day to debug
      Input('apply-centralities-button', 'n_clicks'),
      Input('apply-shortestpath-button', 'n_clicks')],
@@ -79,7 +77,7 @@ def update_layout(hit0, canvasheight, layout, fenced, layerview,filternode,filte
      State('execution-details', 'value')
      ]
 )
-def updateCytoStyleSheet(button, oraclebutton, baselineoraclebutton, executionsbutton, advancedpropertiesbutton,#log, advancedpropertiesbutton,
+def updateCytoStyleSheet(legenda, oraclebutton, baselineoraclebutton, executionsbutton, advancedpropertiesbutton,#log, advancedpropertiesbutton,
                          centralitiesbutton, shortestpathbutton, visualsdata, selectedoracles, oracledata,
                          selectedbaselineoracles, baselineoracledata, selectedexecutions, executionsdata,
                          layerview, selectedadvancedproperties, advancedpropertiesdata, selectedcentralities,
@@ -92,7 +90,7 @@ def updateCytoStyleSheet(button, oraclebutton, baselineoraclebutton, executionsb
     ctx = dash.callback_context
     trigger = ctx.triggered[0]['prop_id'].split('.')[0]
     if ('error' in returndata[-1]) and trigger == 'apply-shortestpath-button':  # shortestpatherror
-        return dash.no_update, dash.no_update, dash.no_update, dash.no_update, returndata[-1]
+        return dash.no_update, dash.no_update, dash.no_update,dash.no_update,dash.no_update, dash.no_update, returndata[-1]
     else:
         return returndata
 
@@ -110,11 +108,11 @@ def update_selnodestabletest(selnodes):
     df = df.reindex(sorted(df.columns), axis=1)
     if glob.image_element in df.columns:
         df = df.drop(columns=glob.image_element)
-        ncolumns = list(df.columns)
-        # # move the column to head of list using index, pop and insert
-        ncolumns.insert(0, ncolumns.pop(ncolumns.index('label')))
-        ncolumns.insert(0, ncolumns.pop(ncolumns.index('nodeid')))
-        df = df.reindex(ncolumns, axis=1)
+    ncolumns = list(df.columns)
+    # # move the column to head of list using index, pop and insert
+    ncolumns.insert(0, ncolumns.pop(ncolumns.index('label')))
+    ncolumns.insert(0, ncolumns.pop(ncolumns.index('nodeid')))
+    df = df.reindex(ncolumns, axis=1)
     cols = [{'id': c, 'name': c, 'hideable': True} for c in df.columns]
     style_cell_conditional = []
     for c in df.columns:

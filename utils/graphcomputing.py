@@ -18,7 +18,7 @@ import time
 
 from utils import globals as glob
 from utils.filehandling import imagefilename, savescreenshottodisk, copydefaultimagetoasset
-from utils.gui import updatesubgraph, setgraphattributes, setvizproperties
+from utils.gui import getsubgraph, setgraphattributes, setvizproperties
 
 
 def processgraphmlfile(details=True, advanced=False):
@@ -26,7 +26,10 @@ def processgraphmlfile(details=True, advanced=False):
 
     print('start ', "--- %.3f seconds ---" % (time.time() - start_time))
     glob.grh = nx.read_graphml(glob.graphmlfile)
-    subgraph = updatesubgraph('Concrete')  # regard only items: NOT in ABSTRACT and NOT in WIDGET and NOT in TEST
+    if 'All' in glob.centralitynodes:
+        subgraph=glob.grh
+    else:
+        subgraph = getsubgraph(glob.centralitynodes)  # regard only items: NOT in ABSTRACT and NOT in WIDGET and NOT in TEST
     noselfloopssubgraph = subgraph.copy()
     edgelist = []
     for s, t, k in subgraph.edges(keys=True):
@@ -53,7 +56,7 @@ def processgraphmlfile(details=True, advanced=False):
                         if predec == n: # this node is successor of the testsequence, thus pointer to firstnode
                             initialnode = [x for x, y in glob.grh.nodes(data=True) if
                                            y[glob.label_nodeelement] == 'ConcreteState' and
-                                           y['ConcreteIDCustom'] == tndict['concreteStateId']]
+                                           y['ConcreteIDCustom'] == tndict['concreteStateId']] #case sentitive !!
                 if initialnode !='':
                     break
         testlength = i  # len(ts)-1 # substrct testsequencenode
@@ -81,22 +84,24 @@ def processgraphmlfile(details=True, advanced=False):
     centralitymeasure = [{'measure': 'N/A', 'binning': 'N/A'}]
     V = len(subgraph)
     E = subgraph.size()
+    Max_V=2000
+    Max_E=20000
     #     d = nx.betweenness_centrality(subgraph) # this is not implemented in networkx for MultiDigraph
-    if (V * E) < (2000 * 20000):  # 40.000.000 will take 60 seconds??
-        #  this must be caluculate before the call setcytoelements.
+    if (V * E) < (Max_V * Max_E):  # 40.000.000 will take 60 seconds??
+        #  this must be calculated before the call to  setcytoelements.
         centralitymeasure = []
         centralitymeasure.append(setcentralitymeasure(subgraph,'indegree'))
         centralitymeasure.append(setcentralitymeasure(noselfloopssubgraph, 'indegree_noselfloops'))
         centralitymeasure.append(setcentralitymeasure(subgraph, 'outdegree'))
         centralitymeasure.append(setcentralitymeasure(noselfloopssubgraph, 'outdegree_noselfloops'))
         centralitymeasure.append(setcentralitymeasure(subgraph, 'loadcentrality'))
-        #centralitymeasure.append(setcentralitymeasure(noselfloopssubgraph, 'loadcentrality_noselfloops'))
+    else:
+        print('graph centralities not calculated. graph too big V * E = '+str(V)+' * '+str(E)+' exceeds '+str(Max_V * Max_E))
     glob.centralitiemeasures = pd.DataFrame(centralitymeasure)
     print('updating graph centralities attributes  done', "--- %.3f seconds ---" % (time.time() - start_time))
 
-    ######## part 2
 
-    ######## part 3
+    ######## part 2
     glob.elementcreationdistri = []
     if advanced:
         for tup in glob.sortedsequencetuples:
@@ -157,13 +162,12 @@ def processgraphmlfile(details=True, advanced=False):
             labels[lvalue] = 1 + labels.get(lvalue, 0)
             if lvalue == glob.elementwithmetadata:
                 metadata = [('  * ' + k + ' : ' + v.replace('[', '\[').replace(']', '\]')) for k, v in d.items() if
-                            k != glob.label_nodeelement]
+                            k != glob.label_nodeelement and not ('degree' in k) and not ('loadcentrality' in k) ]
 
         detaillog = [('  * ' + k + ' : ' + str(v)) for k, v in labels.items()]
         log.extend(detaillog)
         masterlog.update({'log1': log})
         log = []
-    # log.append('  ')
     if details:
         log.append('* Edge count in ' + glob.graphmlfile + " is: " + str(glob.grh.number_of_edges()))
         labels = {}
@@ -215,15 +219,11 @@ def setCytoElements(parenting=False, layerview=None,filternode=None,filtervalue=
     if filtervalue is None: filtervalue=''
 
 
-    TestSequenceKey = ''
     nodes = []
     edges = []
     allnodes = []
-    c_parentnode = {}
-    w_parentnode = {}
-    a_parentnode = {}
-    t_parentnode = {}
-    TestSequencekeylist = set()
+    parentnodeset = set()
+    TestSequencekeyset = set()
     try:
         copydefaultimagetoasset()  # optimize: do only once:-)
         if (glob.layerviewincache == layerview and glob.parentingincache == parenting and
@@ -231,7 +231,7 @@ def setCytoElements(parenting=False, layerview=None,filternode=None,filtervalue=
             pass
         else:
 
-            grh = updatesubgraph(layerview,filternode,filtervalue)
+            grh = getsubgraph(layerview, filternode, filtervalue)
             glob.filtervalueincache = filtervalue
             glob.filternodeincache = filternode
             for n, ndict in grh.nodes(data=True):
@@ -241,42 +241,33 @@ def setCytoElements(parenting=False, layerview=None,filternode=None,filtervalue=
                 tempdict.update({'id': n})
                 tempdict.update({'nodeid': n})
                 if parenting:
-                    if 'Concrete' in layerview and ndict[glob.label_nodeelement] == 'ConcreteState':
-                        tempdict.update({'parent': 'ConcreteLayer'})
-                        c_parentnode = {
-                            'data': {'id': 'ConcreteLayer', glob.label_nodeelement: glob.parent_subtypeelement,
-                                     'nodeid': 'ConcreteLayer'}}
-                    if 'Widget' in layerview and ndict[glob.label_nodeelement] == 'Widget':
-                        tempdict.update({'parent': 'WidgetLayer'})
-                        w_parentnode = {
-                            'data': {'id': 'WidgetLayer', glob.label_nodeelement: glob.parent_subtypeelement,
-                                     'nodeid': 'WidgetLayer'}}
-                    if 'Abstract' in layerview and ndict[glob.label_nodeelement] == 'AbstractState':
-                        tempdict.update({'parent': 'AbstractLayer'})
-                        a_parentnode = {
-                            'data': {'id': 'AbstractLayer', glob.label_nodeelement: glob.parent_subtypeelement,
-                                     'nodeid': 'AbstractLayer'}}
-                    if ('Test Executions' in layerview) and ((ndict[glob.label_nodeelement] == 'SequenceNode') or (
-                            ndict[glob.label_nodeelement] == 'TestSequence')):
-                        TestSequenceKey = 'TestTrace_' + ndict['sequenceId']
-                        TestSequencekeylist.add(TestSequenceKey)
-                        tempdict.update({'parent': TestSequenceKey})  # sync with nodeid of the child
+                    layer= ndict[glob.label_nodeelement]
+                    if (layer in layerview) or layerview == 'Any':
+                        if layer =='TestSequence':
+                            pass
+                        if layer != 'SequenceNode':
+                            tempdict.update({'parent': layer+'Layer'})
+                            parentnodeset.add(layer+'Layer')
+                        else:
+                            TestSequenceKey = layer+"_" + ndict['sequenceId']+'Layer'
+                            TestSequencekeyset.add(TestSequenceKey)
+                            tempdict.update({'parent': TestSequenceKey})  # sync with nodeid of the child
+
 
                 fname = glob.outputfolder + savescreenshottodisk(str(n), tempdict)
                 tempdict.update({glob.elementimgurl: app.get_asset_url(fname)})  # pointer to the image
                 nodes.append({'data': tempdict, 'position': {'x': 0, 'y': 0}})
             if parenting:
-                if c_parentnode != {}: allnodes.append(c_parentnode)
-                if w_parentnode != {}: allnodes.append(w_parentnode)
-                if a_parentnode != {}: allnodes.append(a_parentnode)
 
-                for TestSequenceKey in TestSequencekeylist:
+                for k in parentnodeset:
+                    c_parentnode = {'data': {'id': k, glob.label_nodeelement: glob.parent_subtypeelement,'nodeid': k}}
+                    allnodes.append(c_parentnode)
+                for TestSequenceKey in TestSequencekeyset:
                     t_parentnode = {'data': {'id': TestSequenceKey, glob.label_nodeelement: glob.parent_subtypeelement,
                                              'nodeid': TestSequenceKey}}
                     allnodes.append(t_parentnode)
             glob.parentingincache = parenting
             allnodes.extend(nodes)
-            # next line can raise an error while initializing: just ignore. no negative impact
             for source, target, n, edict in grh.edges(data=True, keys=True):
                 tempdict = dict(edict)
                 tempdict.update({'label': edict[glob.label_edgeelement]})  # copy as cyto wants the label tag
@@ -284,12 +275,12 @@ def setCytoElements(parenting=False, layerview=None,filternode=None,filtervalue=
                 tempdict.update({'target': target})
                 tempdict.update({'id': n});
                 tempdict.update({'edgeid': n})
+                #actually; there is no screenshot for an edge. :-)
                 # if usecache:
                 #     fname = glob.outputfolder + imagefilename(n)
                 # else:
-                #actually; there is no screenshot for an edge. :-)
-                fname = glob.outputfolder + savescreenshottodisk(str(n), tempdict)  # n was ''+source+target
-                tempdict.update({glob.elementimgurl: app.get_asset_url(fname)})
+                #     fname = glob.outputfolder + savescreenshottodisk(str(n), tempdict)  # n was ''+source+target
+                #tempdict.update({glob.elementimgurl: app.get_asset_url(fname)})
                 edges.append({'data': tempdict})
             glob.cytoelements = allnodes + edges
     except Exception as e:

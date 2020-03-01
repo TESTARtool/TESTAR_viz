@@ -73,8 +73,8 @@ def update_legenda(hit0, newlog, data, cols):
         if row[glob.elementtype] == 'node' and 'State' in row[glob.elementsubtype] and not alreadydonedeadstate:
             itemstyle = styler.nodestyler(nodedata=row, dsp='element', legenda=True)
             itemstyle.update({'label': 'DeadState'})
-            itemstyle.update({'shape': row['shape_if_deadstate']})
-            itemstyle.update({'background-color': row['color_if_deadstate']})
+            itemstyle.update({'shape': row['shape_if_terminal']})
+            itemstyle.update({'background-color': row['color_if_terminal']})
             alreadydonedeadstate = True
             legenda = styler.stylelegenda('node', 'DeadState', itemstyle)
             cstylesheet.append(legenda[0])

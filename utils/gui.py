@@ -1,21 +1,22 @@
 import base64
 import datetime
 import re
-import sys
 import time
-
 import networkx as nx
 import pandas as pd
-
 from utils import globals as glob
 
+def getsubgraph(layerview, filternode=None, filtervalue=None):
+    """
 
-def updatesubgraph(layerview,filternode=None,filtervalue=None):
-
+    :param layerview: test
+    :param filternode: test
+    :param filtervalue:
+    :return: nnn
+    """
     graphcopy = glob.grh.copy()
     filterlist = []
     filterparts=[]
-    #if filternode != '' and filtervalue != '':
     if (not filternode is None) and (not filtervalue is None):
         foundfilter = re.search(glob.elementcompositefilter, filtervalue)
         if foundfilter is not None:
@@ -30,29 +31,18 @@ def updatesubgraph(layerview,filternode=None,filtervalue=None):
                 comparator = found.group(2)
                 rhs = found.group(3)
                 filterlist.append((subject, comparator, rhs))
-
     removenodelist = []
-    if not 'Abstract' in layerview:
-        removenodelist = [n for n, v in glob.grh.nodes(data=True) if
-                          v[glob.label_nodeelement] == 'AbstractState' or
-                          v[glob.label_nodeelement] == 'AbstractStateModel']
-        graphcopy.remove_nodes_from(removenodelist)
-    if not 'Incl Blackhole' in layerview:
-        removenodelist = [n for n, v in glob.grh.nodes(data=True) if v[glob.label_nodeelement] == 'BlackHole']
-        graphcopy.remove_nodes_from(removenodelist)
-
-    if not 'Widget' in layerview:
-        removenodelist = [n for n, v in glob.grh.nodes(data=True) if v[glob.label_nodeelement] == 'Widget']
-        graphcopy.remove_nodes_from(removenodelist)
-
-    if not 'Concrete' in layerview:
-        removenodelist = [n for n, v in glob.grh.nodes(data=True) if v[glob.label_nodeelement] == 'ConcreteState']
-        graphcopy.remove_nodes_from(removenodelist)
+    if ('Any' not in layerview):
+        drawingelements=glob.dfdisplayprops.to_dict('records')
+        for row in drawingelements:
+            if (row[glob.elementtype] == 'node') and (not (row[glob.elementsubtype] in layerview)):
+                removenodelist = [n for n, v in glob.grh.nodes(data=True) if (v[glob.label_nodeelement] == row[glob.elementsubtype])]
+                graphcopy.remove_nodes_from(removenodelist)
 
     if (len(filterlist) > 0):
         removenodelist = []
         for n, v in graphcopy.nodes(data=True):
-            if v[glob.label_nodeelement] == filternode:
+            if (v[glob.label_nodeelement] == filternode) or (filternode == 'Any') :
                 remove = False
                 for filt in filterlist:
                     subject = ''
@@ -92,22 +82,10 @@ def updatesubgraph(layerview,filternode=None,filtervalue=None):
             filtervalue is not None and filtervalue != '' and len(removenodelist) == 0):
         print('Graph Filter on key: <' + filternode + '> and value: <' + filtervalue + '> did not match any node')
 
-    #graphcopy.remove_nodes_from(removenodelist)
 
-
-    if not 'Test Executions' in layerview:
-        # removeedgelist = [(s,t) for s,t,n, v in glob.grh.edges(data=True,keys=True) if v['glob.label_edgeelement'] == 'Accessed']
-        # tmpgrh.remove_edges_from(removeedgelist)
-        removenodelist = [n for n, v in glob.grh.nodes(data=True) if
-                          (v[glob.label_nodeelement] == 'SequenceNode' or v[
-                              glob.label_nodeelement] == 'TestSequence')]
-        graphcopy.remove_nodes_from(removenodelist)
-
-    else:
-        pass  # subgraph = 'all' # tmpgrh=glob.grh.copy
     glob.subgraph=graphcopy
     glob.layerviewincache = layerview
-    return graphcopy
+    return glob.subgraph
 
 
 def prettytime(timestamp=None,level="milliseconds"):
@@ -122,12 +100,10 @@ def setgraphattributes(infer=True, contents=None, filename=''):
         print('inferring attributes from Graph')
         nodelabels = set()
         l = nx.get_node_attributes(glob.grh, glob.label_nodeelement)
-        # nodelabels.update({glob.default_subtypeelement})
         nodelabels.update({glob.parent_subtypeelement})
         nodelabels.update(l.values())
         edgelabels = set()
         l = nx.get_edge_attributes(glob.grh, glob.label_edgeelement)
-        # edgelabels.update({glob.default_subtypeelement})
         edgelabels.update(l.values())
         nodepropdict = dict()
         dfnodes = pd.DataFrame()
@@ -142,11 +118,10 @@ def setgraphattributes(infer=True, contents=None, filename=''):
                         for k in v.keys():
                             nodepropdict.update({k: 1})
                         nodepropdict.pop(lbl, '')
-                        break  # assume that nodesof the same type have the same attributes
+                        break  # assume that nodes of the same type have the same attributes
             df = pd.DataFrame(nodepropdict, index=[0])
             dfnodes = pd.concat([dfnodes, df], ignore_index=True, sort=False)
 
-        edgepropdict = dict()
         dfedges = pd.DataFrame()
         for lbl in edgelabels:
             edgepropdict = dict()
@@ -162,22 +137,9 @@ def setgraphattributes(infer=True, contents=None, filename=''):
                         break  # assume that edges of the same type have the same attributes
                 df = pd.DataFrame(edgepropdict, index=[0])
                 dfedges = pd.concat([dfedges, df], ignore_index=True, sort=False)
-
         glob.dfattributes = pd.concat([dfnodes, dfedges], ignore_index=True, sort=False)
-
     elif contents is not None:  # load attributes from file trigger=='upload-button-attrib-file': #
-        content_type, content_string = contents.split(',')
-        decoded = base64.b64decode(content_string)
-        try:
-            # data=io.StringIO(decoded.decode('utf-8'))
-            directory = (glob.scriptfolder + glob.assetfolder + glob.outputfolder);
-            fout = open(directory + filename, encoding='utf-8', mode='w', newline='')
-            fout.write(decoded.decode('utf-8'))  # writes the uploaded file to the newly created file.
-            #                   tu.savetofile(decoded.decode('utf-8'),filename )
-            fout.close()  # closes the file, upload complete.
-            glob.dfattributes = pd.read_csv(directory + filename, sep=';')
-        except Exception as e:
-            print('*  There was an error processing file <' + filename + '> :' + str(e))
+        glob.dfattributes = loadcsv(contents, filename)
     else:
         pass
 
@@ -200,19 +162,21 @@ def setvizproperties(loaddefaults=True, contents=None, filename=''):
             glob.dfdisplayprops = pd.concat([glob.dfdisplayprops, df], ignore_index=True, sort=False)
 
     elif contents is not None:  # load file  trigger=='upload-button-viz-file':
-        content_type, content_string = contents.split(',')
-        decoded = base64.b64decode(content_string)
-        try:
-            # data=io.StringIO(decoded.decode('utf-8'))
-            directory = (glob.scriptfolder + glob.assetfolder + glob.outputfolder);
-            fout = open(directory + filename, encoding='utf-8', mode='w',
-                        newline='')  # creates the file where the uploaded file should be stored
-            fout.write(decoded.decode('utf-8'))  # writes the uploaded file to the newly created file.
-            #                   tu.savetofile(decoded.decode('utf-8'),filename )
-            fout.close()  # closes the file, upload complete.
-            glob.dfdisplayprops = pd.read_csv(directory + filename, sep=';')
-        except Exception as e:
-            print('*  There was an error processing file <' + filename + '> :' + str(e))
-            pass
+        glob.dfdisplayprops=loadcsv(contents, filename)
+
     else:
         pass
+
+def loadcsv(contents, infilename):
+    content_type, content_string = contents.split(',')
+    decoded = base64.b64decode(content_string)
+    try:
+        directory = (glob.scriptfolder + glob.assetfolder + glob.outputfolder);
+        fout = open(directory + infilename, encoding='utf-8', mode='w',
+                    newline='')  # creates the file where the uploaded file should be stored
+        fout.write(decoded.decode('utf-8'))  # writes the uploaded file to the newly created file.
+        fout.close()  # closes the file, upload complete.
+        return pd.read_csv(directory + infilename, sep=';')
+    except Exception as e:
+        print('*  There was an error processing file <' + infilename + '> :' + str(e))
+        return pd.DataFrame()

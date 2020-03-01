@@ -44,6 +44,10 @@ elementimgurl ='imgurl'
 elementwithmetadata = 'AbstractStateModel'
 createdby='createdby_sequenceid'
 updatedby='updatedby_sequenceid'
+# scope: list all the labelV elements for the basis of  the calculation
+# use 'All' as a wildcard
+centralitynodes=['ConcreteState']
+
 
 dfattributes=pd.DataFrame()
 dforacles=pd.DataFrame()
@@ -79,8 +83,8 @@ nodedisplayprop={
                 'border-color' : 'black',
                 'border-style' :'solid',
                 'color' : 'grey',
-                'color_if_deadstate' : 'purple',
-                'shape_if_deadstate': 'octagon',
+                'color_if_terminal' : 'purple',
+                'shape_if_terminal': 'octagon',
                 'opacity': 1
                 }
 parentnodedisplayprop={
@@ -96,8 +100,8 @@ parentnodedisplayprop={
                 'border-width' : 2,
                 'border-color' : 'black',
                 'color' : 'wheat',
-                'color_if_deadstate' : '',
-                'shape_if_deadstate': ''
+                'color_if_terminal' : '',
+                'shape_if_terminal': ''
                 }
 edgedisplayprop={
                 'hide':'',

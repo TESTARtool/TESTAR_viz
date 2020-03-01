@@ -22,7 +22,7 @@ def updateCytoStyleSheet( selectedoracles, oracledata, selectedbaselineoracles, 
     for row in data:
         if row[glob.elementtype] == 'node':
             valuefilterentry = row[glob.elementsubtype]
-            valuefilter.append({'label': valuefilterentry.capitalize(), 'value': valuefilterentry})
+            valuefilter.append({'label': valuefilterentry, 'value': valuefilterentry})
 
             dsp = 'element'
             legenda = styler.stylelegenda(row[glob.elementtype], row[glob.elementsubtype], nodestyler(row, dsp),
@@ -128,7 +128,7 @@ def updateCytoStyleSheet( selectedoracles, oracledata, selectedbaselineoracles, 
 
         else:
             selectorfilter = ""  # should not happen
-
+    valuefilter.append({'label': 'Any', 'value': 'Any'})
     #######  oracles
     selectedrows = selectedoracles
     if not (oracledata is None) and len(oracledata) > 0 and not (selectedrows is None) and len(selectedrows) > 0:
@@ -187,47 +187,50 @@ def updateCytoStyleSheet( selectedoracles, oracledata, selectedbaselineoracles, 
     ###### baseline oracles
     # else: no special handling for display oracles
 
-    ######color deadAbstractState/actions and then ConcreteStates/Actions
+    ######color terminal States
     if glob.grh.size() != 0:
-        tmpgrh= utils.gui.updatesubgraph('Abstract')
-        properties = [r for r in data if r[glob.elementtype] == 'node' and r[glob.elementsubtype] == 'AbstractState']
-        stylepropdict = dict()
-        if len(properties) > 0:  # take first row
-            stylepropdict.update({'background-color': properties[0]['color_if_deadstate']})
-            stylepropdict.update({'shape': properties[0]['shape_if_deadstate']})
-        deadstates = (node for node, out_degree in tmpgrh.out_degree() if out_degree == 0)
-        for stateid in deadstates: stylesheet.extend(updatestyleoftrace(stateid, 'node', stylepropdict))
+        for row in data:
+            if row[glob.elementtype] == 'node':
+                tmpgrh = utils.gui.getsubgraph(row[glob.elementsubtype])
+                stylepropdict = dict()
+                stylepropdict.update({'background-color': row['color_if_terminal']})
+                stylepropdict.update({'shape': row['shape_if_terminal']})
+                # next line is candidate for refactirong, as centralities like outdegree  are calculated at initial load
+                deadstates = (node for node, out_degree in tmpgrh.out_degree() if out_degree == 0)
+                for stateid in deadstates: stylesheet.extend(updatestyleoftrace(stateid, 'node', stylepropdict))
 
-        tmpgrh = utils.gui.updatesubgraph('Concrete')
-        properties = [r for r in data if r[glob.elementtype] == 'node' and r[glob.elementsubtype] == 'ConcreteState']
-        stylepropdict = dict()
-        if len(properties) > 0:  # take first row
-            stylepropdict.update({'background-color': properties[0]['color_if_deadstate']})
-            stylepropdict.update({'shape': properties[0]['shape_if_deadstate']})
-        # next line is candidate for refactirong, as centralities like outdegree  are calculated at initial load
-        deadstates = (node for node, out_degree in tmpgrh.out_degree() if out_degree == 0)
-        for stateid in deadstates: stylesheet.extend(updatestyleoftrace(stateid, 'node', stylepropdict))
 
     #######  testexecutions
     selectedrows = selectedexecutions
-    if executiondetails:
-        attribute = glob.updatedby
-    else:
-        attribute = glob.createdby
     if (not executionsdata is None) and (not selectedrows is None):
         if len(executionsdata) > 0 and len(selectedrows) > 0:
             i = -1
             nodeselectors = []
             edgeselectors = []
-            for r in executionsdata:
-                i = i + 1
-                if not i in selectedrows:
-                    nodeselector = "node[" + glob.label_nodeelement + " = 'ConcreteState'][" + attribute + \
-                                   " = " + "'" + r['sequenceId'] + "'" + "]"
-                    edgeselector = "edge[" + glob.label_edgeelement + " = 'ConcreteAction'][" + attribute + \
-                                   " = " + "'" + r['sequenceId'] + "'" + "]"
-                    nodeselectors.append(nodeselector)
-                    edgeselectors.append(edgeselector)
+            if not executiondetails:
+                for r in executionsdata:
+                    i = i + 1
+                    if not i in selectedrows:
+                        nodeselector = "node[" + glob.label_nodeelement + " = 'ConcreteState'][" + glob.createdby + \
+                                       " = " + "'" + r['sequenceId'] + "'" + "]"
+                        edgeselector = "edge[" + glob.label_edgeelement + " = 'ConcreteAction'][" + glob.createdby + \
+                                       " = " + "'" + r['sequenceId'] + "'" + "]"
+                        nodeselectors.append(nodeselector)
+                        edgeselectors.append(edgeselector)
+            else:
+                nodeselectorbuilder=''
+                edgeselectorbuilder = ''
+                for r in executionsdata:
+                    i = i + 1
+                    if i in selectedrows:
+                        nodepartselector = "[" + glob.label_nodeelement + " = 'ConcreteState'][" + glob.updatedby + \
+                                       " !*= " + "'" + r['sequenceId'] + "'" + "]"
+                        nodeselectorbuilder=nodeselectorbuilder+nodepartselector
+                        edgepartselector = "[" + glob.label_edgeelement + " = 'ConcreteAction'][" + glob.updatedby + \
+                                       " !*= " + "'" + r['sequenceId'] + "'" + "]"
+                        edgeselectorbuilder=edgeselectorbuilder+edgepartselector
+                nodeselectors.append("node"+nodeselectorbuilder)
+                edgeselectors.append("edge"+edgeselectorbuilder)
 
             selectordict = {'selector': ','.join(nodeselectors)}
             styledict = {'style': glob.trace_node_unselected}
@@ -253,8 +256,8 @@ def updateCytoStyleSheet( selectedoracles, oracledata, selectedbaselineoracles, 
                 if i in selectedcentralitiesrows:
                     selectordict = dict()
                     bins = json.loads(r['binning'])  # convert string back to dict
-                    colorlist = utils.gradient.colorgradient(colornameStart=glob.centrality_colornameStart, colornameEnd=glob.centrality_colornameEnd, n=len(bins))[
-                        'hex']
+                    colorlist = utils.gradient.colorgradient(colornameStart=glob.centrality_colornameStart,
+                                colornameEnd=glob.centrality_colornameEnd, n=len(bins))['hex']
                     j = 0
                     for k, v in bins.items():
                         nodeselector = "node[" + r['measure'] + " >= " + "'" + str(v) + "'" + "]"
@@ -273,7 +276,7 @@ def updateCytoStyleSheet( selectedoracles, oracledata, selectedbaselineoracles, 
     if not (advancedpropertiesdata is None) and len(advancedpropertiesdata) > 0 and not (
             selectedadvancedrows is None) and len(selectedadvancedrows) > 0:
         # regard only items that are NOT in ABSTRACT and NOT in WIDGET and NOT in TEST
-        subgraph = utils.gui.updatesubgraph('Concrete')
+        subgraph = utils.gui.getsubgraph('ConcreteState')
         i = -1
         for r in advancedpropertiesdata:
             i = i + 1
@@ -288,7 +291,7 @@ def updateCytoStyleSheet( selectedoracles, oracledata, selectedbaselineoracles, 
         if not (len(selectednodedata) == 2):
             shortestpatherror = '(shortestpath error: select exactly 2 nodes in current view)'
         else:
-            tmpgrh = utils.gui.updatesubgraph(layerview)
+            tmpgrh = utils.gui.getsubgraph(layerview)
             sourcenode = selectednodedata[0]['nodeid']
             targetnode = selectednodedata[1]['nodeid']
             try:
@@ -303,8 +306,10 @@ def updateCytoStyleSheet( selectedoracles, oracledata, selectedbaselineoracles, 
             stylesheet.extend(ret)
     ## SP between 2 nodes
 
-
-    return '', stylesheet, valuefilter,oracleconditionalstyle, baselineoracleconditionalstyle, shortestpatherror
+    layervaluefilter=valuefilter.copy()
+    if {'label': glob.parent_subtypeelement, 'value':glob.parent_subtypeelement } in layervaluefilter:
+        layervaluefilter.remove({'label': glob.parent_subtypeelement, 'value':glob.parent_subtypeelement })
+    return '', stylesheet, layervaluefilter,valuefilter,oracleconditionalstyle, baselineoracleconditionalstyle, shortestpatherror
 
 
 # helper method:

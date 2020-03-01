@@ -36,21 +36,27 @@ cytolayout =  html.Div([
                     ],style={'max-width': '300px', 'margin-top':'5px','height': '25px', 'border-style': 'solid', 'padding': '5px',
                              'display': 'inline-block','vertical-align':'top'}),
                 html.Div([
-                    html.Div(children='Layer view:', style={'display': 'inline-block','width': '2'}),
-                    dcc.Checklist(
+                    html.Div(children='Layer view:', style={'display': 'inline-block','width': '2','vertical-align': 'top'}),
+                    dcc.Dropdown(
                         id='checkbox-layerview-options',
-                        value=['Concrete'],
-                        style={'width': '250', 'color': 'black', 'display': 'inline-block', 'fontSize': 12},
-                        options=[{'label': name.capitalize(), 'value': name}
-                                 for name in ['Abstract', 'Incl Blackhole','Concrete', 'Widget', 'Test Executions']]),
+                        value=[],
+                        multi=True,
+                        placeholder="Select:",
+                        #persistence=True,
+                        options=[{'label': name, 'value': name}
+                                 for name in ['Abstract', 'Incl Blackhole','Concrete', 'Widget', 'Test Executions']],
+                        style={'width': '400px','minwidth' : '100px', 'color': 'black', 'display': 'inline-block', 'fontSize': 12, 'height': '25px','margin-right': '5px'},
+                        optionHeight=25
+                        ),
+
                     dcc.Checklist(
                         id='fenced',
                         options=[
                             {'label': 'Fenced', 'value': 'Fenced'} ],
                         value=[],
-                        style={'width': '75','color': 'black', 'display': 'inline-block','fontSize': 12},
+                        style={'width': '75px','color': 'black', 'display': 'inline-block','fontSize': 12,'height': '25px','margin-right': '5px','vertical-align': 'top'},
                     )
-                    ], style={'max-width': '550px', 'height': '25px', 'margin': '5px', 'border-style': 'solid', 'padding': '5px', 'display': 'inline-block','vertical-align':'top'}),
+                    ], style={ 'height': '25px', 'margin': '5px', 'border-style': 'solid', 'padding': '5px', 'display': 'inline-block','vertical-align':'top'}),
 
                 html.Div([
                     html.Div(children='Remove:', style={'display': 'inline-block','vertical-align': 'top'}),
@@ -58,14 +64,17 @@ cytolayout =  html.Div([
                         id='dropdown-valuefilter-layout',
                         value='',
                         clearable=False,
-                        style={'width': '100px', 'color': 'black', 'fontSize': 12, 'height': '25px',
+                        style={'width': '200px', 'color': 'black', 'fontSize': 12, 'height': '25px',
                                'display': 'inline-block','margin-right': '5px'},
-                        persistence=True,
+                        #persistence=True,
+                        # multi=True,
+                        placeholder="Select:",
                         options=[
                             {'label': name.capitalize(), 'value': name}
                             for name in
                             ['all']
-                        ]),
+                        ],
+                        optionHeight=25),
                     dcc.Input(id="filter-input",
                               type="text",
                               placeholder="example: Role!=UIAMenuItem",
@@ -76,7 +85,7 @@ cytolayout =  html.Div([
 
 
 
-                ], style={'max-width': '1100px', 'margin-top': '5px', 'height': '25px', 'border-style': 'solid',
+                ], style={'margin-top': '5px', 'height': '25px', 'border-style': 'solid',
                           'padding': '5px',  'display': 'inline-block', 'vertical-align': 'top'}),
                 html.Div(
                     children=[
