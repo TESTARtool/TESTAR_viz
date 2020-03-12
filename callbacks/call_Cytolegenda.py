@@ -39,8 +39,8 @@ def update_legenda(hit0, newlog, data, cols):
             return dash.no_update, dash.no_update, dash.no_update, dash.no_update, \
                    dash.no_update, dash.no_update, dash.no_update, dash.no_update #prevents unwanted updates
     else:
-        pdcol = [i['id'] for i in cols]
-        glob.dfdisplayprops = pd.DataFrame(data, columns=pdcol)
+        pdcol = [i['id'] for i in s_viz_settings_columns]
+        glob.dfdisplayprops = pd.DataFrame(s_viz_settings_data, columns=pdcol)
     displayproperties = glob.dfdisplayprops.to_dict('records')
     cstylesheet = []
     celements = []
@@ -137,14 +137,13 @@ def update_legenda(hit0, newlog, data, cols):
         cytonodes = []
         selectorfilter = '[' + 'id'+ ' ' + '=' + ' ' + '\'' + 'bin'+k + '\'' + ']'    #  [id = 'bins_0']
         selectordict = {'selector': 'node' + selectorfilter}
-        styling={'shape': 'ellipse',
+        styling={'shape': glob.centralitiesshape, #candidate refactoring: codeclone in Stylemanager
                     'width': centralitywidth(j),
                    'height': centralityheight(j),
                    'background-color': colorlist[j],
                    'border-color': colorlist[j],
                    'font-size': 18,
                    'label': 'data(id)'}
-        #styling=getcentralitystyle( colorlist[j],j)
         styledict = {'style': styling}
         style = selectordict
         style.update(styledict)

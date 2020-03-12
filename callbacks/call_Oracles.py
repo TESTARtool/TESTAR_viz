@@ -21,8 +21,8 @@ from styler import style_dframe
     [Input('upload-oracles-from-file', 'contents')],
     [State('upload-oracles-from-file', 'filename'),
      State('upload-oracles-from-file', 'last_modified')])
-def update_oracles_uitable(contents, filename, date):
-    ret = load_oracles_from_file(contents, filename, glob.dforacles)
+def update_oracles_uitable(i_oracle_filecontents, i_oracle_filename, i_oraclefile_lastmodified):
+    ret = oracles_from_file_to_dframe(i_oracle_filecontents, i_oracle_filename, glob.dforacles)
     return ret[0], ret[1], ret[2]
 
 
@@ -33,12 +33,12 @@ def update_oracles_uitable(contents, filename, date):
     [Input('upload-baseline-oracles-from-file', 'contents')],
     [State('upload-baseline-oracles-from-file', 'filename'),
      State('upload-baseline-oracles-from-file', 'last_modified')])
-def update_oracles_baseline_uitable(contents, filename, date):
-    ret = load_oracles_from_file(contents, filename, glob.dfbaselineoracles)
+def update_oracles_baseline_uitable(i_baselineoracle_filecontents, i_baselineoracle_filename, i_oracle_file_lastmodified):
+    ret = oracles_from_file_to_dframe(i_baselineoracle_filecontents, i_baselineoracle_filename, glob.dfbaselineoracles)
     return ret[0], ret[1], ret[2]
 
 
-def load_oracles_from_file(contents, filename, dframe):
+def oracles_from_file_to_dframe(filecontents, filename, dframe):
     ctx = dash.callback_context
     if ctx.triggered:
         if contents is not None:

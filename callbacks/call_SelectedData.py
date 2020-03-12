@@ -16,15 +16,15 @@ from filehandling import save_uitable
     Output('save-nodedata', 'href'),
     [Input('selectednodetable', 'derived_virtual_data')],
     [State('selectednodetable', 'columns')])
-def save_node_table(data, cols):
-    return save_uitable(data, cols)
+def save_node_table(i_selectednodetable_virtdata, i_selectednodetable_columns):
+    return save_uitable(i_selectednodetable_virtdata, i_selectednodetable_columns)
 
 
 @app.callback(
     Output('save-edgedata', 'href'),
     [Input('selectededgetable', 'derived_virtual_data')],
     [State('selectededgetable', 'columns')])
-def save_edge_table(data, cols):
-    return save_uitable(data, cols)
+def save_edge_table(i_selectededgetable_virtdata, i_selectededgetable_columns):
+    return save_uitable(i_selectededgetable_virtdata, i_selectededgetable_columns)
 
 

@@ -24,7 +24,7 @@ def validate(button, val):
     if button > 0:
         masterlog = {}
         if os.path.isfile(glob.scriptfolder + glob.graphmlfile):  # fullpath for OS operations
-            masterlog = (tu.processgraphmlfile(True, ('Advanced' in val)))
+            masterlog = (tu.processgraphmlfile(True, ('Advanced' in s_advanced)))
         else:
             masterlog = {'log1': '*  There was no file available'}
     else:

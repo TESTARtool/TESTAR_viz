@@ -11,7 +11,7 @@ from utils import globals as glob
 def getsubgraph(layerview, filternode=None, filtervalue=None):
     """
 
-    :param layerview: test
+    @param layerview: test
     :param filternode: test
     :param filtervalue:
     :return: nnn

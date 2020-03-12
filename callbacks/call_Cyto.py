@@ -9,18 +9,12 @@ import os
 import dash
 from dash.dependencies import Input, Output, State
 import dash_html_components as html
-
 import utils.filehandling
 from appy import app
 import utils.globals as glob
 import utils.graphcomputing as tu
-import callbacks.call_Cyto_StyleManager as ch
+import utils.cytostylemanager as ch
 import pandas as pd
-
-
-##############################################
-# cyto
-#from call_Oracles import style_dframe
 from styler import style_dframe
 
 
@@ -37,15 +31,15 @@ from styler import style_dframe
      State('filter-input', 'value'),
 
      ])
-def update_layout(hit0, canvasheight, layout, fenced, layerview,filternode,filtervalue):
+def update_layout(i_updatelayoutbutton, s_canvasheight, s_layout, s_fenced, s_layerview, s_filternodetype, s_filtervalue):
     ctx = dash.callback_context
     trigger = ctx.triggered[0]['prop_id'].split('.')[0]
-    if (trigger == 'submit-button' and hit0 >= 1):
+    if (trigger == 'submit-button' and i_updatelayoutbutton >= 1):
         if glob.grh.size() != 0:
-            parenting = (len(fenced) > 0)
-            tu.setCytoElements(parenting, layerview,filternode,filtervalue)
-    h = 600 * canvasheight
-    return glob.cytoelements, {'name': layout, 'animate': False}, {'height': '' + str(h) + 'px'},
+            parenting = (len(s_fenced) > 0)
+            tu.setCytoElements(parenting, s_layerview, s_filternodetype, s_filtervalue)
+    h = 600 * s_canvasheight
+    return glob.cytoelements, {'name': s_layout, 'animate': False}, {'height': '' + str(h) + 'px'},
 
 #############################
 
