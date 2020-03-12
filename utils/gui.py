@@ -4,6 +4,8 @@ import re
 import time
 import networkx as nx
 import pandas as pd
+
+from filehandling import read_file_in_dataframe
 from utils import globals as glob
 
 def getsubgraph(layerview, filternode=None, filtervalue=None):
@@ -31,16 +33,19 @@ def getsubgraph(layerview, filternode=None, filtervalue=None):
                 comparator = found.group(2)
                 rhs = found.group(3)
                 filterlist.append((subject, comparator, rhs))
-    removenodelist = []
+
+    if (len(layerview) == 0):
+        print('Graph Filter on Layer: No Layer selected, returning  graph with zero elements')
+
     if ('Any' not in layerview):
         drawingelements=glob.dfdisplayprops.to_dict('records')
         for row in drawingelements:
             if (row[glob.elementtype] == 'node') and (not (row[glob.elementsubtype] in layerview)):
                 removenodelist = [n for n, v in glob.grh.nodes(data=True) if (v[glob.label_nodeelement] == row[glob.elementsubtype])]
                 graphcopy.remove_nodes_from(removenodelist)
-
+    removenodefilterlist = []
     if (len(filterlist) > 0):
-        removenodelist = []
+
         for n, v in graphcopy.nodes(data=True):
             if (v[glob.label_nodeelement] == filternode) or (filternode == 'Any') :
                 remove = False
@@ -71,15 +76,24 @@ def getsubgraph(layerview, filternode=None, filtervalue=None):
                         if not remove:
                             remove = subject.startswith(setpoint) if operator == '^=' else False
                         if not remove:
-                            remove = subject.endswith(setpoint) == -1 if operator == '$=' else False
+                            remove = subject.endswith(setpoint)  if operator == '$=' else False
                         if not remove:
                             remove = subject.find(setpoint) != -1 if operator == '*=' else False
+                        if not remove:
+                            remove = not (subject.startswith(setpoint)) if operator == '!^=' else False
+                        if not remove:
+                            remove = not (subject.endswith(setpoint)) if operator == '!$=' else False
+                        if not remove:
+                            remove = subject.find(setpoint) == -1 if operator == '!*=' else False
                         if remove: break
+                    else:
+                        if operator.startswith('!'):
+                            remove = True # when operator starts with '!': remove nodes that do not have the attribute
                 if remove:
-                    removenodelist.append(n)
-        graphcopy.remove_nodes_from(removenodelist)
+                    removenodefilterlist.append(n)
+        graphcopy.remove_nodes_from(removenodefilterlist)
     if (filternode is not None and filternode != '' and
-            filtervalue is not None and filtervalue != '' and len(removenodelist) == 0):
+            filtervalue is not None and filtervalue != '' and len(removenodefilterlist) == 0):
         print('Graph Filter on key: <' + filternode + '> and value: <' + filtervalue + '> did not match any node')
 
 
@@ -139,7 +153,7 @@ def setgraphattributes(infer=True, contents=None, filename=''):
                 dfedges = pd.concat([dfedges, df], ignore_index=True, sort=False)
         glob.dfattributes = pd.concat([dfnodes, dfedges], ignore_index=True, sort=False)
     elif contents is not None:  # load attributes from file trigger=='upload-button-attrib-file': #
-        glob.dfattributes = loadcsv(contents, filename)
+        glob.dfattributes = read_file_in_dataframe(contents, filename)
     else:
         pass
 
@@ -162,21 +176,21 @@ def setvizproperties(loaddefaults=True, contents=None, filename=''):
             glob.dfdisplayprops = pd.concat([glob.dfdisplayprops, df], ignore_index=True, sort=False)
 
     elif contents is not None:  # load file  trigger=='upload-button-viz-file':
-        glob.dfdisplayprops=loadcsv(contents, filename)
+        glob.dfdisplayprops=read_file_in_dataframe(contents, filename)
 
     else:
         pass
 
-def loadcsv(contents, infilename):
-    content_type, content_string = contents.split(',')
-    decoded = base64.b64decode(content_string)
-    try:
-        directory = (glob.scriptfolder + glob.assetfolder + glob.outputfolder);
-        fout = open(directory + infilename, encoding='utf-8', mode='w',
-                    newline='')  # creates the file where the uploaded file should be stored
-        fout.write(decoded.decode('utf-8'))  # writes the uploaded file to the newly created file.
-        fout.close()  # closes the file, upload complete.
-        return pd.read_csv(directory + infilename, sep=';')
-    except Exception as e:
-        print('*  There was an error processing file <' + infilename + '> :' + str(e))
-        return pd.DataFrame()
+# def loadcsv(contents, infilename):
+#     content_type, content_string = contents.split(',')
+#     decoded = base64.b64decode(content_string)
+#     try:
+#         directory = (glob.scriptfolder + glob.assetfolder + glob.outputfolder);
+#         fout = open(directory + infilename, encoding='utf-8', mode='w',
+#                     newline='')  # creates the file where the uploaded file should be stored
+#         fout.write(decoded.decode('utf-8'))  # writes the uploaded file to the newly created file.
+#         fout.close()  # closes the file, upload complete.
+#         return pd.read_csv(directory + infilename, sep=';')
+#     except Exception as e:
+#         print('*  There was an error processing file <' + infilename + '> :' + str(e))
+#         return pd.DataFrame()

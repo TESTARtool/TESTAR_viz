@@ -14,7 +14,7 @@ def updateCytoStyleSheet( selectedoracles, oracledata, selectedbaselineoracles, 
                          selectedcentralities, centralitiesdata, selectednodedata, executiondetails):
     stylesheet = []
     oracleconditionalstyle = [glob.tableoddrowstyle]  # a comma <,> at the end of this line cost me a day
-    baselineoracleconditionalstyle = [glob.tableoddrowstyle]  # a comma <,> at the end of this line cost me a day
+    baselineoracleconditionalstyle = [glob.tableoddrowstyle]
 
     data = glob.dfdisplayprops.to_dict('records')
     valuefilter = []
@@ -140,26 +140,26 @@ def updateCytoStyleSheet( selectedoracles, oracledata, selectedbaselineoracles, 
                     tmpdict={"if": {"row_index": i}}
                     tmpdict.update(glob.oracletable_showfail)
                     oracleconditionalstyle.append(tmpdict)
-                    stylesheet.extend(updatestyleoftrace(r['EXAMPLERUN_CYCLE_STATES'], 'node',
-                        glob.latestoracle_fail_cycle_states))
-                    stylesheet.extend(updatestyleoftrace(r['EXAMPLERUN_PREFIX_STATES'], 'node',
-                        glob.latestoracle_fail_prefix_states))
-                    stylesheet.extend( updatestyleoftrace(r['EXAMPLERUN_CYCLE_TRANSITIONS'], 'edge',
-                        glob.latestoracle_fail_cycle_transitions))
-                    stylesheet.extend(updatestyleoftrace(r['EXAMPLERUN_PREFIX_TRANSITIONS'], 'edge',
-                        glob.latestoracle_fail_prefix_transitions))
+                    stylesheet.extend(style_csvelements(r['EXAMPLERUN_CYCLE_STATES'], 'node',
+                                                        glob.latestoracle_fail_cycle_states))
+                    stylesheet.extend(style_csvelements(r['EXAMPLERUN_PREFIX_STATES'], 'node',
+                                                        glob.latestoracle_fail_prefix_states))
+                    stylesheet.extend(style_csvelements(r['EXAMPLERUN_CYCLE_TRANSITIONS'], 'edge',
+                                                        glob.latestoracle_fail_cycle_transitions))
+                    stylesheet.extend(style_csvelements(r['EXAMPLERUN_PREFIX_TRANSITIONS'], 'edge',
+                                                        glob.latestoracle_fail_prefix_transitions))
                 elif r['ORACLE_VERDICT'] == 'PASS':
                     tmpdict = {"if": {"row_index": i}}
                     tmpdict.update(glob.oracletable_showpass)
                     oracleconditionalstyle.append(tmpdict)
-                    stylesheet.extend(updatestyleoftrace(r['EXAMPLERUN_CYCLE_STATES'], 'node',
-                        glob.latestoracle_pass_cycle_states))
-                    stylesheet.extend(updatestyleoftrace(r['EXAMPLERUN_PREFIX_STATES'], 'node',
-                        glob.latestoracle_pass_prefix_states))
-                    stylesheet.extend(updatestyleoftrace(r['EXAMPLERUN_CYCLE_TRANSITIONS'], 'edge',
-                        glob.latestoracle_pass_cycle_transitions))
-                    stylesheet.extend(updatestyleoftrace(r['EXAMPLERUN_PREFIX_TRANSITIONS'], 'edge',
-                        glob.latestoracle_pass_prefix_transitionss))
+                    stylesheet.extend(style_csvelements(r['EXAMPLERUN_CYCLE_STATES'], 'node',
+                                                        glob.latestoracle_pass_cycle_states))
+                    stylesheet.extend(style_csvelements(r['EXAMPLERUN_PREFIX_STATES'], 'node',
+                                                        glob.latestoracle_pass_prefix_states))
+                    stylesheet.extend(style_csvelements(r['EXAMPLERUN_CYCLE_TRANSITIONS'], 'edge',
+                                                        glob.latestoracle_pass_cycle_transitions))
+                    stylesheet.extend(style_csvelements(r['EXAMPLERUN_PREFIX_TRANSITIONS'], 'edge',
+                                                        glob.latestoracle_pass_prefix_transitionss))
     #######  oracles
     ###### baseline oracles
     selectedbaselinerows = selectedbaselineoracles
@@ -171,17 +171,17 @@ def updateCytoStyleSheet( selectedoracles, oracledata, selectedbaselineoracles, 
                 i = i + 1
                 if i in selectedbaselinerows:
                     if r['ORACLE_VERDICT'] == 'FAIL':
-                        stylesheet.extend(updatestyleoftrace(r['EXAMPLERUN_CYCLE_STATES'], 'node', glob.baselineoracle_fail_cycle_states))
-                        stylesheet.extend(updatestyleoftrace(r['EXAMPLERUN_PREFIX_STATES'], 'node',  glob.baselineoracle_fail_prefix_states))
-                        stylesheet.extend(updatestyleoftrace(r['EXAMPLERUN_CYCLE_TRANSITIONS'], 'edge', glob.baselineoracle_fail_cycle_transitions))
-                        stylesheet.extend(updatestyleoftrace(r['EXAMPLERUN_PREFIX_TRANSITIONS'], 'edge', glob.baselineoracle_fail_prefix_transitions))
+                        stylesheet.extend(style_csvelements(r['EXAMPLERUN_CYCLE_STATES'], 'node', glob.baselineoracle_fail_cycle_states))
+                        stylesheet.extend(style_csvelements(r['EXAMPLERUN_PREFIX_STATES'], 'node', glob.baselineoracle_fail_prefix_states))
+                        stylesheet.extend(style_csvelements(r['EXAMPLERUN_CYCLE_TRANSITIONS'], 'edge', glob.baselineoracle_fail_cycle_transitions))
+                        stylesheet.extend(style_csvelements(r['EXAMPLERUN_PREFIX_TRANSITIONS'], 'edge', glob.baselineoracle_fail_prefix_transitions))
                         baselineoracleconditionalstyle.append({
                             "if": {"row_index": i}, "backgroundColor": "red",'color': 'white'})
                     elif r['ORACLE_VERDICT'] == 'PASS':
-                        stylesheet.extend(updatestyleoftrace(r['EXAMPLERUN_CYCLE_STATES'], 'node', glob.baselineoracle_pass_cycle_states))
-                        stylesheet.extend(updatestyleoftrace(r['EXAMPLERUN_PREFIX_STATES'], 'node',glob.baselineoracle_pass_prefix_states ))
-                        stylesheet.extend(updatestyleoftrace(r['EXAMPLERUN_CYCLE_TRANSITIONS'], 'edge', glob.baseineoracle_pass_cycle_transitions))
-                        stylesheet.extend(updatestyleoftrace(r['EXAMPLERUN_PREFIX_TRANSITIONS'], 'edge', glob.baselineoracle_pass_prefix_transitionss))
+                        stylesheet.extend(style_csvelements(r['EXAMPLERUN_CYCLE_STATES'], 'node', glob.baselineoracle_pass_cycle_states))
+                        stylesheet.extend(style_csvelements(r['EXAMPLERUN_PREFIX_STATES'], 'node', glob.baselineoracle_pass_prefix_states))
+                        stylesheet.extend(style_csvelements(r['EXAMPLERUN_CYCLE_TRANSITIONS'], 'edge', glob.baseineoracle_pass_cycle_transitions))
+                        stylesheet.extend(style_csvelements(r['EXAMPLERUN_PREFIX_TRANSITIONS'], 'edge', glob.baselineoracle_pass_prefix_transitionss))
                         baselineoracleconditionalstyle.append({
                             "if": {"row_index": i},"backgroundColor": "green",'color': 'white'})
     ###### baseline oracles
@@ -197,7 +197,7 @@ def updateCytoStyleSheet( selectedoracles, oracledata, selectedbaselineoracles, 
                 stylepropdict.update({'shape': row['shape_if_terminal']})
                 # next line is candidate for refactirong, as centralities like outdegree  are calculated at initial load
                 deadstates = (node for node, out_degree in tmpgrh.out_degree() if out_degree == 0)
-                for stateid in deadstates: stylesheet.extend(updatestyleoftrace(stateid, 'node', stylepropdict))
+                for stateid in deadstates: stylesheet.extend(style_csvelements(stateid, 'node', stylepropdict))
 
 
     #######  testexecutions
@@ -282,7 +282,7 @@ def updateCytoStyleSheet( selectedoracles, oracledata, selectedbaselineoracles, 
             i = i + 1
             if i in selectedadvancedrows:  # multiple rows selected: some node style become updated!!
                 nlist=r['LSP'].split(';')
-                ret=pathstylesheet(nlist,subgraph)
+                ret=style_path(nlist, subgraph)
                 stylesheet.extend(ret)
     shortestpatherror = ''
 
@@ -302,7 +302,7 @@ def updateCytoStyleSheet( selectedoracles, oracledata, selectedbaselineoracles, 
             except nx.NodeNotFound as e:
                 shortestpatherror = '(shortestpath error:  ' + sourcenode + ' or target node ' + targetnode + ' not in current view)'
                 spnodelist = []
-            ret = pathstylesheet(spnodelist, tmpgrh)
+            ret = style_path(spnodelist, tmpgrh)
             stylesheet.extend(ret)
     ## SP between 2 nodes
 
@@ -313,7 +313,7 @@ def updateCytoStyleSheet( selectedoracles, oracledata, selectedbaselineoracles, 
 
 
 # helper method:
-def updatestyleoftrace(csvlistofelements, elementype, stylepropdict):
+def style_csvelements(csvlistofelements, elementype, stylepropdict):
     tmpstylesheet = []
     elementlist = []
     if csvlistofelements == None:
@@ -324,20 +324,20 @@ def updatestyleoftrace(csvlistofelements, elementype, stylepropdict):
         tmpstylesheet.append(legenda[0])
     return tmpstylesheet
 
-def pathstylesheet(nodelist=[], graph=None):
+def style_path(nodelist=[], graph=None):
     if len(nodelist) == 0:
         return []
     tmpstylesheet=[]
     style = glob.path_allnodes
-    tmpstylesheet.extend(updatestyleoftrace(';'.join(nodelist), 'node', style))  # default
+    tmpstylesheet.extend(style_csvelements(';'.join(nodelist), 'node', style))  # default
     style = glob.path_firstnodes
-    tmpstylesheet.extend(updatestyleoftrace(nodelist[0], 'node', style))  # after default, so prevails
+    tmpstylesheet.extend(style_csvelements(nodelist[0], 'node', style))  # after default, so prevails
     style = glob.path_lastnodes
-    tmpstylesheet.extend(updatestyleoftrace(nodelist[-1], 'node', style))
+    tmpstylesheet.extend(style_csvelements(nodelist[-1], 'node', style))
     edgelist = []
     for i in range(len(nodelist) - 1):
         e = graph.get_edge_data(nodelist[i], nodelist[i + 1])
         edgelist.append(list(e.keys())[0])  # just take the first
     style = glob.path_alledges
-    tmpstylesheet.extend(updatestyleoftrace(';'.join(edgelist), 'edge', style))
+    tmpstylesheet.extend(style_csvelements(';'.join(edgelist), 'edge', style))
     return tmpstylesheet

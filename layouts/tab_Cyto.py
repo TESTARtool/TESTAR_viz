@@ -26,7 +26,7 @@ cytolayout =  html.Div([
                         id='dropdown-update-layout',
                         value='random',
                         clearable=False,
-                        style= {'width' : '100px','color': 'black', 'fontSize': 12, 'height': '25px', 'display': 'inline-block'},
+                        style= {'width' : '100px','color': 'black', 'font-size': 14, 'height': '25px', 'display': 'inline-block'},
                         persistence=True,
                         options=[
                             {'label': name.capitalize(), 'value': name}
@@ -45,7 +45,7 @@ cytolayout =  html.Div([
                         #persistence=True,
                         options=[{'label': name, 'value': name}
                                  for name in ['Abstract', 'Incl Blackhole','Concrete', 'Widget', 'Test Executions']],
-                        style={'width': '400px','minwidth' : '100px', 'color': 'black', 'display': 'inline-block', 'fontSize': 12, 'height': '25px','margin-right': '5px'},
+                        style={'width': '400px','minwidth' : '100px', 'color': 'black', 'display': 'inline-block', 'fontSize': '12px', 'height': '25px','margin-right': '5px'},
                         optionHeight=25
                         ),
 
@@ -54,7 +54,7 @@ cytolayout =  html.Div([
                         options=[
                             {'label': 'Fenced', 'value': 'Fenced'} ],
                         value=[],
-                        style={'width': '75px','color': 'black', 'display': 'inline-block','fontSize': 12,'height': '25px','margin-right': '5px','vertical-align': 'top'},
+                        style={'width': '75px','color': 'black', 'display': 'inline-block','font-size': '14px','height': '25px','margin-right': '5px','vertical-align': 'top'},
                     )
                     ], style={ 'height': '25px', 'margin': '5px', 'border-style': 'solid', 'padding': '5px', 'display': 'inline-block','vertical-align':'top'}),
 
@@ -64,7 +64,7 @@ cytolayout =  html.Div([
                         id='dropdown-valuefilter-layout',
                         value='',
                         clearable=False,
-                        style={'width': '200px', 'color': 'black', 'fontSize': 12, 'height': '25px',
+                        style={'width': '200px', 'color': 'black', 'fontSize': '12px', 'height': '25px',
                                'display': 'inline-block','margin-right': '5px'},
                         #persistence=True,
                         # multi=True,
@@ -81,7 +81,7 @@ cytolayout =  html.Div([
                               debounce=True,
                               value='',
                               size='40',
-                              style={'minwidth': '175px', 'color': 'black', 'display': 'inline-block','vertical-align': 'top','fontSize': 12,'margin-right': '5px'}),
+                              style={'minwidth': '175px', 'color': 'black', 'display': 'inline-block','vertical-align': 'top','font-size': '14px','margin-right': '5px'}),
 
 
 
@@ -94,7 +94,7 @@ cytolayout =  html.Div([
                             id='canvas_height',
                             options=[{'label' : '{}x'.format(2**i), 'value': 2**i}  for i in range(0, 3)],
                             value=1,
-                        style={'color': 'black', 'display': 'inline-block','fontSize': 12},
+                        style={'color': 'black', 'display': 'inline-block','fontSize': '12px'},
                         )],
                     style={'max-width': '450px','height': '25px', 'margin': '5px', 'border-style': 'solid','padding': '5px','display': 'inline-block','vertical-align':'top'}),
 

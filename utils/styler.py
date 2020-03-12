@@ -1,4 +1,5 @@
 import utils.globals as glob
+from graphcomputing import centralitywidth, centralityheight
 
 
 def stylelegenda(elementtype, legendaitem, styling, filteredattribute='id', subselector='', comparator='='):
@@ -66,3 +67,26 @@ def edgestyler(edgedata=None,dsp='element',legenda=False):
                       'text-margin-y': -5,
                       })
     return itemstyle
+
+
+def set_centrality_style(colour, index):
+    cstyle = glob.centrality_shape
+    cstyle.update({'width': centralitywidth(index),
+                   'height': centralityheight(index),
+                   'background-color': colour,
+                   'border-color': colour,
+                   'font-size': 18,
+                   'label': 'data(id)'})
+    return cstyle
+
+
+def style_dframe(dframe):
+    columns = [{'id': c, 'name': c, 'hideable': True} for c in dframe.columns]
+    style_cell_conditional = []
+    for c in dframe.columns:
+        style_cell_conditional.append({
+            'if': {'column_id': c},
+            'minWidth': '' + str(len(c) * 9) + 'px'
+        })
+    data = dframe.to_dict("rows")
+    return columns, data, style_cell_conditional

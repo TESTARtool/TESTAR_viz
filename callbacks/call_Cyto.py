@@ -20,6 +20,10 @@ import pandas as pd
 
 ##############################################
 # cyto
+#from call_Oracles import style_dframe
+from styler import style_dframe
+
+
 @app.callback(
     [Output('cytoscape-update-layout', 'elements'),
      Output('cytoscape-update-layout', 'layout'),
@@ -77,18 +81,23 @@ def update_layout(hit0, canvasheight, layout, fenced, layerview,filternode,filte
      State('execution-details', 'value')
      ]
 )
-def updateCytoStyleSheet(legenda, oraclebutton, baselineoraclebutton, executionsbutton, advancedpropertiesbutton,#log, advancedpropertiesbutton,
-                         centralitiesbutton, shortestpathbutton, visualsdata, selectedoracles, oracledata,
-                         selectedbaselineoracles, baselineoracledata, selectedexecutions, executionsdata,
-                         layerview, selectedadvancedproperties, advancedpropertiesdata, selectedcentralities,
-                         centralitiesdata, selectednodedata,executiondetails):
-    returndata = ch.updateCytoStyleSheet(selectedoracles, oracledata, selectedbaselineoracles,
-                                         baselineoracledata, selectedexecutions, executionsdata, layerview,
-                                         selectedadvancedproperties,
-                                         advancedpropertiesdata, selectedcentralities, centralitiesdata,
-                                         selectednodedata,executiondetails)
+def updateCytoStyleSheet(i_legenda, i_apply_oracle, i_apply_baselineoracle, i_apply_testexecutions, i_apply_longstsimplepath,  #log, advancedpropertiesbutton,
+                         i_apply_centralities, i_apply_shortestpath, s_visualsdata, s_selectedoracles, s_oracledata,
+                         s_selectedbaselineoracles, s_baselineoracledata, s_selectedexecutions, s_executionsdata,
+                         s_layerview, s_selectedsimplepath, s_simplepathdata, s_selectedcentralities,
+                         s_centralitiesdata, s_selectednodedata, s_createdby_or_updatedby):
     ctx = dash.callback_context
     trigger = ctx.triggered[0]['prop_id'].split('.')[0]
+    triggervalue=ctx.triggered[0]['value']
+    if trigger == 'cytoscape-legenda' and len(triggervalue) == 0 :
+        return dash.no_update, dash.no_update, dash.no_update, \
+               dash.no_update, dash.no_update, dash.no_update,dash.no_update
+
+    returndata = ch.updateCytoStyleSheet(s_selectedoracles, s_oracledata, s_selectedbaselineoracles,
+                                         s_baselineoracledata, s_selectedexecutions, s_executionsdata, s_layerview,
+                                         s_selectedsimplepath, s_simplepathdata, s_selectedcentralities,
+                                         s_centralitiesdata,s_selectednodedata, s_createdby_or_updatedby)
+
     if ('error' in returndata[-1]) and trigger == 'apply-shortestpath-button':  # shortestpatherror
         return dash.no_update, dash.no_update, dash.no_update,dash.no_update,dash.no_update, dash.no_update, returndata[-1]
     else:
@@ -101,35 +110,20 @@ def updateCytoStyleSheet(legenda, oraclebutton, baselineoraclebutton, executions
      Output('selectednodetable', 'style_cell_conditional'),
      Output('screenimage-coll', 'children')],
     [Input('cytoscape-update-layout', 'selectedNodeData')])
-def update_selnodestabletest(selnodes):
-    if selnodes is None or len(selnodes)==0:  # at initial rendering this is None
-        return dash.no_update, dash.no_update, dash.no_update,dash.no_update
-    df = pd.DataFrame(selnodes)
-    df = df.reindex(sorted(df.columns), axis=1)
-    if glob.image_element in df.columns:
-        df = df.drop(columns=glob.image_element)
-    ncolumns = list(df.columns)
-    # # move the column to head of list using index, pop and insert
-    ncolumns.insert(0, ncolumns.pop(ncolumns.index('label')))
-    ncolumns.insert(0, ncolumns.pop(ncolumns.index('nodeid')))
-    df = df.reindex(ncolumns, axis=1)
-    cols = [{'id': c, 'name': c, 'hideable': True} for c in df.columns]
-    style_cell_conditional = []
-    for c in df.columns:
-        style_cell_conditional.append({
-            'if': {'column_id': c},
-            'minWidth': '' + str(len(c) * 9) + 'px'
-        })
-    data = df.to_dict("rows")
-    screens = []
-    for c in selnodes:
-        fname = glob.outputfolder + utils.filehandling.imagefilename(c['id'])
-        screens.append(html.P(children='Screenprint of node: ' + c['id']))
-        imgname = fname if os.path.exists(glob.scriptfolder + glob.assetfolder + fname) else glob.no_image_file
-        screens.append(
-            html.Img(id='screenimage' + c['id'], style={'max-height': '600px', 'display': 'inline-block'},
-                     src=app.get_asset_url(imgname)))
-    return cols, data,style_cell_conditional, screens
+def update_selectednode_uitable(i_selectednodes):
+    returndata= helper_selectedtable(i_selectednodes, 'nodeid')
+    if returndata is None:
+        return dash.no_update, dash.no_update, dash.no_update, dash.no_update
+    else:
+        screens = []
+        for c in i_selectednodes:
+            fname = glob.outputfolder + utils.filehandling.set_imagefilename(c['id'])
+            screens.append(html.P(children='Screenprint of node: ' + c['id']))
+            imgname = fname if os.path.exists(glob.scriptfolder + glob.assetfolder + fname) else glob.no_image_file
+            screens.append(
+                html.Img(id='screenimage' + c['id'], style={'max-height': '600px', 'display': 'inline-block'},
+                         src=app.get_asset_url(imgname)))
+        return returndata[0],returndata[1], returndata[2],screens
 
 
 @app.callback(
@@ -137,24 +131,26 @@ def update_selnodestabletest(selnodes):
      Output('selectededgetable', "data"),
      Output('selectededgetable','style_cell_conditional')],
     [Input('cytoscape-update-layout', "selectedEdgeData")])
-def update_seledgetabletest(seledges):
-    if seledges is None or len(seledges)==0:  # at initial rendering this is None
+def update_selectededge_uitable(i_selectededges):
+    returndata=helper_selectedtable(i_selectededges, 'edgeid')
+    if returndata is None:
         return dash.no_update, dash.no_update, dash.no_update
-    df = pd.DataFrame(seledges)
+    else:
+        return returndata[0], returndata[1], returndata[2]
+
+def helper_selectedtable(selected_elements, id='edgeid'):
+    if selected_elements is None or len(selected_elements)==0:  # at initial rendering this is None
+        return None #dash.no_update, dash.no_update, dash.no_update
+    df = pd.DataFrame(selected_elements)
     df = df.reindex(sorted(df.columns), axis=1)
-    ecolumns = list(df.columns)
+    columns = list(df.columns)
     # move the column to head of list using index, pop and insert
-    ecolumns.insert(0, ecolumns.pop(ecolumns.index('target')))
-    ecolumns.insert(0, ecolumns.pop(ecolumns.index('source')))
-    ecolumns.insert(0, ecolumns.pop(ecolumns.index('label')))
-    ecolumns.insert(0, ecolumns.pop(ecolumns.index('edgeid')))
-    df = df.reindex(ecolumns, axis=1)
-    cols = [{'id': c, 'name': c, 'hideable': True} for c in df.columns]
-    style_cell_conditional = []
-    for c in df.columns:
-        style_cell_conditional.append({
-            'if': {'column_id': c},
-            'minWidth': '' + str(len(c) * 9) + 'px'
-        })
-    data = df.to_dict("rows")
-    return cols, data, style_cell_conditional
+    if id == 'edgeid':
+        columns.insert(0, columns.pop(columns.index('target')))
+        columns.insert(0, columns.pop(columns.index('source')))
+    columns.insert(0, columns.pop(columns.index('label')))
+    columns.insert(0, columns.pop(columns.index(id)))
+    df = df.reindex(columns, axis=1)
+
+    returndata = style_dframe(df)
+    return returndata[0], returndata[1], returndata[2]

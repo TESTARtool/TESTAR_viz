@@ -5,13 +5,12 @@ Created on Wed Apr  3 18:27:03 2019
 
 @author: cseng
 """
-import urllib
-import pandas as pd
 import dash
 from dash.dependencies import Input, Output, State
 import utils.gui
 from appy import app
 import utils.globals as glob
+from filehandling import save_uitable
 
 
 @app.callback(
@@ -22,7 +21,7 @@ import utils.globals as glob
      Input('upload-visual-from-file', 'contents')],
     [State('upload-visual-from-file', 'filename'),
      State('upload-visual-from-file', 'last_modified')])
-def load_viz_table(loadlog, hitsb0, contents, filename, date):
+def update_viz_settings_uitable(loadlog, hitsb0, contents, filename, date):
     ctx = dash.callback_context
     trigger = ctx.triggered[0]['prop_id'].split('.')[0]
     triggervalue = ctx.triggered[0]['value']
@@ -38,48 +37,45 @@ def load_viz_table(loadlog, hitsb0, contents, filename, date):
         return cols, data  # , csvstr
 
 
-########################################
 
 @app.callback(
     [Output('executions-table', 'columns'),
-     Output('executions-table', 'data'),
-     Output('advancedproperties-table', 'columns'),
-     Output('advancedproperties-table', 'data'),
-     Output('centralities-table', 'columns'),
+     Output('executions-table', 'data')],
+    [Input('cytoscape-legenda', 'elements')])
+def update_executions_uitable(legendachange):
+    return update_helper_uitable(glob.testexecutions)
+
+@app.callback(
+    [Output('advancedproperties-table', 'columns'),
+     Output('advancedproperties-table', 'data')],
+    [Input('cytoscape-legenda', 'elements')],)
+def update_path_uitable(legendachange):
+    return update_helper_uitable(glob.lsptraces)
+
+@app.callback(
+    [Output('centralities-table', 'columns'),
      Output('centralities-table', 'data')],
-    [Input('cytoscape-legenda', 'elements'),  #cascaded trigger #Input('loading-logtext', 'children'),
-    ])
-def update_exec_advanced_uitable(dummy ):
-    ctx = dash.callback_context
-    dummycol = {'id': 'dummy', 'name': 'dummy'}
-    dummydata = {}
-    #next conditions left intact for the usecase of a NON-TESTAR-GRAPHML sourcefile
-    if not glob.testexecutions.empty: #
-        cols = [{'id': c, 'name': c} for c in glob.testexecutions.columns]
-        data = glob.testexecutions.to_dict("rows")
+    [Input('cytoscape-legenda', 'elements')])
+def update_centralities_uitable(legendachange):
+    return update_helper_uitable(glob.centralitiemeasures)
+
+
+
+def update_helper_uitable(dframe):
+    if not dframe.empty: #
+        cols = [{'id': c, 'name': c} for c in dframe.columns]
+        data = dframe.to_dict("rows")
     else:
-        cols = [dummycol]
-        data = [dummydata]
-    if not glob.lsptraces.empty:
-        cols1 = [{'id': c, 'name': c} for c in glob.lsptraces.columns]
-        data1 = glob.lsptraces.to_dict("rows")
-    else:
-        cols1 = [dummycol]
-        data1 = [dummydata]
-    if not glob.centralitiemeasures.empty:
-        cols2 = [{'id': c, 'name': c} for c in glob.centralitiemeasures.columns]
-        data2 = glob.centralitiemeasures.to_dict("rows")
-    else:
-        cols2 = [dummycol]
-        data2 = [dummydata]
-    return cols, data, cols1, data1, cols2, data2
+        cols = [{'id': 'dummy', 'name': 'dummy'}]
+        data = [{}]
+    return cols, data
 
 
 @app.callback(
     Output('save-visual-settings', 'href'),
     [Input('viz-settings-table', 'derived_virtual_data')],
     [State('viz-settings-table', 'columns')])
-def save_viz_table(data, cols):
+def save_viz_settings_table(data, cols):
     return save_uitable(data, cols)
 
 
@@ -87,7 +83,7 @@ def save_viz_table(data, cols):
     Output('save-testexecutions-settings', 'href'),
     [Input('executions-table', 'derived_virtual_data')],
     [State('executions-table', 'columns')])
-def save_exec_table(data, cols):
+def save_testexececutions_table(data, cols):
     return save_uitable(data, cols)
 
 
@@ -95,7 +91,7 @@ def save_exec_table(data, cols):
     Output('save-advproperties-table', 'href'),# 'save-advancedproperties-table' caused a infinite loop: python name-clash?
     [Input('advancedproperties-table', 'derived_virtual_data')],
     [State('advancedproperties-table', 'columns')])
-def save_properties_table(data, cols):
+def save_path_table(data, cols):
     return save_uitable(data, cols)
 
 
@@ -106,14 +102,5 @@ def save_properties_table(data, cols):
 def save_centrality_table(data, cols):
     return save_uitable(data, cols)
 
-
-def save_uitable(data, cols):
-    csvstr = ''
-    if data is not None:
-        pdcol = [i['id'] for i in cols]
-        df = pd.DataFrame(data, columns=pdcol)
-        csvstr = df.to_csv(index=False, encoding='utf-8', sep=';')
-        csvstr = "data:text/csv;charset=utf-8," + urllib.parse.quote(csvstr)
-    return csvstr
 ########################################
 

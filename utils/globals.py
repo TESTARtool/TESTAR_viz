@@ -25,7 +25,7 @@ graphmlfile = os.path.join(assetfolder+outputfolder,'GraphML.xml')
 screenshotregex='.*\[(.+?)\].*'
 
 elementcompositefilter = "(.*?)(\s\|\|\s)(.*)" # allow a disjunct of 2 valuefilters
-elementvaluefilter= "\s*(\S*?)\s(>|>=|<|<=|=|!=|\^=|\*=|\$=)\s'(.*?)'" #gui.py depends on this
+elementvaluefilter= "\s*(\S*?)\s(>|>=|<|<=|=|!=|\^=|\*=|\$=|!\^=|!\*=|!\$=)\s'(.*?)'" #gui.py depends on this
 image_attrib_key='image-source'
 image_element = 'screenshot'
 no_image_file= 'no_image.png'

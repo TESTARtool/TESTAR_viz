@@ -135,7 +135,7 @@ def update_legenda(hit0, newlog, data, cols):
     for k, v in bins.items():
         #style.stylelegenda did not work: strange memory assignment
         cytonodes = []
-        selectorfilter = '[' + 'id'+ ' ' + '=' + ' ' + '\'' + 'bins'+k + '\'' + ']'    #  [id = 'bins_0']
+        selectorfilter = '[' + 'id'+ ' ' + '=' + ' ' + '\'' + 'bin'+k + '\'' + ']'    #  [id = 'bins_0']
         selectordict = {'selector': 'node' + selectorfilter}
         styling={'shape': 'ellipse',
                     'width': centralitywidth(j),
@@ -148,7 +148,7 @@ def update_legenda(hit0, newlog, data, cols):
         styledict = {'style': styling}
         style = selectordict
         style.update(styledict)
-        cytonodes.append({'data': {'id': 'bins'+k}})
+        cytonodes.append({'data': {'id': 'bin'+k}})
         innerlegenda0=style
         mstylesheet.append(innerlegenda0)
         melements.extend(cytonodes)
