@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Tue Apr 2 2019
+##
+# Function: Collection of global variables used in the application
+#
 
 
-@author: carlo sengers 
-"""
 import pandas as pd
 import networkx as nx
 import os
@@ -13,6 +12,8 @@ scriptfolder = ''
 assetfolder = 'assets'+os.sep #20190428 there is a dependency with app.get_asset_url
 outputfolder = 'content'+os.sep
 port = 8050
+debug=False  # show debug information in the browser.. and the DASH call graph
+title='TESTAR Temporal Visualizer'
 
 
 grh = nx.DiGraph()
@@ -68,57 +69,31 @@ elementcreationdistri=[]
 nodeonselectmultiplier=3
 edgeonselectmultiplier=3
 nodedisplayprop={
-                'hide':'',
-                'focus': '',
-                'cover': '',
-                'label':'nodeid',
-                'label_fontsize' : 14,
-                'shape' :'rectangle',
-                'width' : 30,
-                'height' : 30,
+                'hide':'','focus': '','cover': '',
+                'label':'nodeid','label_fontsize' : 14,
+                'shape' :'rectangle','width' : 30,'height' : 30,
                 'image-source': 'screenshot',
-                 #'image-source': 'infer|out|Accessed',
-                 #' image-source': 'infer|in|isAbstractedBy',
-                'border-width' : 1,
-                'border-color' : 'black',
-                'border-style' :'solid',
-                'color' : 'grey',
-                'color_if_terminal' : 'purple',
-                'shape_if_terminal': 'octagon',
-                'opacity': 1
+                'border-width' : 1,'border-color' : 'black','border-style' :'solid',
+                'color' : 'grey','color_if_terminal' : 'purple',
+                 'shape_if_terminal': 'octagon','opacity': 1
                 }
 parentnodedisplayprop={
-                'hide':'',
-                'focus': '',
-                'cover': '',
-                'label':'nodeid',
-                'label_fontsize' : 18,
-                'shape' :'rectangle',
-                'width': 30,
-                'height': 30,
+                'hide':'','focus': '','cover': '',
+                'label':'nodeid','label_fontsize' : 18,
+                'shape' :'rectangle','width': 30,'height': 30,
                 'image-source': '',
-                'border-width' : 2,
-                'border-color' : 'black',
-                'color' : 'wheat',
-                'color_if_terminal' : '',
+                'border-width' : 2,'border-color' : 'black',
+                'color' : 'wheat','color_if_terminal' : '',
                 'shape_if_terminal': ''
                 }
 edgedisplayprop={
-                'hide':'',
-                'focus': '',
-                'cover': '',
-                'label':'',
-                'label_fontsize' : 10,
-                'label-onselect': 'Desc',
-                'arrow-shape' : 'vee',
-                'arrow-scale' : 1,
-                'arrow-color' : 'blue',
+                'hide':'','focus': '', 'cover': '',
+                'label':'','label_fontsize' : 10,'label-onselect': 'Desc',
+                'arrow-shape' : 'vee','arrow-scale' : 1, 'arrow-color' : 'blue',
                 'line-width' : 1,
                 'image-source': '',
-                'edgestyle' : 'bezier',
-                'edgefill' : 'solid',
-                'color' : 'grey',
-                'opacity': 1
+                'edgestyle' : 'bezier','edgefill' : 'solid',
+                'color' : 'grey', 'opacity': 1
                 }
 
 tableoddrowstyle = {
@@ -153,13 +128,6 @@ latestoracle_fail_cycle_states = {'border-width': 2, 'border-color': 'red', 'bac
 latestoracle_fail_prefix_states = {'border-width': 2, 'border-color': 'brown', 'background-color': 'brown', 'border-style': 'dashed'}
 latestoracle_fail_cycle_transitions = {'width': 4, 'line-style': 'dashed','line-color': 'red', 'mid-target-arrow-color':'red'}
 latestoracle_fail_prefix_transitions  = {'width': 4, 'line-style': 'dashed','line-color': 'brown', 'mid-target-arrow-color': 'brown'}
-
-
-
-
-
-
-
 
 trace_node_unselected = {'shape': 'octagon','background-color': 'red','border-style': 'dotted',
                 'opacity': 0.1, 'border-color': 'fuchsia'}

@@ -19,8 +19,12 @@ def savetofile(data, tofile='graphml.xml'):
 def imagefilename(s=""):
     return glob.imgfiletemplate + s.replace(':', '.').replace('#', '_') + glob.imgfileextension  # do not change!!
 
-
+##
+#helper method: delete cached images from the previous run.
+# the server can be forcely stopped, leaving obsolete content in the asset folder
+#
 def clearassetsfolder():
+
     fldr = glob.scriptfolder + glob.assetfolder + glob.outputfolder
 
     try:
@@ -40,8 +44,13 @@ def clearassetsfolder():
             print(exc_type, fname, exc_tb.tb_lineno)
             print('*  There was an error processing : ' + str(e))
 
-
+##
+#    Function: extracts the image (as byte array) from the GraphML and save as file to disk.
+#    @param n: nodeid containing the image
+#    @param eldict: data map consisting of all the proprties+data of the node n.
+#    @return string: relative path to the image file.
 def savescreenshottodisk(n, eldict):
+
     # testar db in graphml export from orientdb has a screenshot attrbute
     # with format <#00:00><[<byte>,<byte>,...]><v1>
     # action: extract the substring [...], split at the separator, convert the list to a bytelist
@@ -50,19 +59,15 @@ def savescreenshottodisk(n, eldict):
     fname = '_no_image_for_' + n
     try:
         if not (eldict.get(glob.image_element) is None):
-            param = eldict.get(glob.image_element)
-
-            if param.split('|')[0] != 'inferin' and param.split('|')[0] != 'inferout': #future use: for abstractstates/teststeps?
-                fname = imagefilename(n)
-                found = re.search(glob.screenshotregex, eldict[glob.image_element]).group(1)
-                if not found:       # or   eldict[glob.image_element]=='' ?
-                    return fname
-                else:
-                    pngintarr = [(int(x) + 256) % 256 for x in found.split(",")]
-                    f = open(glob.scriptfolder + glob.assetfolder + glob.outputfolder + fname, 'wb')
-                    f.write(bytearray(pngintarr))
-                    f.close()
-                    #eldict[glob.image_element]='' # reduce memory allocation.
+            fname = set_imagefilename(n)
+            found = re.search(glob.screenshotregex, eldict[glob.image_element]).group(1)
+            if not found:       # or   eldict[glob.image_element]=='' ?
+                return fname
+            else:
+                pngintarr = [(int(x) + 256) % 256 for x in found.split(",")]
+                f = open(glob.scriptfolder + glob.assetfolder + glob.outputfolder + fname, 'wb')
+                f.write(bytearray(pngintarr))
+                f.close()
         else:
             return glob.no_image_file
     except Exception as e:  # AttributeError:	# [ ] not found in the original string
@@ -81,6 +86,7 @@ def updateinferrablecreenshots(n, eldict, usecache=False):
 
 
 def copydefaultimagetoasset():
+
     try:
         f = open(glob.scriptfolder + 'utils' + '/' + glob.no_image_file, 'rb')
         fnew = open(glob.scriptfolder + glob.assetfolder + glob.outputfolder + '/' + glob.no_image_file, 'wb')

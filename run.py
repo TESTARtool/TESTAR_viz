@@ -1,14 +1,8 @@
+# -*- coding: utf-8 -*-
 ## @package run
-#Created on Tue Apr 2 2019
-#
-#@author: carlo sengers
-#exploring UI features of rendered graphs from TESTAR with dash-cytoscape integration.
-#(dash and cytoscape.js are both with an MIT License).
-#"""
+# the run.py command starts the server to listen on localhost:8050 \n
+# @param \--port to start the server on another port than 8050 E.g. Python run.py \--port 8044
 
-##############
-# this file must be placed in the parent folder
-##############
 def setup():
     import utils.filehandling
     from appy import app
@@ -20,33 +14,33 @@ def setup():
     import os
     import utils.globals as glob
     import platform
-    from layouts.layout import testarlayout
+    from layouts.layout import mainlayout
 
-
+    glob.scriptfolder = os.path.realpath(__file__)[:(len(os.path.realpath(__file__))-len(os.path.basename(__file__)))]
+    os.chdir(glob.scriptfolder)
     print('************  TESTAR graph visualizer properties  ************')
     print('python version:',platform.python_version())
     print ('script version:',glob.version)
-    glob.scriptfolder = os.path.realpath(__file__)[:(len(os.path.realpath(__file__))-len(os.path.basename(__file__)))]
-    os.chdir(glob.scriptfolder)
     print('scriptfolder : ',glob.scriptfolder)
     print('dash package version: ', dashversion)
     print('dash cytoscape package version: ', cyto.__version__)
     print('networkx package version: ', networkxversion)
     print('pandas package version: ', pandasversion)
     print('************  TESTAR graph visualizer  Starts now  ************')
+    utils.filehandling.clearassetsfolder()
     if len(sys.argv) == 1 or (len(sys.argv) >1 and sys.argv[1]!='--port'):
         port=glob.port
     else: # (len(sys.argv) >1 and sys.argv[1]=='--port'):
         port=int(sys.argv[2])
-
     print ('use commandline option --port to run an instance parallel to/other than',port)
-    utils.filehandling.clearassetsfolder()
 
-    app.layout = testarlayout
+
+    app.layout = mainlayout
     app.config['suppress_callback_exceptions'] = True
     cyto.load_extra_layouts()  # Load extra layouts
 
-    # callbacks are connected to layout: Keep/remain despite pythonwarnings !!!
+    # !!!!callbacks are connected to layout: Keep/Remain the following entries despite python warnings !!!
+    # these imports need to be placed -after- the 'app.layout' definition
     import utils.serverlargeupload
     import utils.servershutdown
     import callbacks.call_LoadGraph
@@ -55,23 +49,14 @@ def setup():
     import callbacks.call_Cyto
     import callbacks.call_Cytolegenda
     import callbacks.call_SelectedData
+    # end of dash dependent imports
 
     import logging
     log = logging.getLogger('werkzeug')
     log.setLevel(logging.ERROR)
 
-    ##
-    # @var title
-    # Documentation for a var.
-    # More
-    ##"""
-    ##
-    # @var log
-    # Documentation for a qvar.
-    # More
-    ##"""
-    app.title = 'TESTAR Temporal Visualizer'
-    app.run_server(port=port, debug=False)
+    app.title = glob.title
+    app.run_server(port=port, debug=glob.debug)
 if __name__ == '__main__':
     setup()
     pass

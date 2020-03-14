@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
+##
+# Main web page layout
+# compartments of the page are described in individual .py files
+# No parameters
 """
 Created on Tue Apr 2 2019
 
@@ -28,7 +32,7 @@ contentstyle={  'width':'100%',
                 'border-color':'yellow',
                 'border-style': 'solid'
                 }
-testarlayout = html.Div(id='main',children=[
+mainlayout = html.Div(id='main', children=[
                     dcc.Location(id='url', refresh=False),
                     html.Hr(),
                     html.Div('Run date: '+prettytime(None,'seconds')+'  System version: '+version, style={'font-size' : 10}),

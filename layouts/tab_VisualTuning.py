@@ -1,13 +1,7 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Tue Apr 2 2019
-
-
-@author: carlo sengers 
-exploring UI features,  of  rendered TESTAR graphs with dash/cytoscape.js integration.
-(both come with MIT License).
-
-"""
+## @Namespace tab_VisualTuning
+# Layout and controls (buttons) of the Appearance, Test Sequence and Measurement component
+# No parameters
 
 #######################################################
 import dash_table as dt

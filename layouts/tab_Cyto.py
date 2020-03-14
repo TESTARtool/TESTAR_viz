@@ -1,11 +1,7 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Tue Apr 2 2019
-
-
-@author: carlo sengers 
-
-"""
+##
+# Layout and controls (buttons) of Graph component
+# No parameters
 
 #######################################################
 

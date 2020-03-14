@@ -1,12 +1,7 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Tue Apr 2 2019
-
-
-@author: carlo sengers 
-exploring UI features of rendered graphs with dash-cytoscape integration.
-(both come with MIT License).
-"""
+##
+# Layout of the Legend component
+# No parameters
 
 import dash_html_components as html
 import dash_cytoscape as cyto

@@ -180,17 +180,3 @@ def setvizproperties(loaddefaults=True, contents=None, filename=''):
 
     else:
         pass
-
-# def loadcsv(contents, infilename):
-#     content_type, content_string = contents.split(',')
-#     decoded = base64.b64decode(content_string)
-#     try:
-#         directory = (glob.scriptfolder + glob.assetfolder + glob.outputfolder);
-#         fout = open(directory + infilename, encoding='utf-8', mode='w',
-#                     newline='')  # creates the file where the uploaded file should be stored
-#         fout.write(decoded.decode('utf-8'))  # writes the uploaded file to the newly created file.
-#         fout.close()  # closes the file, upload complete.
-#         return pd.read_csv(directory + infilename, sep=';')
-#     except Exception as e:
-#         print('*  There was an error processing file <' + infilename + '> :' + str(e))
-#         return pd.DataFrame()

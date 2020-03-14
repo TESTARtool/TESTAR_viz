@@ -1,12 +1,7 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Tue Apr 2 2019
-
-
-@author: carlo sengers 
-
-"""
-#######################################################
+##
+# Layout and controls (buttons) of the Selected data component
+# No parameters
 import dash_table as dt
 import dash_html_components as html
 

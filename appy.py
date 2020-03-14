@@ -1,23 +1,17 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Tue Apr 2 2019
+## @package appy
+# function to connect the variable 'app' to the Dash framework.\n
+# this variable is used for annotating the call-back functions in other part of the application, \n
 
+# this file must exist on the toplevel
+# otherwise content in the assets folder cannot be served with default flask settings
 
-@author: carlo sengers 
-"""
-##############
-# this file must be placed in the parent folder
-# otherwise files in the assets folder cannot be served with default flask settings
-##############
 import dash
-#external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
-#app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
-
 
 # DISABLE the next line when creating Sphinx documentation
 app = dash.Dash(__name__,)
 
-# ENABLE this section when creating Sphinx documentation
+# ENABLE this following code section when creating Sphinx documentation
 #inspired by https://github.com/plotly/dash/issues/696
 # class app:
 #     def callback(*argument):

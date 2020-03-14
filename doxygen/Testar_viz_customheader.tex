@@ -1,3 +1,17 @@
+
+
+%Doxygen : how to get the Logo in Latex document?
+%Inspired by https://sourceforge.net/p/doxygen/mailman/message/36268451/>
+%
+%	1. Perform actions below in a new folder
+%	2. doxygen -g to generate a doxyfile
+%	3. doxygen --w latex header.tex footer.tex doxygen.sty doxyfile  to generate header.tex
+%	4. header.tex: Find the line that says "{\Large Your title here}\\".   Change to "{\Large {projectname}\\"
+%	5. Add a new lines with "\includegraphics{$projectlogo}\\ \vspace*{1cm}   {\large $projectbrief}\\"
+%   6. when running doxygen set "LATEX_HEADER = header.tex"
+
+
+
 % Latex header for doxygen 1.8.17
 \let\mypdfximage\pdfximage\def\pdfximage{\immediate\mypdfximage}\documentclass[twoside]{book}
 

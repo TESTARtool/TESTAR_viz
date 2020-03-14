@@ -7,11 +7,37 @@ import utils.globals as glob
 from utils import styler
 from utils.styler import nodestyler, edgestyler
 
-
+##
+#    Function: Multiple \n
+#    returns '' for the dummyspinner
+#    sets the styling for the cyto graph,
+#    sets the styling for the selected oracles,
+#    shows text for shortestpath error
+#    sets the available options for selecting a layer or value filter
+#    \n
+#    complexity of this function is due to the dependencies for multiple components\n
+#    \n
+#    @param selectedoracles:
+#    @param oracledata:
+#    @param selectedbaselineoracles:
+#    @param baselineoracledata:
+#    @param selectedexecutions:
+#    @param executionsdata:
+#    @param layerview:
+#    @param selectedadvancedproperties:
+#    @param advancedpropertiesdata:
+#    @param selectedcentralities:
+#    @param centralitiesdata:
+#    @param selectednodedata:
+#    @param executiondetails:
+#    @return 7-tuple =>    '',stylesheet, layervaluefilter,valuefilter,
+#    oracleconditionalstyle,baselineoracleconditionalstyle,shortestpatherror
+#
 def updateCytoStyleSheet( selectedoracles, oracledata, selectedbaselineoracles, baselineoracledata,
                          selectedexecutions, executionsdata, layerview, selectedadvancedproperties,
                          advancedpropertiesdata,
                          selectedcentralities, centralitiesdata, selectednodedata, executiondetails):
+
     stylesheet = []
     oracleconditionalstyle = [glob.tableoddrowstyle]  # a comma <,> at the end of this line cost me a day
     baselineoracleconditionalstyle = [glob.tableoddrowstyle]
@@ -311,9 +337,16 @@ def updateCytoStyleSheet( selectedoracles, oracledata, selectedbaselineoracles, 
         layervaluefilter.remove({'label': glob.parent_subtypeelement, 'value':glob.parent_subtypeelement })
     return '', stylesheet, layervaluefilter,valuefilter,oracleconditionalstyle, baselineoracleconditionalstyle, shortestpatherror
 
+##
+#    helper method: styles the nodes with the style map
+#    @param csvlistofelements: comma separated list of node ids from the GraphML
+#    @param elementype: node or edge
+#    @param stylepropdict: css property list and corresponding values
+#    @return stylesheet in cytoscape format
 
-# helper method:
 def style_csvelements(csvlistofelements, elementype, stylepropdict):
+
+
     tmpstylesheet = []
     elementlist = []
     if csvlistofelements == None:
@@ -324,7 +357,14 @@ def style_csvelements(csvlistofelements, elementype, stylepropdict):
         tmpstylesheet.append(legenda[0])
     return tmpstylesheet
 
+##
+#    helper method: styles the nodes in the path with the shortest-path-style
+#    @param nodelist: list of node ids from from the GraphML
+#    @param graph: reference to find the edges corresponding to the nodes
+#    @return: stylesheet in cytoscape formatt
+
 def style_path(nodelist=[], graph=None):
+
     if len(nodelist) == 0:
         return []
     tmpstylesheet=[]

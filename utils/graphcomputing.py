@@ -20,8 +20,14 @@ from utils import globals as glob
 from utils.filehandling import imagefilename, savescreenshottodisk, copydefaultimagetoasset
 from utils.gui import getsubgraph, setgraphattributes, setvizproperties
 
+##
+#Function  validates the graphml file, reads into NetworkX graph and calculates properties
+#@param details: Always set to True: whther to show meta dat aor not
+#@param advanced: When true calculates time consuming properties : determining the test step created a StateNode.
+#@return: log containing the meta data
 
 def processgraphmlfile(details=True, advanced=False):
+
     start_time = time.time()
 
     print('start ', "--- %.3f seconds ---" % (time.time() - start_time))
@@ -129,7 +135,7 @@ def processgraphmlfile(details=True, advanced=False):
     ########## shortest simple path to farest node
 
     lspbyinitial = [{'initialNode': 'N/A', 'LSP length': '-1', 'LSP': 'N/A'}]
-    if True or advanced:
+    if advanced:
         traces = glob.sortedsequencetuples  # concreteStateId
         initialnodes = [initialnode for id, daterun, length, initialnode in traces]
         initialnodes = list(dict.fromkeys(initialnodes))  # remove duplicates
