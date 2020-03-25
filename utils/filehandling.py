@@ -7,16 +7,12 @@ import urllib
 import pandas as pd
 from utils import globals as glob
 
+##
+#@param s: node id which contains an image.
+#@return: sanitized filename
+#
+def set_imagefilename(s=""):
 
-def savetofile(data, tofile='graphml.xml'):
-    # f=open("graphml.xml",encoding='ISO-8859-1',mode="w+")
-    f = open(tofile, encoding='utf-8', mode="w+")
-    for x in data:  f.write(str(x[0]))
-    f.close()
-    print('saved to : ', tofile, ' size: ', os.path.getsize(tofile))
-
-
-def imagefilename(s=""):
     return glob.imgfiletemplate + s.replace(':', '.').replace('#', '_') + glob.imgfileextension  # do not change!!
 
 ##
@@ -79,11 +75,9 @@ def savescreenshottodisk(n, eldict):
     return fname
 
 
-def updateinferrablecreenshots(n, eldict, usecache=False):
-    # G.in_edges(node)
-    # G.out_edges(node)
-    return True
-
+##
+#    Function: copies the default image to the asset folder.
+#    This image is displayed when the node has no image and the visual appearances require an image..
 
 def copydefaultimagetoasset():
 
@@ -101,23 +95,42 @@ def copydefaultimagetoasset():
         print(exc_type, fname, exc_tb.tb_lineno)
         print('*  There was an error processing : ' + str(e))
 
+##
+#    @param contents: encoded content of a CSV file transferred via the browser.
+#    @param infilename: filename of the file that was uploaded
+#    @return: panda Dataframe
+#
+def read_file_in_dataframe(contents=None, infilename=''):
 
-def loadoracles(contents=None, filename=''):
-    print('set data for  oracle table')
-
-    if contents is not None:  # load oracless from file trigger=='upload-button-oracle-file': #
+    if contents is not None:
         content_type, content_string = contents.split(',')
         decoded = base64.b64decode(content_string)
         try:
-            # data=io.StringIO(decoded.decode('utf-8'))
             directory = (glob.scriptfolder + glob.assetfolder + glob.outputfolder);
-            fout = open(directory + filename, encoding='utf-8', mode='w', newline='')
+            fout = open(directory + infilename, encoding='utf-8', mode='w',
+                        newline='')  # creates the file where the uploaded file should be stored
             fout.write(decoded.decode('utf-8'))  # writes the uploaded file to the newly created file.
-            #                   tu.savetofile(decoded.decode('utf-8'),filename )
             fout.close()  # closes the file, upload complete.
-            df = pd.read_csv(directory + filename, sep=';')
+            return pd.read_csv(directory + infilename, sep=';')
         except Exception as e:
-            print('*  There was an error processing file <' + filename + '> :' + str(e))
-        return df
+            print('*  There was an error processing file <' + infilename + '> :' + str(e))
+            return pd.DataFrame()
     else:
         pass
+
+
+##
+#    Function: Saves a Dash table as displayed on the webpage into a CSV file
+#    @param data: dictionary of data of the table
+#    @param cols: dictionary of columns of the table
+#    @return: string: contains the csv data of the table
+
+def save_uitable(data, cols):
+
+    csvstr = ''
+    if data is not None:
+        pdcol = [i['id'] for i in cols]
+        df = pd.DataFrame(data, columns=pdcol)
+        csvstr = df.to_csv(index=False, encoding='utf-8', sep=';')
+        csvstr = "data:text/csv;charset=utf-8," + urllib.parse.quote(csvstr)
+    return csvstr

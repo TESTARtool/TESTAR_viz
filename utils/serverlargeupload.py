@@ -5,6 +5,7 @@ Created on Wed Apr  3 18:27:03 2019
 
 @author: cseng
 """
+import time
 
 from flask import render_template, Blueprint, request, make_response, send_from_directory
 from appy import app
@@ -13,16 +14,18 @@ import logging
 import os
 #supply the dropzone layout
 @app.server.route('/large-upload')
-def index():
+def display_largehandler_page():
     # Route to serve the upload form
     return send_from_directory('assets', 'large-upload.html')
 
 #process the dropzone request
 @app.server.route('/large-file-upload', methods=['POST'])
-def uploadlarge():
+def large_upload_handler():
     file = request.files['file']
     save_path = glob.graphmlfile
     current_chunk = int(request.form['dzchunkindex'])
+    if current_chunk == 1 :
+        glob.start_timer_upload = time.time()
 
     # If the file already exists it's ok if we are appending to it,
     # but not if it's new file that would overwrite the existing one
@@ -55,8 +58,7 @@ def uploadlarge():
             return make_response(('Size mismatch', 500))
         else:
            # log=tu.processgraphmlfile()
-            print("large File "+file.filename+" has been uploaded successfully")
-            #print(log);
+            print("large File "+file.filename+" has been uploaded successfully." , "--- %.3f seconds ---"  % (time.time() - glob.start_timer_upload))
             logging.info(f'File {file.filename} has been uploaded successfully')
     else:
         logging.info(f'Chunk {current_chunk + 1} of {total_chunks} '

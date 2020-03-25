@@ -30,7 +30,7 @@ from utils.graphcomputing import centralitywidth, centralityheight
      [State('viz-settings-table', 'data'),
      State('viz-settings-table', 'columns')]
 )
-def update_legenda(hit0, newlog, data, cols):
+def set_legenda(i_apply_viz_settings, i_loadingcomplete, s_viz_settings_data, s_viz_settings_columns):
     ctx = dash.callback_context
     trigger = ctx.triggered[0]['prop_id'].split('.')[0]
     triggervalue = ctx.triggered[0]['value']
@@ -155,14 +155,4 @@ def update_legenda(hit0, newlog, data, cols):
     mstylesheet.extend(tmplist)
     return celements, cstylesheet, trelements, trstylesheet, pelements, pstylesheet, melements, mstylesheet
 
-
-def getcentralitystyle(colour, index):
-    cstyle = glob.centrality_shape
-    cstyle.update({'width': centralitywidth(index),
-                   'height': centralityheight(index),
-                   'background-color': colour,
-                   'border-color': colour,
-                   'font-size': 18,
-                   'label': 'data(id)'})
-    return cstyle
 

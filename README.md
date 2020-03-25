@@ -52,12 +52,11 @@ The following interactive features are at the users' disposal:
     - print the PDF (via browser) to have a single document for reference.
     
 07. TESTAR test sequences
-    - Import TESTAR temporal Oracle verdicts. 
     - Highlight Nodes that are *created by* (or *updated-by*) a specific test run
     * Show Longest Simple Path from initial node  
     
 08. Oracles: 
-    - Import oracle file
+    - Import TESTAR temporal Oracle verdicts. 
     - Import 2nd oracle file for comparison
     - Show counterexample or witness traces of the selected oracles (LTL only)
 

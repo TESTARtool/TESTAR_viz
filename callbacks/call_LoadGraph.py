@@ -20,8 +20,8 @@ import utils.graphcomputing as tu
      Output('loading-logtext3', 'children')],
     [Input('validate-graph-file', 'n_clicks')],
     [State('advanced_properties', 'value')])
-def validate(button, val):
-    if button > 0:
+def validate_graphml_file(i_validatebutton, s_advanced):
+    if i_validatebutton > 0:
         masterlog = {}
         if os.path.isfile(glob.scriptfolder + glob.graphmlfile):  # fullpath for OS operations
             masterlog = (tu.processgraphmlfile(True, ('Advanced' in s_advanced)))

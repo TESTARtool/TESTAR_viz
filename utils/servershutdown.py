@@ -11,7 +11,7 @@ from appy import app
 from flask import request
 ##############################################
 
-def shutdown_server():
+def raise_shutdown():
     func = request.environ.get('werkzeug.server.shutdown')
     if func is None:
         raise RuntimeError('Not running with the Werkzeug Server')
@@ -19,7 +19,7 @@ def shutdown_server():
 
 
 @app.server.route('/shutdown', methods=['POST', 'GET'])
-def shutdown():
+def shut_down_webserver():
     print(' shutdown')
-    shutdown_server()
+    raise_shutdown()
     return 'Server shutting down...'

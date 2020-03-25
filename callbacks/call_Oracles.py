@@ -41,8 +41,9 @@ def update_oracles_baseline_uitable(i_baselineoracle_filecontents, i_baselineora
 def oracles_from_file_to_dframe(filecontents, filename, dframe):
     ctx = dash.callback_context
     if ctx.triggered:
-        if contents is not None:
-            dframe = utils.filehandling.loadoracles(contents, filename)
+        if filecontents is not None:
+            print('set data for  oracle table')
+            dframe = utils.filehandling.read_file_in_dataframe(filecontents, filename)
         else:
             return [{'id': 'dummy', 'name': 'dummy'}], [{'dummy': ''}],None
         returndata = style_dframe(dframe)

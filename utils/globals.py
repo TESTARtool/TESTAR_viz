@@ -18,12 +18,15 @@ title='TESTAR Temporal Visualizer'
 
 grh = nx.DiGraph()
 subgraph= nx.DiGraph()
+Threshold_V = 2000
+Threshold_E = 20000
 layerviewincache='--unknown--'
 parentingincache='--unknown--'
 filternodeincache='--unknown--'
 filtervalueincache='--unknown--'
 graphmlfile = os.path.join(assetfolder+outputfolder,'GraphML.xml')
 screenshotregex='.*\[(.+?)\].*'
+start_timer_upload = 0
 
 elementcompositefilter = "(.*?)(\s\|\|\s)(.*)" # allow a disjunct of 2 valuefilters
 elementvaluefilter= "\s*(\S*?)\s(>|>=|<|<=|=|!=|\^=|\*=|\$=|!\^=|!\*=|!\$=)\s'(.*?)'" #gui.py depends on this

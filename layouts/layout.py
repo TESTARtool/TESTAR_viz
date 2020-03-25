@@ -1,14 +1,8 @@
-# -*- coding: utf-8 -*-
-##
-# Main web page layout
-# compartments of the page are described in individual .py files
-# No parameters
-"""
-Created on Tue Apr 2 2019
+'''
+Provides the Web-Layout and hosts the subsections:
+'''
 
 
-@author: carlo sengers 
-"""
 from  utils.globals import version
 import dash_html_components as html
 import dash_core_components as dcc

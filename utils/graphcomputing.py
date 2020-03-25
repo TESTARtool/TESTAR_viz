@@ -9,6 +9,8 @@ import json
 import os
 import re
 import sys
+import urllib
+
 import dateutil
 
 from appy import app
@@ -26,9 +28,28 @@ from utils.gui import getsubgraph, setgraphattributes, setvizproperties
 #@param advanced: When true calculates time consuming properties : determining the test step created a StateNode.
 #@return: log containing the meta data
 
+def Widgetdistri():
+    widget_nodes = dict()
+    for n, ndict in glob.grh.nodes(data=True):
+        if ndict[glob.label_nodeelement] == 'Widget':
+            if ndict["ConcreteIDCustom"] in widget_nodes:
+                widget_nodes[ndict["ConcreteIDCustom"]]= (1+widget_nodes[ndict["ConcreteIDCustom"]])
+            else:
+                widget_nodes[ndict["ConcreteIDCustom"]] = 1
+    df = pd.DataFrame.from_dict(widget_nodes,orient='index')
+    csvstr = df.to_csv(index=True,encoding='utf-8', sep=';')
+    directory = (glob.scriptfolder + glob.assetfolder + glob.outputfolder);
+    fout = open(directory + "WidgetDistribution.csv", encoding='utf-8', mode='w',  newline='')
+    fout.write(csvstr)
+    fout.close()
+
+
+
+
 def processgraphmlfile(details=True, advanced=False):
 
     start_time = time.time()
+
 
     print('start ', "--- %.3f seconds ---" % (time.time() - start_time))
     glob.grh = nx.read_graphml(glob.graphmlfile)
@@ -45,6 +66,10 @@ def processgraphmlfile(details=True, advanced=False):
             edgelist.append((s, t))
     noselfloopssubgraph.remove_edges_from(list(edgelist))
     print('copying graphs done', "--- %.3f seconds ---" % (time.time() - start_time))
+
+
+    Widgetdistri()
+    print('experiment: calculating widget distribution doubles', "--- %.3f seconds ---" % (time.time() - start_time))
     ######## part 1
     sequencetuples = []
 

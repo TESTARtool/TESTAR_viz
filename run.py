@@ -1,9 +1,17 @@
-# -*- coding: utf-8 -*-
-## @package run
-# the run.py command starts the server to listen on localhost:8050 \n
-# @param \--port to start the server on another port than 8050 E.g. Python run.py \--port 8044
+'''
+the run.py command starts the server to listen on localhost:8050 \n
+param --port to start the server on another port than 8050 E.g. Python run.py \--port 8044
+'''
 
 def setup():
+    """
+    Takes care of Cleanup of previous interrupted runs
+    Determine the path from where the script is run,
+    determine the port for the web server
+    Prepage the Webpage layout,
+    Increase the loglevel of the Server to Error.
+    Finally the server is started
+    """
     import utils.filehandling
     from appy import app
     from dash import __version__ as dashversion
