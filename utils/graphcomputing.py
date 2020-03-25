@@ -17,7 +17,7 @@ import pandas as pd
 import time
 
 from utils import globals as glob
-from utils.filehandling import imagefilename, savescreenshottodisk, copydefaultimagetoasset
+from utils.filehandling import set_imagefilename, savescreenshottodisk, copydefaultimagetoasset
 from utils.gui import getsubgraph, setgraphattributes, setvizproperties
 
 ##
@@ -32,6 +32,8 @@ def processgraphmlfile(details=True, advanced=False):
 
     print('start ', "--- %.3f seconds ---" % (time.time() - start_time))
     glob.grh = nx.read_graphml(glob.graphmlfile)
+    setgraphattributes(True, None, '')
+    setvizproperties(True, None, '')
     if 'All' in glob.centralitynodes:
         subgraph=glob.grh
     else:
@@ -87,13 +89,13 @@ def processgraphmlfile(details=True, advanced=False):
         print('updating all ConcreteStates & Actions with "'+glob.createdby+'" done',
               "--- %.3f seconds ---" % (time.time() - start_time))
 
-    centralitymeasure = [{'measure': 'N/A', 'binning': 'N/A'}]
+    #centralitymeasure = [{'measure': 'N/A', 'binning': 'N/A'}]
+    centralitymeasure = [setcentralitymeasure(None, 'N/A')]
     V = len(subgraph)
     E = subgraph.size()
-    Max_V=2000
-    Max_E=20000
+
     #     d = nx.betweenness_centrality(subgraph) # this is not implemented in networkx for MultiDigraph
-    if (V * E) < (Max_V * Max_E):  # 40.000.000 will take 60 seconds??
+    if (V * E) < (glob.Threshold_V * glob.Threshold_E):  # 40.000.000 will take 60 seconds??
         #  this must be calculated before the call to  setcytoelements.
         centralitymeasure = []
         centralitymeasure.append(setcentralitymeasure(subgraph,'indegree'))
@@ -102,7 +104,7 @@ def processgraphmlfile(details=True, advanced=False):
         centralitymeasure.append(setcentralitymeasure(noselfloopssubgraph, 'outdegree_noselfloops'))
         centralitymeasure.append(setcentralitymeasure(subgraph, 'loadcentrality'))
     else:
-        print('graph centralities not calculated. graph too big V * E = '+str(V)+' * '+str(E)+' exceeds '+str(Max_V * Max_E))
+        print('graph centralities not calculated. graph consisting of nodes in '+ str(glob.centralitynodes)+' is too big V * E = ' + str(V) +' * ' + str(E) +' exceeds ' + str(glob.Threshold_V * glob.Threshold_E))
     glob.centralitiemeasures = pd.DataFrame(centralitymeasure)
     print('updating graph centralities attributes  done', "--- %.3f seconds ---" % (time.time() - start_time))
 
@@ -189,8 +191,8 @@ def processgraphmlfile(details=True, advanced=False):
         log.extend(metadata)
         masterlog.update({'log3': log})
 
-    setgraphattributes(True, None, '')
-    setvizproperties(True, None, '')
+    # setgraphattributes(True, None, '')
+    # setvizproperties(True, None, '')
     print('validating graph  done', "--- %.3f seconds ---" % (time.time() - start_time))
     return masterlog
 
@@ -203,7 +205,7 @@ def setcentralitymeasure(graph=None,centralityname='indegree_noselfloops'):
         elif 'loadcentrality'  in centralityname:
             d = nx.load_centrality(graph)
         else:
-            return {'measure': 'error', 'binning': json.dumps('error')}
+             return {'measure': 'N/A', 'binning': json.dumps({'N/A':0})}
         ditemvaluelist = list(d.values())
         ditemvaluelist.sort()
         maxvalplus = ditemvaluelist[-1]
