@@ -1,19 +1,25 @@
-# -*- coding: utf-8 -*-
-##
-# Function: Collection of global variables used in the application
-#
+'''
+Function: Collection of global variables used throughout the application
+ccc
+'''
+
+
 
 
 import pandas as pd
 import networkx as nx
 import os
-version = '20200215'
+
+## version of the Pythoncode
+version = '20200328'
+## working directory
 scriptfolder = ''
 assetfolder = 'assets'+os.sep #20190428 there is a dependency with app.get_asset_url
 outputfolder = 'content'+os.sep
 port = 8050
 debug=False  # show debug information in the browser.. and the DASH call graph
 title='TESTAR Temporal Visualizer'
+experiment_widgetdistri=True
 
 
 grh = nx.DiGraph()

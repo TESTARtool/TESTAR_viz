@@ -1,3 +1,6 @@
+'''
+Function: helper methods for file operations
+'''
 import base64
 import os
 import re

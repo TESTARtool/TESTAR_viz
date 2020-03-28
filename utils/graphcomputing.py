@@ -91,6 +91,7 @@ def processgraphmlfile(details=True, advanced=False):
 
     print('start ', "--- %.3f seconds ---" % (time.time() - start_time))
     glob.grh = nx.read_graphml(glob.graphmlfile)
+    print('importing graphml done', "--- %.3f seconds ---" % (time.time() - start_time))
     setgraphattributes(True, None, '')
     setvizproperties(True, None, '')
     if 'All' in glob.centralitynodes:
@@ -103,11 +104,11 @@ def processgraphmlfile(details=True, advanced=False):
         if s == t:
             edgelist.append((s, t))
     noselfloopssubgraph.remove_edges_from(list(edgelist))
-    print('copying graphs done', "--- %.3f seconds ---" % (time.time() - start_time))
+    print('creating sub-graphs done', "--- %.3f seconds ---" % (time.time() - start_time))
 
-
-    Widgetdistri()
-    print('experiment: calculating widget distribution doubles', "--- %.3f seconds ---" % (time.time() - start_time))
+    if glob.experiment_widgetdistri:
+        Widgetdistri()
+        print('experiment: calculating widget distribution doubles done', "--- %.3f seconds ---" % (time.time() - start_time))
     ######## part 1
     sequencetuples = []
 

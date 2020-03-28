@@ -1,7 +1,7 @@
-##
-# Function: collection of helper methods to make a list of color gradient
-# inspired by https://bsou.io/posts/color-gradients-with-python
-
+'''
+Function: collection of helper methods to make a list of color gradient
+inspired by https://bsou.io/posts/color-gradients-with-python
+'''
 from matplotlib import colors as mplcolors
 
 
@@ -51,14 +51,16 @@ def linear_gradient(start_hex, finish_hex="#FFFFFF", n=10):
 
     return color_dict(RGB_list)
 
-##
-#    Function: makes a color gradient collection
-#    @param colornameStart: colorname as string or rgb
-#    @param colornameEnd: colorname as string or rgb
-#    @param n: number of steps in the list
-#    @return: dictionary of a hex color list, r-list,g-list and a b-list
+
 
 def colorgradient(colornameStart, colornameEnd='dark blue', n=10):
+    '''
+    Function: makes a color gradient collection (dict)
 
-    # return linear_gradient(matplotlib.colors.cnames[colornameStart],matplotlib.colors.cnames[colornameStart],n)
+    colornameStart : colorname as string
+    colornameEnd   : colorname as string
+    n              : number of steps in the list
+    return         : dictionary of sortedlists:  hex color list, r-list, g-list and b-list
+    '''
+
     return linear_gradient(mplcolors.cnames[colornameStart], mplcolors.cnames[colornameEnd], n)
