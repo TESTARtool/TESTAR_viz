@@ -3,13 +3,14 @@ Function: Collection of settings (maintainable by advanced users) used throughou
 '''
 ## default port to run the webserver
 port = 8050
-## When True, it shows debug information in the browser and the DASH call graph
+## DASH setting: When True, the application shows debug information in the browser and the DASH call graph
+# this slows down the performance by 50%
 debug=False
 ## maximum allowable nr of nodes  to calculate centralities : Threshold_V * Threshold_E
 Threshold_V = 2000
 ## maximum allowable nr of edges  to calculate centralities : Threshold_V * Threshold_E
 Threshold_E = 20000
-## centralitynodes scope: list all the labelV elements for the basis of  the centrality calculation.
+## centralitynodes scope: list of all the labelV elements subject to the centrality calculation.
 # use 'All' as a wildcard
 centralitynodes=['ConcreteState']
 ## regex to extract the bytearray from the GraphML file
@@ -29,9 +30,9 @@ label_edgeelement=default_edgeelement
 ## Element in GraphMl that contians meta dat and is listed during validation of the GraphML file.
 elementwithmetadata = 'AbstractStateModel'
 
-## multipler to highlight the selected node
+## shape size multipler to highlight the selected node
 nodeonselectmultiplier=3
-## multipler to highlight the selected edge
+## shape size multipler to highlight the selected edge
 edgeonselectmultiplier=3
 ## default visual properties for all cyto nodes
 nodedisplayprop={
@@ -43,7 +44,7 @@ nodedisplayprop={
                 'color' : 'grey','color_if_terminal' : 'purple',
                  'shape_if_terminal': 'octagon','opacity': 1
                 }
-## default visual properties for parent node ('boxed')
+## default visual properties for a 'box' node
 parentnodedisplayprop={
                 'hide':'','focus': '','cover': '',
                 'label':'nodeid','label_fontsize' : 18,
@@ -63,18 +64,11 @@ edgedisplayprop={
                 'edgestyle' : 'bezier','edgefill' : 'solid',
                 'color' : 'grey', 'opacity': 1
                 }
-## alternating row style
+## alternating row style in UITables
 tableoddrowstyle = {
                 'if': {'row_index': 'odd'},
                 'backgroundColor': 'AliceBlue'}
-# ## style of the selected row in the oracle table when the oracle is a FAIL
-# oraclefailstyle={
-#                 "backgroundColor": "red",
-#                 'color': 'white'}
-# ## style of the selected row in the oracle table when the oracle is a PASS
-# oraclepassstyle={
-#                 "backgroundColor": "green",
-#                 'color': 'white'}
+
 ## style of the selected row in the oracle table when the oracle is a FAIL
 oracletable_showfail={"backgroundColor": "tomato", 'color': 'white'}
 ## style of the selected row in the oracle table when the oracle is a PASS
@@ -130,7 +124,7 @@ centralitiesshape='ellipse'
 centrality_colornameStart= 'red'
 ## color range of the centrality shape
 centrality_colornameEnd='green'
-## nr of bins color of the centrality measure
+## nr of bins of the centrality measure
 centrality_bins=7
 ## minimum width of the shape in first bin. Subsequent bins get increased width.
 centrality_minwidth=20
