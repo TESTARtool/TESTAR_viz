@@ -3,9 +3,9 @@
 
 Based on Python, Dash (flask) and Cytoscape.js. Dash and Cytoscape.js are both MIT Licensed.
 
-The application is primarily intended for visual analytics of TESTAR Models.
-TESTAR State Models can be exported in GraphML format. 
-This application can import the Graphml files and render the contents as a node-edge network.
+The application is primarily intended for visual analytics of TESTAR Models.  
+TESTAR can export State Models in GraphML format.  
+This application can import the GraphML files and render the content as a node-edge network.
 
 The following interactive features are at the users' disposal:
  
@@ -23,10 +23,10 @@ The following interactive features are at the users' disposal:
     * Zooming by mouse wheel
     * Dragging of nodes
     * Automatic legend
-        - All types of nodes and edge are displayed conform their  appearances
+        - All types of nodes and edge are displayed conform their appearances in the legend
         - legend for shortest paths, test sequences and centralities 
         
-05. Custom appearances
+05. Customizable appearances
     * for nodes:
         * background coloring, shape
         * border style, thickness and color 
@@ -44,12 +44,12 @@ The following interactive features are at the users' disposal:
      \**the occupied space in the graph is made transparent*   
              
 06. Selecting graph elements
-    - nodes or edges by mouse click or by boxing.
+    - Nodes or edges by mouse click or by making a box with CTRL+Left-Click.
     - Show Shortest path between 2 selected nodes.
     - Exporting selected node data to CSV.
-    - exporting selected edge data to CSV.
-    - list of screen-prints of nodes( ordered by node selection).
-    - print the PDF (via browser) to have a single document for reference.
+    - Exporting selected edge data to CSV.
+    - List of screen-prints of nodes( ordered by node selection).
+    - Print PDF (via browser) to have a single document for reference.
     
 07. TESTAR test sequences
     - Highlight Nodes that are *created by* (or *updated-by*) a specific test run
@@ -70,8 +70,8 @@ The following interactive features are at the users' disposal:
   * layer selection feature only works when the requirements for labelV and labelE are fulfilled.
  
 ###Advanced  use case: 
-* Modifying any variable in globals.py can change the behavior (radically!)
-    * Adapt Styling that is not customizable via the browser. (oracles,path, centralities) 
+* Modifying any variable in settings.py can change the behavior (radically!)
+    * Adapt Styling that is not yet customizable via the browser. (oracles,path, centralities) 
     * Override the regular expression that captures the bytearray of the screen-print of the Node.
     * Override the default keying of GraphML nodes (*default_nodeelement='labelV'*) 
     * Override the default keying of GraphML edges (*default_edgeelement='labelE'*) 
@@ -95,11 +95,14 @@ The following interactive features are at the users' disposal:
  
 ####Starting the Application:
  1. Open a Command prompt or Terminal.
- 2. invoke Python run.py  or  Python run.py --port *dddd*
- 3. open browser at localhost:8050 or localhost:*dddd*
- 4. Terminate the server process by:
-    * Closing the Command prompt or Terminal
-    * Submit 'localhost:*dddd*/shutdown' from the browser.
+ 2. Go to the folder that contains the repository.
+ 3. invoke Python run.py  or  Python run.py \-\-port *pppp*
+ 4. open browser at localhost:8050 or localhost:*pppp*
 
-CSS 20200314
+####Stopping the Application:
+ 1. Terminate the server process by:
+    * Closing the Command prompt or Terminal or
+    * Submit 'localhost:*pppp*/shutdown' from the browser.
+
+CSS 20200328
 
