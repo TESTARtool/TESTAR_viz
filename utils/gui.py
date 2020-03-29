@@ -5,6 +5,8 @@ import time
 import networkx as nx
 import pandas as pd
 
+import globals
+import settings
 from filehandling import read_file_in_dataframe
 from utils import globals as glob
 
@@ -41,13 +43,13 @@ def getsubgraph(layerview, filternode=None, filtervalue=None):
         drawingelements=glob.dfdisplayprops.to_dict('records')
         for row in drawingelements:
             if (row[glob.elementtype] == 'node') and (not (row[glob.elementsubtype] in layerview)):
-                removenodelist = [n for n, v in glob.grh.nodes(data=True) if (v[glob.label_nodeelement] == row[glob.elementsubtype])]
+                removenodelist = [n for n, v in glob.grh.nodes(data=True) if (v[settings.label_nodeelement] == row[glob.elementsubtype])]
                 graphcopy.remove_nodes_from(removenodelist)
     removenodefilterlist = []
     if (len(filterlist) > 0):
 
         for n, v in graphcopy.nodes(data=True):
-            if (v[glob.label_nodeelement] == filternode) or (filternode == 'Any') :
+            if (v[settings.label_nodeelement] == filternode) or (filternode == 'Any') :
                 remove = False
                 for filt in filterlist:
                     subject = ''
@@ -98,7 +100,7 @@ def getsubgraph(layerview, filternode=None, filtervalue=None):
 
 
     glob.subgraph=graphcopy
-    glob.layerviewincache = layerview
+    globals.layerviewincache = layerview
     return glob.subgraph
 
 
@@ -113,22 +115,22 @@ def setgraphattributes(infer=True, contents=None, filename=''):
     if infer:  # infer from graph
         print('inferring attributes from Graph')
         nodelabels = set()
-        l = nx.get_node_attributes(glob.grh, glob.label_nodeelement)
+        l = nx.get_node_attributes(glob.grh, settings.label_nodeelement)
         nodelabels.update({glob.parent_subtypeelement})
         nodelabels.update(l.values())
         edgelabels = set()
-        l = nx.get_edge_attributes(glob.grh, glob.label_edgeelement)
+        l = nx.get_edge_attributes(glob.grh, settings.label_edgeelement)
         edgelabels.update(l.values())
         nodepropdict = dict()
         dfnodes = pd.DataFrame()
         for lbl in nodelabels:
             nodepropdict = dict()
             nodepropdict.update({'node/edge': 'node', 'subtype': lbl})
-            if lbl == glob.parent_subtypeelement or lbl == glob.label_nodeelement:  # ?????????????????
-                nodepropdict.update({glob.label_nodeelement: 1})
+            if lbl == glob.parent_subtypeelement or lbl == settings.label_nodeelement:  # ?????????????????
+                nodepropdict.update({settings.label_nodeelement: 1})
             else:
                 for n, v in glob.grh.nodes(data=True):
-                    if v[glob.label_nodeelement] == lbl:  # find a node of each type
+                    if v[settings.label_nodeelement] == lbl:  # find a node of each type
                         for k in v.keys():
                             nodepropdict.update({k: 1})
                         nodepropdict.pop(lbl, '')
@@ -140,11 +142,11 @@ def setgraphattributes(infer=True, contents=None, filename=''):
         for lbl in edgelabels:
             edgepropdict = dict()
             edgepropdict.update({'node/edge': 'edge', 'subtype': lbl})
-            if lbl == glob.label_edgeelement:  # ?????????????????
-                nodepropdict.update({glob.label_edgeelement: 1})
+            if lbl == settings.label_edgeelement:  # ?????????????????
+                nodepropdict.update({settings.label_edgeelement: 1})
             else:
                 for s, t, v in glob.grh.edges(data=True):
-                    if v[glob.label_edgeelement] == lbl:  # find a node of each type
+                    if v[settings.label_edgeelement] == lbl:  # find a node of each type
                         for k in v.keys():
                             edgepropdict.update({k: 1})
                             edgepropdict.pop(lbl, '')
@@ -167,11 +169,11 @@ def setvizproperties(loaddefaults=True, contents=None, filename=''):
             displaydict.update({'node/edge': row['node/edge'], 'subtype': row['subtype']})
             if row['node/edge'] == 'node':
                 if row['subtype'] == glob.parent_subtypeelement:
-                    displaydict.update(glob.parentnodedisplayprop)
+                    displaydict.update(settings.parentnodedisplayprop)
                 else:
-                    displaydict.update(glob.nodedisplayprop)
+                    displaydict.update(settings.nodedisplayprop)
             else:
-                displaydict.update(glob.edgedisplayprop)
+                displaydict.update(settings.edgedisplayprop)
             df = pd.DataFrame(displaydict, index=[0])
             glob.dfdisplayprops = pd.concat([glob.dfdisplayprops, df], ignore_index=True, sort=False)
 

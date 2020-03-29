@@ -2,6 +2,8 @@
 the run.py command starts the server to listen on localhost:8050 \n
 param --port to start the server on another port than 8050 E.g. Python run.py \--port 8044
 '''
+import settings
+
 
 def setup():
     """
@@ -37,7 +39,7 @@ def setup():
     print('************  TESTAR graph visualizer  Starts now  ************')
     utils.filehandling.clearassetsfolder()
     if len(sys.argv) == 1 or (len(sys.argv) >1 and sys.argv[1]!='--port'):
-        port=glob.port
+        port= settings.port
     else: # (len(sys.argv) >1 and sys.argv[1]=='--port'):
         port=int(sys.argv[2])
     print ('use commandline option --port to run an instance parallel to/other than',port)
@@ -64,7 +66,7 @@ def setup():
     log.setLevel(logging.ERROR)
 
     app.title = glob.title
-    app.run_server(port=port, debug=glob.debug)
+    app.run_server(port=port, debug=settings.debug)
 if __name__ == '__main__':
     setup()
     pass

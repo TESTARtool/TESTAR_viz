@@ -9,6 +9,8 @@ import os
 import dash
 from dash.dependencies import Input, Output, State
 import dash_html_components as html
+
+import settings
 import utils.filehandling
 from appy import app
 import utils.globals as glob
@@ -113,7 +115,7 @@ def update_selectednode_uitable(i_selectednodes):
         for c in i_selectednodes:
             fname = glob.outputfolder + utils.filehandling.set_imagefilename(c['id'])
             screens.append(html.P(children='Screenprint of node: ' + c['id']))
-            imgname = fname if os.path.exists(glob.scriptfolder + glob.assetfolder + fname) else glob.no_image_file
+            imgname = fname if os.path.exists(glob.scriptfolder + glob.assetfolder + fname) else settings.no_image_file
             screens.append(
                 html.Img(id='screenimage' + c['id'], style={'max-height': '600px', 'display': 'inline-block'},
                          src=app.get_asset_url(imgname)))

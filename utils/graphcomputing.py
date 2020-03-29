@@ -1,38 +1,29 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon Apr  1 21:38:18 2019
-
-@author: cseng
-testar graph module
-"""
+'''
+Function: Loading of the GraphML file into internal datastructures
+Computes 'static' graph properties: test sequence metrics, longest simple paths and centralities,
+'''
 import hashlib
 import json
 import os
-import re
 import sys
-import urllib
-
 import dateutil
 
+import globals
+import settings
 from appy import app
 import networkx as nx
 import pandas as pd
 import time
-
 from utils import globals as glob
 from utils.filehandling import set_imagefilename, savescreenshottodisk, copydefaultimagetoasset
 from utils.gui import getsubgraph, setgraphattributes, setvizproperties
 
-##
-#Function  validates the graphml file, reads into NetworkX graph and calculates properties
-#@param details: Always set to True: whther to show meta dat aor not
-#@param advanced: When true calculates time consuming properties : determining the test step created a StateNode.
-#@return: log containing the meta data
+
 
 def Widgetdistri():
     widget_nodes = dict()
     for n, ndict in glob.grh.nodes(data=True):
-        if ndict[glob.label_nodeelement] == 'Widget':
+        if ndict[settings.label_nodeelement] == 'Widget':
             if ndict["ConcreteID"] in widget_nodes:
                 widget_nodes[ndict["ConcreteID"]]= (1+widget_nodes[ndict["ConcreteID"]])
             else:
@@ -48,41 +39,44 @@ def Widgetdistri():
     widget_nodes_hash = dict()
 
     for n, ndict in glob.grh.nodes(data=True):
-        if ndict[glob.label_nodeelement] == 'Widget':
+        if ndict[settings.label_nodeelement] == 'Widget':
             widget_nodes[n] = ndict
             widget_nodes_hash[n]={k:(int(hashlib.sha256(str(v).encode('utf-8')).hexdigest(), 16) %10**10) for k,v in ndict.items()}
+    if len(widget_nodes)>0:
+        df = pd.DataFrame.from_dict(widget_nodes, orient='index')
+        df.sort_values("ConcreteIDCustom", axis=0, ascending=True,
+                         inplace=True, na_position='last')
+        csvstr = df.to_csv(index=True, encoding='utf-8', sep=';')
+        directory = (glob.scriptfolder + glob.assetfolder + glob.outputfolder);
+        fout = open(directory + "WidgetDetails.csv", encoding='utf-8', mode='w', newline='')
+        fout.write(csvstr)
+        fout.close()
+        df1 = pd.DataFrame.from_dict(widget_nodes_hash, orient='index')
+        df1.sort_values("ConcreteIDCustom", axis=0, ascending=True,
+                       inplace=True, na_position='last')
+        csvstr = df1.to_csv(index=True, encoding='utf-8', sep=';')
+        directory = (glob.scriptfolder + glob.assetfolder + glob.outputfolder);
+        fout = open(directory + "WidgetDetailsHashes.csv", encoding='utf-8', mode='w', newline='')
+        fout.write(csvstr)
+        fout.close()
+        df2= df1.copy()
+        df2 = df2.diff()
 
-    df = pd.DataFrame.from_dict(widget_nodes, orient='index')
-    df.sort_values("ConcreteIDCustom", axis=0, ascending=True,
-                     inplace=True, na_position='last')
-    csvstr = df.to_csv(index=True, encoding='utf-8', sep=';')
-    directory = (glob.scriptfolder + glob.assetfolder + glob.outputfolder);
-    fout = open(directory + "WidgetDetails.csv", encoding='utf-8', mode='w', newline='')
-    fout.write(csvstr)
-    fout.close()
-    df1 = pd.DataFrame.from_dict(widget_nodes_hash, orient='index')
-    df1.sort_values("ConcreteIDCustom", axis=0, ascending=True,
-                   inplace=True, na_position='last')
-    csvstr = df1.to_csv(index=True, encoding='utf-8', sep=';')
-    directory = (glob.scriptfolder + glob.assetfolder + glob.outputfolder);
-    fout = open(directory + "WidgetDetailsHashes.csv", encoding='utf-8', mode='w', newline='')
-    fout.write(csvstr)
-    fout.close()
-    df2= df1.copy()
-    df2 = df2.diff()
-
-    csvstr = df2.to_csv(index=True, encoding='utf-8', sep=';')
-    directory = (glob.scriptfolder + glob.assetfolder + glob.outputfolder);
-    fout = open(directory + "WidgetDetailsHashesDIFF.csv", encoding='utf-8', mode='w', newline='')
-    fout.write(csvstr)
-    fout.close()
-
-
+        csvstr = df2.to_csv(index=True, encoding='utf-8', sep=';')
+        directory = (glob.scriptfolder + glob.assetfolder + glob.outputfolder);
+        fout = open(directory + "WidgetDetailsHashesDIFF.csv", encoding='utf-8', mode='w', newline='')
+        fout.write(csvstr)
+        fout.close()
 
 
 
 
 
+##
+#Function:  validates the graphml file, reads into NetworkX graph and calculates properties
+#@param details: Always set to True: whether to show meta data or not
+#@param advanced: When true calculates time consuming properties : determining the test step created a StateNode.
+#@return: log containing the meta data
 
 def processgraphmlfile(details=True, advanced=False):
 
@@ -94,10 +88,10 @@ def processgraphmlfile(details=True, advanced=False):
     print('importing graphml done', "--- %.3f seconds ---" % (time.time() - start_time))
     setgraphattributes(True, None, '')
     setvizproperties(True, None, '')
-    if 'All' in glob.centralitynodes:
+    if 'All' in settings.centralitynodes:
         subgraph=glob.grh
     else:
-        subgraph = getsubgraph(glob.centralitynodes)  # regard only items: NOT in ABSTRACT and NOT in WIDGET and NOT in TEST
+        subgraph = getsubgraph(settings.centralitynodes)  # regard only items: NOT in ABSTRACT and NOT in WIDGET and NOT in TEST
     noselfloopssubgraph = subgraph.copy()
     edgelist = []
     for s, t, k in subgraph.edges(keys=True):
@@ -106,13 +100,13 @@ def processgraphmlfile(details=True, advanced=False):
     noselfloopssubgraph.remove_edges_from(list(edgelist))
     print('creating sub-graphs done', "--- %.3f seconds ---" % (time.time() - start_time))
 
-    if glob.experiment_widgetdistri:
+    if advanced:
         Widgetdistri()
         print('experiment: calculating widget distribution doubles done', "--- %.3f seconds ---" % (time.time() - start_time))
     ######## part 1
     sequencetuples = []
 
-    testsequence_nodes = {n: d for n, d in glob.grh.nodes(data=True) if d[glob.label_nodeelement] == 'TestSequence'}
+    testsequence_nodes = {n: d for n, d in glob.grh.nodes(data=True) if d[settings.label_nodeelement] == 'TestSequence'}
     for n, d in testsequence_nodes.items():
         date_time_obj = dateutil.parser.parse(d['startDateTime'],
                                               ignoretz=True)  # date_time_str='Wed Nov 13 18:56:29 CET 2019'
@@ -120,14 +114,14 @@ def processgraphmlfile(details=True, advanced=False):
         i = 0
         initialnode = ''
         for tn, tndict in glob.grh.nodes(data=True):
-            if tndict[glob.label_nodeelement] == 'SequenceNode' and tndict['sequenceId'] == d['sequenceId']:
+            if tndict[settings.label_nodeelement] == 'SequenceNode' and tndict['sequenceId'] == d['sequenceId']:
                 i = i + 1
                 if initialnode=='':
                     neighbors = glob.grh.predecessors(tn)
                     for predec in neighbors:  # should be only 1 entry. :-)
                         if predec == n: # this node is successor of the testsequence, thus pointer to firstnode
                             initialnode = [x for x, y in glob.grh.nodes(data=True) if
-                                           y[glob.label_nodeelement] == 'ConcreteState' and
+                                           y[settings.label_nodeelement] == 'ConcreteState' and
                                            y['ConcreteIDCustom'] == tndict['concreteStateId']] #case sentitive !!
                 if initialnode !='':
                     break
@@ -140,17 +134,17 @@ def processgraphmlfile(details=True, advanced=False):
           "--- %.3f seconds ---" % (time.time() - start_time))
     if advanced:
         for n, ndict in glob.grh.nodes(data=True):
-            if ndict[glob.label_nodeelement] == 'ConcreteState':
+            if ndict[settings.label_nodeelement] == 'ConcreteState':
                 sequenceid,allsequenceids = getConcreteStateSequenceid(n)
-                glob.grh.nodes[n][glob.createdby] = sequenceid
-                glob.grh.nodes[n][glob.updatedby] = allsequenceids
+                glob.grh.nodes[n][globals.createdby] = sequenceid
+                glob.grh.nodes[n][globals.updatedby] = allsequenceids
 
         for source, target, n, edict in glob.grh.edges(data=True, keys=True):
-            if edict[glob.label_edgeelement] == 'ConcreteAction':
+            if edict[settings.label_edgeelement] == 'ConcreteAction':
                 sequenceid,allsequenceids = getConcreteActionSequenceid(edict['actionId'])
-                glob.grh[source][target][n][glob.createdby] = sequenceid  # is syntax for multidi graph edges
-                glob.grh[source][target][n][glob.updatedby]= allsequenceids
-        print('updating all ConcreteStates & Actions with "'+glob.createdby+'" done',
+                glob.grh[source][target][n][globals.createdby] = sequenceid  # is syntax for multidi graph edges
+                glob.grh[source][target][n][globals.updatedby]= allsequenceids
+        print('updating all ConcreteStates & Actions with "' + globals.createdby + '" done',
               "--- %.3f seconds ---" % (time.time() - start_time))
 
     #centralitymeasure = [{'measure': 'N/A', 'binning': 'N/A'}]
@@ -159,7 +153,7 @@ def processgraphmlfile(details=True, advanced=False):
     E = subgraph.size()
 
     #     d = nx.betweenness_centrality(subgraph) # this is not implemented in networkx for MultiDigraph
-    if (V * E) < (glob.Threshold_V * glob.Threshold_E):  # 40.000.000 will take 60 seconds??
+    if (V * E) < (settings.Threshold_V * settings.Threshold_E):  # 40.000.000 will take 60 seconds??
         #  this must be calculated before the call to  setcytoelements.
         centralitymeasure = []
         centralitymeasure.append(setcentralitymeasure(subgraph,'indegree'))
@@ -168,7 +162,9 @@ def processgraphmlfile(details=True, advanced=False):
         centralitymeasure.append(setcentralitymeasure(noselfloopssubgraph, 'outdegree_noselfloops'))
         centralitymeasure.append(setcentralitymeasure(subgraph, 'loadcentrality'))
     else:
-        print('graph centralities not calculated. graph consisting of nodes in '+ str(glob.centralitynodes)+' is too big V * E = ' + str(V) +' * ' + str(E) +' exceeds ' + str(glob.Threshold_V * glob.Threshold_E))
+        print('graph centralities not calculated. graph consisting of nodes in ' + str(
+            settings.centralitynodes) + ' is too big V * E = ' + str(V) + ' * ' + str(E) + ' exceeds ' + str(
+            settings.Threshold_V * settings.Threshold_E))
     glob.centralitiemeasures = pd.DataFrame(centralitymeasure)
     print('updating graph centralities attributes  done', "--- %.3f seconds ---" % (time.time() - start_time))
 
@@ -179,7 +175,7 @@ def processgraphmlfile(details=True, advanced=False):
         for tup in glob.sortedsequencetuples:
             createdbylist = []
             for n1, d1 in glob.grh.nodes(data=True):
-                if d1[glob.label_nodeelement] == 'ConcreteState':
+                if d1[settings.label_nodeelement] == 'ConcreteState':
                     if 'createdby_sequenceid' in d1:
                         if d1['createdby_sequenceid'] == tup[0]:
                             createdbylist.append(n1)
@@ -187,7 +183,7 @@ def processgraphmlfile(details=True, advanced=False):
 
             createdbylist = []
             for s1, t1, n1, d1 in glob.grh.edges(data=True, keys=True):
-                if d1[glob.label_edgeelement] == 'ConcreteAction':
+                if d1[settings.label_edgeelement] == 'ConcreteAction':
                     if 'createdby_sequenceid' in d1:
                         if d1['createdby_sequenceid'] == tup[0]:
                             createdbylist.append(n1)
@@ -230,11 +226,11 @@ def processgraphmlfile(details=True, advanced=False):
     if details:
         labels = {}
         for n, d in glob.grh.nodes(data=True):
-            lvalue = d[glob.label_nodeelement]
+            lvalue = d[settings.label_nodeelement]
             labels[lvalue] = 1 + labels.get(lvalue, 0)
-            if lvalue == glob.elementwithmetadata:
+            if lvalue == settings.elementwithmetadata:
                 metadata = [('  * ' + k + ' : ' + v.replace('[', '\[').replace(']', '\]')) for k, v in d.items() if
-                            k != glob.label_nodeelement and not ('degree' in k) and not ('loadcentrality' in k) ]
+                            k != settings.label_nodeelement and not ('degree' in k) and not ('loadcentrality' in k)]
 
         detaillog = [('  * ' + k + ' : ' + str(v)) for k, v in labels.items()]
         log.extend(detaillog)
@@ -244,7 +240,7 @@ def processgraphmlfile(details=True, advanced=False):
         log.append('* Edge count in ' + glob.graphmlfile + " is: " + str(glob.grh.number_of_edges()))
         labels = {}
         for s, t, d in glob.grh.edges(data=True):
-            lvalue = d[glob.label_edgeelement]
+            lvalue = d[settings.label_edgeelement]
             labels[lvalue] = 1 + labels.get(lvalue, 0)
         detaillog = [('  * ' + k + ' : ' + str(v)) for k, v in labels.items()]
         log.extend(detaillog)
@@ -255,8 +251,6 @@ def processgraphmlfile(details=True, advanced=False):
         log.extend(metadata)
         masterlog.update({'log3': log})
 
-    # setgraphattributes(True, None, '')
-    # setvizproperties(True, None, '')
     print('validating graph  done', "--- %.3f seconds ---" % (time.time() - start_time))
     return masterlog
 
@@ -274,7 +268,7 @@ def setcentralitymeasure(graph=None,centralityname='indegree_noselfloops'):
         ditemvaluelist.sort()
         maxvalplus = ditemvaluelist[-1]
         cut_bins = []
-        for i in range(glob.centrality_bins):
+        for i in range(settings.centrality_bins):
             cut_bins.append(maxvalplus * pow(2, -i))
         cut_bins.append(-1)  # zero has to fall in the first bin/bucket.
         cut_bins.sort()
@@ -298,22 +292,22 @@ def setCytoElements(parenting=False, layerview=None,filternode=None,filtervalue=
     TestSequencekeyset = set()
     try:
         copydefaultimagetoasset()  # optimize: do only once:-)
-        if (glob.layerviewincache == layerview and glob.parentingincache == parenting and
-                glob.filternodeincache == filternode and glob.filtervalueincache == filtervalue):
+        if (globals.layerviewincache == layerview and globals.parentingincache == parenting and
+                globals.filternodeincache == filternode and globals.filtervalueincache == filtervalue):
             pass
         else:
 
             grh = getsubgraph(layerview, filternode, filtervalue)
-            glob.filtervalueincache = filtervalue
-            glob.filternodeincache = filternode
+            globals.filtervalueincache = filtervalue
+            globals.filternodeincache = filternode
             for n, ndict in grh.nodes(data=True):
 
                 tempdict = dict(ndict)
-                tempdict.update({'label': ndict[glob.label_nodeelement]})  # copy as cyto wants the 'label' tag
+                tempdict.update({'label': ndict[settings.label_nodeelement]})  # copy as cyto wants the 'label' tag
                 tempdict.update({'id': n})
                 tempdict.update({'nodeid': n})
                 if parenting:
-                    layer= ndict[glob.label_nodeelement]
+                    layer= ndict[settings.label_nodeelement]
                     if (layer in layerview) or layerview == 'Any':
                         if layer =='TestSequence':
                             pass
@@ -332,17 +326,17 @@ def setCytoElements(parenting=False, layerview=None,filternode=None,filtervalue=
             if parenting:
 
                 for k in parentnodeset:
-                    c_parentnode = {'data': {'id': k, glob.label_nodeelement: glob.parent_subtypeelement,'nodeid': k}}
+                    c_parentnode = {'data': {'id': k, settings.label_nodeelement: glob.parent_subtypeelement, 'nodeid': k}}
                     allnodes.append(c_parentnode)
                 for TestSequenceKey in TestSequencekeyset:
-                    t_parentnode = {'data': {'id': TestSequenceKey, glob.label_nodeelement: glob.parent_subtypeelement,
+                    t_parentnode = {'data': {'id': TestSequenceKey, settings.label_nodeelement: glob.parent_subtypeelement,
                                              'nodeid': TestSequenceKey}}
                     allnodes.append(t_parentnode)
-            glob.parentingincache = parenting
+            globals.parentingincache = parenting
             allnodes.extend(nodes)
             for source, target, n, edict in grh.edges(data=True, keys=True):
                 tempdict = dict(edict)
-                tempdict.update({'label': edict[glob.label_edgeelement]})  # copy as cyto wants the label tag
+                tempdict.update({'label': edict[settings.label_edgeelement]})  # copy as cyto wants the label tag
                 tempdict.update({'source': source})
                 tempdict.update({'target': target})
                 tempdict.update({'id': n});
@@ -369,7 +363,7 @@ def getConcreteStateSequenceid(concretestate):
     sequenceids = set()
     for n in neighbors:
         d = glob.grh.nodes[n]
-        if d[glob.label_nodeelement] == 'SequenceNode':
+        if d[settings.label_nodeelement] == 'SequenceNode':
             sequenceids.add(d['sequenceId'])
 
     index = len(glob.sortedsequencetuples) - 1
@@ -384,7 +378,7 @@ def getConcreteActionSequenceid(concreteaction):
     sequenceids = set()
     # use the global graph object .. to ensure that TestSequence is always included
     for source, target, n, edict in glob.grh.edges(data=True, keys=True):
-        if edict[glob.label_edgeelement] == 'SequenceStep':
+        if edict[settings.label_edgeelement] == 'SequenceStep':
             if edict['concreteActionId'] == concreteaction:
                 d = glob.grh.nodes[source]  # lookup the TestStep
                 sequenceids.add(d['sequenceId'])
@@ -397,9 +391,9 @@ def getConcreteActionSequenceid(concreteaction):
     return sequenceid,';'.join(sequenceids)
 
 
-def centralitywidth(index=0,size=glob.centrality_minwidth):
+def centralitywidth(index=0, size=settings.centrality_minwidth):
     return  int(size * pow(1.25, index))
 
 
-def centralityheight(index=0,size=glob.centrality_minheight):
+def centralityheight(index=0, size=settings.centrality_minheight):
     return  int(size * pow(1.25, index))

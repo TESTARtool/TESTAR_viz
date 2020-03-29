@@ -1,156 +1,83 @@
 '''
-Function: Collection of global variables used throughout the application
-ccc
+Function: Collection of variables used throughout the application
+
 '''
-
-
 
 
 import pandas as pd
 import networkx as nx
 import os
 
-## version of the Pythoncode
-version = '20200328'
+## version of the application
+version = '20200329'
 ## working directory
 scriptfolder = ''
+## folder for static assets
 assetfolder = 'assets'+os.sep #20190428 there is a dependency with app.get_asset_url
+## folder for dynamic assets. this is a subfoler of 'assets'
 outputfolder = 'content'+os.sep
-port = 8050
-debug=False  # show debug information in the browser.. and the DASH call graph
+## title of the webpage
 title='TESTAR Temporal Visualizer'
-experiment_widgetdistri=True
-
-
+## reference to networkX graph that contains the GraphML.XML
 grh = nx.DiGraph()
+## reference to networkX graph that contains the (selective) part of GraphML.XML
+# The part is determined by the layerview
 subgraph= nx.DiGraph()
-Threshold_V = 2000
-Threshold_E = 20000
-layerviewincache='--unknown--'
-parentingincache='--unknown--'
-filternodeincache='--unknown--'
-filtervalueincache='--unknown--'
+## static filename of the import graphML file.
 graphmlfile = os.path.join(assetfolder+outputfolder,'GraphML.xml')
-screenshotregex='.*\[(.+?)\].*'
+## timer for the large fileupload comp[onenet
 start_timer_upload = 0
-
-elementcompositefilter = "(.*?)(\s\|\|\s)(.*)" # allow a disjunct of 2 valuefilters
-elementvaluefilter= "\s*(\S*?)\s(>|>=|<|<=|=|!=|\^=|\*=|\$=|!\^=|!\*=|!\$=)\s'(.*?)'" #gui.py depends on this
+## regex for the nodefilter in the cytograph: allow a disjunct of 2 valuefilters
+elementcompositefilter = "(.*?)(\s\|\|\s)(.*)"
+## regex for the value part of the nodefilter
+#gui.py depends on this
+elementvaluefilter= "\s*(\S*?)\s(>|>=|<|<=|=|!=|\^=|\*=|\$=|!\^=|!\*=|!\$=)\s'(.*?)'"
+## property name in the viz-UITablethat contains the reference to the field that contaons the screenshot as bytearray
 image_attrib_key='image-source'
-image_element = 'screenshot'
-no_image_file= 'no_image.png'
-
+## contaions the nodes and edges in cytoscape format
 cytoelements=[]
-nodetable = dict()
-edgetable = dict()
-default_nodeelement='labelV'
-default_edgeelement='labelE'
-label_nodeelement=default_nodeelement
-label_edgeelement=default_edgeelement
+
+## name cyto nodetype used for boxing child nodes
 parent_subtypeelement ='-ParentNode-'
+## string contaoning either node or edge depending on the cytoelement
 elementtype = 'node/edge'
+## domain/business dependent type of the GraphML element. determined by the 'label_nodeelement' or 'label_edgeelement'
 elementsubtype ='subtype'
+## url to file that contaons the background image on a node
 elementimgurl ='imgurl'
-elementwithmetadata = 'AbstractStateModel'
-createdby='createdby_sequenceid'
-updatedby='updatedby_sequenceid'
-# scope: list all the labelV elements for the basis of  the calculation
-# use 'All' as a wildcard
-centralitynodes=['ConcreteState']
-
-
+## discovered attributes per nodetype in the GraphML file
 dfattributes=pd.DataFrame()
+## backend container for oracles to be displayed in UITable
 dforacles=pd.DataFrame()
+## backend container for oracles to be displayed in UITable
 dfbaselineoracles=pd.DataFrame()
+## backend container for visual properties of the node/edge element types.
 dfdisplayprops=pd.DataFrame()
+## backend container for test sequences of TESTAR.
 testexecutions=pd.DataFrame()
+## backend container for Longest shortest paths from any initial node.
 lsptraces=pd.DataFrame()
+## backend container for centrality measures.
 centralitiemeasures=pd.DataFrame()
-centralitiesshape='ellipse'
+## static part of the screenshot filename of a node.
 imgfiletemplate ='screenshot_of_node_'
+## static extension of the screenshot filename of a nodeb.
 imgfileextension ='.png'
-
+## TESTAR specfic sorted list for determining the 'createdby' properties of a Node.
 sortedsequencetuples=[]
+## TESTAR specfic sorted list for determining the 'createdby' properties of a Node.
 sortedsequenceids=[]
+## TESTAR specfic key in NodeElement that is added during the inspection/calculation of test sequences.
+createdby='createdby_sequenceid'
+## TESTAR specfic key in NodeElement that is added during the inspection/calculation of test sequences.
+updatedby='updatedby_sequenceid'
+## container for experiment on redundancy of 'Widgets' in de GraphML file.
 elementcreationdistri=[]
-
-
-nodeonselectmultiplier=3
-edgeonselectmultiplier=3
-nodedisplayprop={
-                'hide':'','focus': '','cover': '',
-                'label':'nodeid','label_fontsize' : 14,
-                'shape' :'rectangle','width' : 30,'height' : 30,
-                'image-source': 'screenshot',
-                'border-width' : 1,'border-color' : 'black','border-style' :'solid',
-                'color' : 'grey','color_if_terminal' : 'purple',
-                 'shape_if_terminal': 'octagon','opacity': 1
-                }
-parentnodedisplayprop={
-                'hide':'','focus': '','cover': '',
-                'label':'nodeid','label_fontsize' : 18,
-                'shape' :'rectangle','width': 30,'height': 30,
-                'image-source': '',
-                'border-width' : 2,'border-color' : 'black',
-                'color' : 'wheat','color_if_terminal' : '',
-                'shape_if_terminal': ''
-                }
-edgedisplayprop={
-                'hide':'','focus': '', 'cover': '',
-                'label':'','label_fontsize' : 10,'label-onselect': 'Desc',
-                'arrow-shape' : 'vee','arrow-scale' : 1, 'arrow-color' : 'blue',
-                'line-width' : 1,
-                'image-source': '',
-                'edgestyle' : 'bezier','edgefill' : 'solid',
-                'color' : 'grey', 'opacity': 1
-                }
-
-tableoddrowstyle = {
-                'if': {'row_index': 'odd'},
-                'backgroundColor': 'AliceBlue'}
-oraclefailstyle={
-                "backgroundColor": "red",
-                'color': 'white'}
-oraclepassstyle={
-                "backgroundColor": "green",
-                'color': 'white'}
-oracletable_showfail={"backgroundColor": "tomato", 'color': 'white'}
-oracletable_showpass={"backgroundColor": "mediumseagreen",'color': 'white'}
-
-baselineoracle_pass_cycle_states = {'border-width': 2, 'border-color': 'goldenrod', 'background-color': 'goldenrod','border-style': 'dashed'}
-baselineoracle_pass_prefix_states = {'border-width': 2, 'border-color':'gold','background-color': 'gold', 'border-style': 'dashed'}
-baseineoracle_pass_cycle_transitions = {'width': 4, 'line-style': 'dashed','line-color': 'goldenrod', 'mid-target-arrow-color':'goldenrod'}
-baselineoracle_pass_prefix_transitionss  = {'width': 4, 'line-style': 'dashed','line-color': 'gold', 'mid-target-arrow-color':'gold'}
-
-baselineoracle_fail_cycle_states = {'border-width': 2, 'border-color': 'deeppink', 'background-color': 'deeppink','border-style': 'dashed'}
-baselineoracle_fail_prefix_states = {'border-width': 2, 'border-color': 'plum', 'background-color': 'plum', 'border-style': 'dashed'}
-baselineoracle_fail_cycle_transitions = {'width': 4, 'line-style': 'dashed','line-color': 'deeppink', 'mid-target-arrow-color':'deeppink'}
-baselineoracle_fail_prefix_transitions  = {'width': 4, 'line-style': 'dashed','line-color': 'plum', 'mid-target-arrow-color': 'plum'}
-
-
-latestoracle_pass_cycle_states = {'border-width': 2, 'border-color':'green', 'background-color': 'green','border-style': 'dashed'}
-latestoracle_pass_prefix_states = {'border-width': 2, 'border-color':'lightgreen','background-color': 'lightgreen', 'border-style': 'dashed'}
-latestoracle_pass_cycle_transitions = {'width': 4, 'line-style': 'dashed','line-color': 'green', 'mid-target-arrow-color':'green'}
-latestoracle_pass_prefix_transitionss  = {'width': 4, 'line-style': 'dashed','line-color': 'lightgreen', 'mid-target-arrow-color':'lightgreen'}
-
-latestoracle_fail_cycle_states = {'border-width': 2, 'border-color': 'red', 'background-color': 'red','border-style': 'dashed'}
-latestoracle_fail_prefix_states = {'border-width': 2, 'border-color': 'brown', 'background-color': 'brown', 'border-style': 'dashed'}
-latestoracle_fail_cycle_transitions = {'width': 4, 'line-style': 'dashed','line-color': 'red', 'mid-target-arrow-color':'red'}
-latestoracle_fail_prefix_transitions  = {'width': 4, 'line-style': 'dashed','line-color': 'brown', 'mid-target-arrow-color': 'brown'}
-
-trace_node_unselected = {'shape': 'octagon','background-color': 'red','border-style': 'dotted',
-                'opacity': 0.1, 'border-color': 'fuchsia'}
-trace_edge_unselected  = {'line-style': 'dotted', 'opacity': 0.4,'mid-target-arrow-color': 'fuchsia'}
-
-path_allnodes = {'border-width': 3, 'border-color': 'brown', 'background-color': 'white'}
-path_firstnodes = {'border-width': 3, 'border-color': 'blue', 'background-color': 'blue'}
-path_lastnodes = {'border-width': 3, 'border-color': 'black', 'background-color': 'black'}
-path_alledges = {'width': 3, 'mid-target-arrow-color': 'brown', 'arrow-scale': 2, 'line-color': 'blue'}
-
-centrality_shape = {'shape': 'ellipse','opacity': 1}
-centrality_colornameStart= 'red'
-centrality_colornameEnd='green'
-centrality_bins=7
-centrality_minwidth=20
-centrality_minheight=20
-
+## current cached view
+layerviewincache='--unknown--'
+## cached boolean whether  the current view is boxed or not.
+parentingincache='--unknown--'
+## cached the selected node-filter
+filternodeincache='--unknown--'
+## cached the selected (string) value-filter
+filtervalueincache='--unknown--'

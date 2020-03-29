@@ -9,10 +9,13 @@ import json
 from dash.dependencies import Input, Output, State
 import dash
 import pandas as pd
+
+import settings
 import utils
 from appy import app
 import utils.globals as glob
 import utils.gradient
+from styler import set_centrality_style
 from utils import styler
 from utils.graphcomputing import centralitywidth, centralityheight
 
@@ -83,16 +86,16 @@ def set_legenda(i_apply_viz_settings, i_loadingcomplete, s_viz_settings_data, s_
     # nodeprops=nodestyler(glob.nodedisplayprop,'element',False)
     nodeprops = {'width': 30, 'height': 30, 'font-size': 14, 'label': 'data(id)',
                  'text-opacity': 1, 'background-opacity': 0.1, 'border-opacity': 0.1}
-    nodeprops.update(glob.trace_node_unselected)
+    nodeprops.update(settings.trace_node_unselected)
     nodeprops.pop('opacity', '')  # show label
     legenda = styler.stylelegenda('node', 'node-not-in-trace', nodeprops)
     trstylesheet.append(legenda[0])
     trelements.extend(legenda[1])
 
-    edgestyle = styler.edgestyler(glob.edgedisplayprop, 'element', False)
+    edgestyle = styler.edgestyler(settings.edgedisplayprop, 'element', False)
     edgestyle.update({'label': 'data(id)', 'text-opacity': 1, 'background-opacity': 0.1, 'border-opacity': 0.1})
     edgestyle.update({'text-opacity': 1})
-    edgestyle.update(glob.trace_edge_unselected)
+    edgestyle.update(settings.trace_edge_unselected)
     edgestyle.pop('opacity', '')  # show label
     legenda = styler.stylelegenda('edge', 'edge-not-in-trace', edgestyle)
     trstylesheet.append(legenda[0])
@@ -100,25 +103,25 @@ def set_legenda(i_apply_viz_settings, i_loadingcomplete, s_viz_settings_data, s_
 
     # path
     nodeprops = {'width': 30, 'height': 30, 'font-size': 14, 'label': 'data(id)'}
-    nodeprops.update(glob.path_firstnodes)
+    nodeprops.update(settings.path_firstnodes)
     legenda = styler.stylelegenda('node', 'first-path-node', nodeprops)
     pstylesheet.append(legenda[0])
     pelements.extend(legenda[1])
     nodeprops = {'width': 30, 'height': 30, 'font-size': 14, 'label': 'data(id)'}
-    nodeprops.update(glob.path_allnodes)
+    nodeprops.update(settings.path_allnodes)
     legenda = styler.stylelegenda('node', 'inter-path-node', nodeprops)
     pstylesheet.append(legenda[0])
     pelements.extend(legenda[1])
 
     nodeprops = {'width': 30, 'height': 30, 'font-size': 14, 'label': 'data(id)'}
-    nodeprops.update(glob.path_lastnodes)
+    nodeprops.update(settings.path_lastnodes)
     legenda = styler.stylelegenda('node', 'last-path-node', nodeprops)
     pstylesheet.append(legenda[0])
     pelements.extend(legenda[1])
 
-    edgestyle = styler.edgestyler(glob.edgedisplayprop, 'element', False)
+    edgestyle = styler.edgestyler(settings.edgedisplayprop, 'element', False)
     edgestyle.update({'label': 'data(id)'})
-    edgestyle.update(glob.path_alledges)
+    edgestyle.update(settings.path_alledges)
 
     legenda = styler.stylelegenda('edge', 'path-edge', edgestyle)
     pstylesheet.append(legenda[0])
@@ -128,22 +131,15 @@ def set_legenda(i_apply_viz_settings, i_loadingcomplete, s_viz_settings_data, s_
     firstrow = glob.centralitiemeasures.to_dict("rows")[0]
     bins = json.loads(firstrow['binning'])  # convert string back to dict
 
-    colorlist = utils.gradient.colorgradient(colornameStart=glob.centrality_colornameStart,
-                                             colornameEnd=glob.centrality_colornameEnd, n=len(bins))['hex']
+    colorlist = utils.gradient.colorgradient(colornameStart=settings.centrality_colornameStart,
+                                             colornameEnd=settings.centrality_colornameEnd, n=len(bins))['hex']
     j = 0
     tmplist=[]
     for k, v in bins.items():
-        #style.stylelegenda did not work: strange memory assignment
         cytonodes = []
         selectorfilter = '[' + 'id'+ ' ' + '=' + ' ' + '\'' + 'bin'+k + '\'' + ']'    #  [id = 'bins_0']
         selectordict = {'selector': 'node' + selectorfilter}
-        styling={'shape': glob.centralitiesshape, #candidate refactoring: codeclone in Stylemanager
-                    'width': centralitywidth(j),
-                   'height': centralityheight(j),
-                   'background-color': colorlist[j],
-                   'border-color': colorlist[j],
-                   'font-size': 18,
-                   'label': 'data(id)'}
+        styling=set_centrality_style(colorlist[j], j)
         styledict = {'style': styling}
         style = selectordict
         style.update(styledict)

@@ -1,3 +1,4 @@
+import settings
 import utils.globals as glob
 from graphcomputing import centralitywidth, centralityheight
 
@@ -70,7 +71,7 @@ def edgestyler(edgedata=None,dsp='element',legenda=False):
 
 
 def set_centrality_style(colour, index):
-    cstyle = glob.centrality_shape
+    cstyle ={'shape': settings.centralitiesshape}
     cstyle.update({'width': centralitywidth(index),
                    'height': centralityheight(index),
                    'background-color': colour,
