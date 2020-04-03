@@ -2,7 +2,8 @@
 the run.py command starts the server to listen on localhost:8050 \n
 param --port to start the server on another port than 8050 E.g. Python run.py \--port 8044
 '''
-import settings
+
+import utils.settings as settings
 
 
 def setup():

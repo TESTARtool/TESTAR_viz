@@ -5,9 +5,9 @@ import time
 import networkx as nx
 import pandas as pd
 
-import globals
-import settings
-from filehandling import read_file_in_dataframe
+#import globals
+from utils import settings as settings
+from utils.filehandling import read_file_in_dataframe
 from utils import globals as glob
 
 def getsubgraph(layerview, filternode=None, filtervalue=None):
@@ -100,7 +100,7 @@ def getsubgraph(layerview, filternode=None, filtervalue=None):
 
 
     glob.subgraph=graphcopy
-    globals.layerviewincache = layerview
+    glob.layerviewincache = layerview
     return glob.subgraph
 
 

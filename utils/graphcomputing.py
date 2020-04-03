@@ -8,8 +8,9 @@ import os
 import sys
 import dateutil
 
-import globals
-import settings
+#import globals
+#import settings
+from utils import settings as settings
 from appy import app
 import networkx as nx
 import pandas as pd
@@ -136,15 +137,15 @@ def processgraphmlfile(details=True, advanced=False):
         for n, ndict in glob.grh.nodes(data=True):
             if ndict[settings.label_nodeelement] == 'ConcreteState':
                 sequenceid,allsequenceids = getConcreteStateSequenceid(n)
-                glob.grh.nodes[n][globals.createdby] = sequenceid
-                glob.grh.nodes[n][globals.updatedby] = allsequenceids
+                glob.grh.nodes[n][glob.createdby] = sequenceid
+                glob.grh.nodes[n][glob.updatedby] = allsequenceids
 
         for source, target, n, edict in glob.grh.edges(data=True, keys=True):
             if edict[settings.label_edgeelement] == 'ConcreteAction':
                 sequenceid,allsequenceids = getConcreteActionSequenceid(edict['actionId'])
-                glob.grh[source][target][n][globals.createdby] = sequenceid  # is syntax for multidi graph edges
-                glob.grh[source][target][n][globals.updatedby]= allsequenceids
-        print('updating all ConcreteStates & Actions with "' + globals.createdby + '" done',
+                glob.grh[source][target][n][glob.createdby] = sequenceid  # is syntax for multidi graph edges
+                glob.grh[source][target][n][glob.updatedby]= allsequenceids
+        print('updating all ConcreteStates & Actions with "' + glob.createdby + '" done',
               "--- %.3f seconds ---" % (time.time() - start_time))
 
     #centralitymeasure = [{'measure': 'N/A', 'binning': 'N/A'}]
@@ -292,14 +293,14 @@ def setCytoElements(parenting=False, layerview=None,filternode=None,filtervalue=
     TestSequencekeyset = set()
     try:
         copydefaultimagetoasset()  # optimize: do only once:-)
-        if (globals.layerviewincache == layerview and globals.parentingincache == parenting and
-                globals.filternodeincache == filternode and globals.filtervalueincache == filtervalue):
+        if (glob.layerviewincache == layerview and glob.parentingincache == parenting and
+                glob.filternodeincache == filternode and glob.filtervalueincache == filtervalue):
             pass
         else:
 
             grh = getsubgraph(layerview, filternode, filtervalue)
-            globals.filtervalueincache = filtervalue
-            globals.filternodeincache = filternode
+            glob.filtervalueincache = filtervalue
+            glob.filternodeincache = filternode
             for n, ndict in grh.nodes(data=True):
 
                 tempdict = dict(ndict)
@@ -332,7 +333,7 @@ def setCytoElements(parenting=False, layerview=None,filternode=None,filtervalue=
                     t_parentnode = {'data': {'id': TestSequenceKey, settings.label_nodeelement: glob.parent_subtypeelement,
                                              'nodeid': TestSequenceKey}}
                     allnodes.append(t_parentnode)
-            globals.parentingincache = parenting
+            glob.parentingincache = parenting
             allnodes.extend(nodes)
             for source, target, n, edict in grh.edges(data=True, keys=True):
                 tempdict = dict(edict)

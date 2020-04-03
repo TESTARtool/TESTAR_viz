@@ -1,8 +1,10 @@
 import json
+
+import dash
 import networkx as nx
 
-import globals
-import settings
+#import utils.globals
+from utils import settings as settings
 import utils.gradient
 import utils.gui
 import utils.graphcomputing as tu
@@ -248,9 +250,9 @@ def updateCytoStyleSheet( selectedoracles, oracledata, selectedbaselineoracles, 
                 for r in executionsdata:
                     i = i + 1
                     if not i in selectedrows:
-                        nodeselector = "node[" + settings.label_nodeelement + " = 'ConcreteState'][" + globals.createdby + \
+                        nodeselector = "node[" + settings.label_nodeelement + " = 'ConcreteState'][" + glob.createdby + \
                                        " = " + "'" + r['sequenceId'] + "'" + "]"
-                        edgeselector = "edge[" + settings.label_edgeelement + " = 'ConcreteAction'][" + globals.createdby + \
+                        edgeselector = "edge[" + settings.label_edgeelement + " = 'ConcreteAction'][" + glob.createdby + \
                                        " = " + "'" + r['sequenceId'] + "'" + "]"
                         nodeselectors.append(nodeselector)
                         edgeselectors.append(edgeselector)
@@ -260,10 +262,10 @@ def updateCytoStyleSheet( selectedoracles, oracledata, selectedbaselineoracles, 
                 for r in executionsdata:
                     i = i + 1
                     if i in selectedrows:
-                        nodepartselector = "[" + settings.label_nodeelement + " = 'ConcreteState'][" + globals.updatedby + \
+                        nodepartselector = "[" + settings.label_nodeelement + " = 'ConcreteState'][" + glob.updatedby + \
                                        " !*= " + "'" + r['sequenceId'] + "'" + "]"
                         nodeselectorbuilder=nodeselectorbuilder+nodepartselector
-                        edgepartselector = "[" + settings.label_edgeelement + " = 'ConcreteAction'][" + globals.updatedby + \
+                        edgepartselector = "[" + settings.label_edgeelement + " = 'ConcreteAction'][" + glob.updatedby + \
                                        " !*= " + "'" + r['sequenceId'] + "'" + "]"
                         edgeselectorbuilder=edgeselectorbuilder+edgepartselector
                 nodeselectors.append("node"+nodeselectorbuilder)
@@ -348,6 +350,7 @@ def updateCytoStyleSheet( selectedoracles, oracledata, selectedbaselineoracles, 
         layervaluefilter.remove({'label': glob.parent_subtypeelement, 'value':glob.parent_subtypeelement })
     return '', stylesheet, layervaluefilter,valuefilter,oracleconditionalstyle, baselineoracleconditionalstyle, shortestpatherror
 
+
 ##
 #    helper method: styles the nodes with the style map
 #    @param csvlistofelements: comma separated list of node ids from the GraphML
@@ -372,7 +375,7 @@ def style_csvelements(csvlistofelements, elementype, stylepropdict):
 #    helper method: styles the nodes in the path with the shortest-path-style
 #    @param nodelist: list of node ids from from the GraphML
 #    @param graph: reference to find the edges corresponding to the nodes
-#    @return: stylesheet in cytoscape formatt
+#    @return: stylesheet in cytoscape format
 
 def style_path(nodelist=[], graph=None):
 

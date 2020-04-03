@@ -10,14 +10,14 @@ import dash
 from dash.dependencies import Input, Output, State
 import dash_html_components as html
 
-import settings
+from utils import settings as settings
 import utils.filehandling
 from appy import app
 import utils.globals as glob
 import utils.graphcomputing as tu
 import utils.cytostylemanager as ch
 import pandas as pd
-from styler import style_dframe
+from utils.styler import style_dframe
 
 
 @app.callback(
@@ -63,16 +63,16 @@ def update_layout(i_updatelayoutbutton, s_canvasheight, s_layout, s_fenced, s_la
 
     [State('viz-settings-table', "data"),
      State('oracletable', "derived_virtual_selected_rows"),
-     State('oracletable', "data"),
+     State('oracletable', "derived_virtual_data"),
      State('baseline-oracletable', "derived_virtual_selected_rows"),
-     State('baseline-oracletable', "data"),
+     State('baseline-oracletable', "derived_virtual_data"),
      State('executions-table', "derived_virtual_selected_rows"),
-     State('executions-table', "data"),
+     State('executions-table', "derived_virtual_data"),
      State('checkbox-layerview-options', 'value'),
      State('advancedproperties-table', "derived_virtual_selected_rows"),
-     State('advancedproperties-table', "data"),
+     State('advancedproperties-table', "derived_virtual_data"),
      State('centralities-table', "derived_virtual_selected_rows"),
-     State('centralities-table', "data"),
+     State('centralities-table', "derived_virtual_data"),
      State('selectednodetable', 'data'),
      State('execution-details', 'value')
      ]
@@ -88,14 +88,19 @@ def updateCytoStyleSheet(i_legenda, i_apply_oracle, i_apply_baselineoracle, i_ap
     if trigger == 'cytoscape-legenda' and len(triggervalue) == 0 :
         return dash.no_update, dash.no_update, dash.no_update, \
                dash.no_update, dash.no_update, dash.no_update,dash.no_update
-
+    # if trigger == 'cytoscape-legenda' and len(triggervalue) == 0:
+    #     return dash.no_update, dash.no_update, dash.no_update, \
+    #            dash.no_update,  dash.no_update
     returndata = ch.updateCytoStyleSheet(s_selectedoracles, s_oracledata, s_selectedbaselineoracles,
-                                         s_baselineoracledata, s_selectedexecutions, s_executionsdata, s_layerview,
-                                         s_selectedsimplepath, s_simplepathdata, s_selectedcentralities,
-                                         s_centralitiesdata,s_selectednodedata, s_createdby_or_updatedby)
+                                        s_baselineoracledata, s_selectedexecutions, s_executionsdata, s_layerview,
+                                        s_selectedsimplepath, s_simplepathdata, s_selectedcentralities,
+                                        s_centralitiesdata, s_selectednodedata, s_createdby_or_updatedby)
+
 
     if ('error' in returndata[-1]) and trigger == 'apply-shortestpath-button':  # shortestpatherror
-        return dash.no_update, dash.no_update, dash.no_update,dash.no_update,dash.no_update, dash.no_update, returndata[-1]
+        return dash.no_update, returndata[1], dash.no_update,dash.no_update,dash.no_update, dash.no_update, returndata[-1]
+        #return dash.no_update, dash.no_update, dash.no_update, dash.no_update,  returndata[-1]
+
     else:
         return returndata
 

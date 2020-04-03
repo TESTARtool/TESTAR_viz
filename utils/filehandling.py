@@ -9,7 +9,7 @@ import urllib
 
 import pandas as pd
 
-import settings
+from utils import settings as settings
 from utils import globals as glob
 
 ##

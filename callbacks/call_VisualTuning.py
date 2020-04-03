@@ -10,7 +10,7 @@ from dash.dependencies import Input, Output, State
 import utils.gui
 from appy import app
 import utils.globals as glob
-from filehandling import save_uitable
+from utils.filehandling import save_uitable
 
 
 @app.callback(

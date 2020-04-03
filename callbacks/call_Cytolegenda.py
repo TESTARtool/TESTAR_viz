@@ -10,12 +10,12 @@ from dash.dependencies import Input, Output, State
 import dash
 import pandas as pd
 
-import settings
+from utils import settings as settings
 import utils
 from appy import app
 import utils.globals as glob
 import utils.gradient
-from styler import set_centrality_style
+from utils.styler import set_centrality_style
 from utils import styler
 from utils.graphcomputing import centralitywidth, centralityheight
 
@@ -75,11 +75,11 @@ def set_legenda(i_apply_viz_settings, i_loadingcomplete, s_viz_settings_data, s_
 
         if row[glob.elementtype] == 'node' and 'State' in row[glob.elementsubtype] and not alreadydonedeadstate:
             itemstyle = styler.nodestyler(nodedata=row, dsp='element', legenda=True)
-            itemstyle.update({'label': 'DeadState'})
+            itemstyle.update({'label': 'TerminalState'})
             itemstyle.update({'shape': row['shape_if_terminal']})
             itemstyle.update({'background-color': row['color_if_terminal']})
             alreadydonedeadstate = True
-            legenda = styler.stylelegenda('node', 'DeadState', itemstyle)
+            legenda = styler.stylelegenda('node', 'TermionalState', itemstyle)
             cstylesheet.append(legenda[0])
             celements.extend(legenda[1])
     # test exec

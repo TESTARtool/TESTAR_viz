@@ -33,7 +33,7 @@ def spinnertable(ident='baseline-oracletable'):
                 filter_action='native',
                 sort_action='native',
                 sort_mode="multi",
-                virtualization=True,
+                #virtualization=True,
                 page_action='none'
             ),
         ],

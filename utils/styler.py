@@ -1,6 +1,6 @@
-import settings
+from utils import settings as settings
 import utils.globals as glob
-from graphcomputing import centralitywidth, centralityheight
+from utils.graphcomputing import centralitywidth, centralityheight
 
 
 def stylelegenda(elementtype, legendaitem, styling, filteredattribute='id', subselector='', comparator='='):

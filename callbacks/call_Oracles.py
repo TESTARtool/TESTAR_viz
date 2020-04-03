@@ -11,7 +11,7 @@ from dash.dependencies import Input, Output, State
 import utils.filehandling
 from appy import app
 import utils.globals as glob
-from styler import style_dframe
+from utils.styler import style_dframe
 
 
 @app.callback(
@@ -45,7 +45,7 @@ def oracles_from_file_to_dframe(filecontents, filename, dframe):
             print('set data for  oracle table')
             dframe = utils.filehandling.read_file_in_dataframe(filecontents, filename)
         else:
-            return [{'id': 'dummy', 'name': 'dummy'}], [{'dummy': ''}],None
+            return [{'id': 'dummy', 'name': 'dummy'}], [{'dummy': ''}],dash.no_update #None
         returndata = style_dframe(dframe)
         return returndata[0],returndata[1],returndata[2]
 
