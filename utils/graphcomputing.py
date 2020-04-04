@@ -8,69 +8,78 @@ import os
 import sys
 import dateutil
 
-#import globals
-#import settings
 from utils import settings as settings
 from appy import app
 import networkx as nx
 import pandas as pd
 import time
 from utils import globals as glob
-from utils.filehandling import set_imagefilename, savescreenshottodisk, copydefaultimagetoasset
+from utils.filehandling import  savescreenshottodisk, copydefaultimagetoasset
 from utils.gui import getsubgraph, setgraphattributes, setvizproperties
 
 
 
 def Widgetdistri():
+    widget_nodescnt = dict()
     widget_nodes = dict()
-    for n, ndict in glob.grh.nodes(data=True):
-        if ndict[settings.label_nodeelement] == 'Widget':
-            if ndict["ConcreteID"] in widget_nodes:
-                widget_nodes[ndict["ConcreteID"]]= (1+widget_nodes[ndict["ConcreteID"]])
-            else:
-                widget_nodes[ndict["ConcreteID"]] = 1
-    df = pd.DataFrame.from_dict(widget_nodes,orient='index')
-    csvstr = df.to_csv(index=True,encoding='utf-8', sep=';')
-    directory = (glob.scriptfolder + glob.assetfolder + glob.outputfolder);
-    fout = open(directory + "WidgetDistribution.csv", encoding='utf-8', mode='w',  newline='')
-    fout.write(csvstr)
-    fout.close()
-
-    widget_nodes = dict()
-    widget_nodes_hash = dict()
-
     for n, ndict in glob.grh.nodes(data=True):
         if ndict[settings.label_nodeelement] == 'Widget':
             widget_nodes[n] = ndict
-            widget_nodes_hash[n]={k:(int(hashlib.sha256(str(v).encode('utf-8')).hexdigest(), 16) %10**10) for k,v in ndict.items()}
+            if ndict["ConcreteID"] in widget_nodescnt:
+                widget_nodescnt[ndict["ConcreteID"]]= (1+widget_nodescnt[ndict["ConcreteID"]])
+            else:
+                widget_nodescnt[ndict["ConcreteID"]] = 1
+
+
     if len(widget_nodes)>0:
+        df = pd.DataFrame.from_dict(widget_nodescnt, orient='index',columns=['#'] )
+        savedftocsv(df, "WidgetConcreteID_Distribution.csv")
+
+
         df = pd.DataFrame.from_dict(widget_nodes, orient='index')
-        df.sort_values("ConcreteIDCustom", axis=0, ascending=True,
-                         inplace=True, na_position='last')
-        csvstr = df.to_csv(index=True, encoding='utf-8', sep=';')
-        directory = (glob.scriptfolder + glob.assetfolder + glob.outputfolder);
-        fout = open(directory + "WidgetDetails.csv", encoding='utf-8', mode='w', newline='')
-        fout.write(csvstr)
-        fout.close()
-        df1 = pd.DataFrame.from_dict(widget_nodes_hash, orient='index')
-        df1.sort_values("ConcreteIDCustom", axis=0, ascending=True,
-                       inplace=True, na_position='last')
-        csvstr = df1.to_csv(index=True, encoding='utf-8', sep=';')
-        directory = (glob.scriptfolder + glob.assetfolder + glob.outputfolder);
-        fout = open(directory + "WidgetDetailsHashes.csv", encoding='utf-8', mode='w', newline='')
-        fout.write(csvstr)
-        fout.close()
-        df2= df1.copy()
-        df2 = df2.diff()
+        df['UIAValueValue']= df['UIAValueValue'].astype(str).str.slice(0, 255)  # prevent csv overflow
+        df['ValuePattern']=df['ValuePattern'].astype(str).str.slice(0, 255)
+        #df.sort_values("ConcreteIDCustom", axis=0, ascending=True,inplace=True, na_position='last')
 
-        csvstr = df2.to_csv(index=True, encoding='utf-8', sep=';')
-        directory = (glob.scriptfolder + glob.assetfolder + glob.outputfolder);
-        fout = open(directory + "WidgetDetailsHashesDIFF.csv", encoding='utf-8', mode='w', newline='')
-        fout.write(csvstr)
-        fout.close()
+        disctinctdict=dict()
+        for (columnName, columnData) in df.iteritems():
+            uniques= df[columnName].unique()
+            uniqueslist=uniques.tolist()
+            count=len(uniqueslist)
+            disctinctdict.update({columnName:[count,uniqueslist[:25]]})
+        df3 = pd.DataFrame.from_dict(disctinctdict, orient='index', columns=['#', 'Unique values (first 25)'])
+        savedftocsv(df3, "WidgetAttributes_Dependency.csv")
 
 
+        excludelist= ['AbstractIDCustom','ConcreteIDCustom','Abs(R)ID','ConcreteID',
+                    'Abs(R_k_T_k_P)ID','AbstractID','widgetId','Abs(R_k_T)ID','counter']
+        widgethash = []
+        for index, row in df.iterrows():
+            hash=''
+            for i,v in row.items():
+                if i not in excludelist:
+                    try:
+                        hash=hash+str(v)
+                    except Exception as e:  # key error
+                        hash=hash+''
+            widgethash.append(hash)
+        df['stringconcat']=widgethash
+        df['stringconcat_exluding']=str(excludelist)
+        savedftocsv(df, "WidgetDetails.csv")
 
+        uniqueslist = df['stringconcat'].unique().tolist()
+        df4 = pd.DataFrame.from_dict({'uniqueWidgets':uniqueslist})
+        savedftocsv(df4, "WidgetUniqueness.csv")
+
+    else:
+        print('No Widget in Graph, no distribution to produce')
+
+def savedftocsv(dframe, csvfilename):
+    csvstr = dframe.to_csv(index=True, encoding='utf-8', sep=';')
+    directory = (glob.scriptfolder + glob.assetfolder + glob.outputfolder);
+    fout = open(directory + csvfilename, encoding='utf-8', mode='w', newline='')
+    fout.write(csvstr)
+    fout.close()
 
 
 ##
@@ -124,10 +133,10 @@ def processgraphmlfile(details=True, advanced=False):
                             initialnode = [x for x, y in glob.grh.nodes(data=True) if
                                            y[settings.label_nodeelement] == 'ConcreteState' and
                                            y['ConcreteIDCustom'] == tndict['concreteStateId']] #case sentitive !!
-                if initialnode !='':
-                    break
-        testlength = i  # len(ts)-1 # substrct testsequencenode
-        sequencetuples.append((d['sequenceId'], date_time_obj, testlength, initialnode[0]))
+                #if initialnode !='':
+                #    break
+        testlength = i-1  # len(ts)-1 # substrct testsequencenode
+        sequencetuples.append((d['sequenceId'], date_time_obj,  testlength, initialnode[0]))
     glob.sortedsequencetuples = sorted(sequencetuples, key=lambda x: x[1])
     glob.sortedsequenceids = [s for s, d, l, i in glob.sortedsequencetuples]
 
