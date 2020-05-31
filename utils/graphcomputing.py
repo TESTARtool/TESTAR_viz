@@ -18,7 +18,10 @@ from utils.filehandling import  savescreenshottodisk, copydefaultimagetoasset
 from utils.gui import getsubgraph, setgraphattributes, setvizproperties
 
 
-
+##
+#Function:  experiment to determine the redundancy of widgets in a TESTAR State Model.
+#@param:  none
+#@return: exports csv files to analyze the redundancy
 def Widgetdistri():
     widget_nodescnt = dict()
     widget_nodes = dict()
@@ -73,7 +76,11 @@ def Widgetdistri():
 
     else:
         print('No Widget in Graph, no distribution to produce')
-
+##
+#Function:  helper for saving panda Dataframe to CSV with ';' as seperator.
+#@param   dframe: panda dataFrame to convert
+#@param   csvfilename : filemane of the CSV file
+#@return:  exports csv files to analyze the redundancy
 def savedftocsv(dframe, csvfilename):
     csvstr = dframe.to_csv(index=True, encoding='utf-8', sep=';')
     directory = (glob.scriptfolder + glob.assetfolder + glob.outputfolder);
@@ -264,6 +271,12 @@ def processgraphmlfile(details=True, advanced=False):
     print('validating graph  done', "--- %.3f seconds ---" % (time.time() - start_time))
     return masterlog
 
+##
+#Function:  calculates a centrality measure: indegree, outdegree or loadcentrality by using the networkX implementation
+#           assigns a value to each node that corresponds to centrality measure
+#@param graph: networkX graph
+#@param centralityname: indegree, outdegree or loadcentrality.
+#@return: dict containing boundaries of each bin (~bucket) number of bins is determined by a setting
 
 def setcentralitymeasure(graph=None,centralityname='indegree_noselfloops'):
         if 'indegree' in centralityname :
@@ -286,6 +299,13 @@ def setcentralitymeasure(graph=None,centralityname='indegree_noselfloops'):
         nx.set_node_attributes(glob.grh, d, centralityname)
         dicy = dict(zip(cut_labels, cut_bins))
         return {'measure': centralityname, 'binning': json.dumps(dicy)}
+
+##
+#Function:  converts networkX graph to cytoscape format.
+#           and applies caching and filtering
+#@param parenting: show each layer in a box?. this requires extra parent nodes for each box
+#@param layerview: list of which subtypes to show. e.g. ConcreteState, Widget
+#@return: list of nodes and edges in cytoscape format
 
 def setCytoElements(parenting=False, layerview=None,filternode=None,filtervalue=None):
     if layerview is None:
@@ -365,7 +385,11 @@ def setCytoElements(parenting=False, layerview=None,filternode=None,filtervalue=
         print(exc_type, fname1, exc_tb.tb_lineno)
         print('*  There was an error processing : ' + str(e))
 
-
+##
+#Function:  find the testsequences that updated and created the COncreteState node.
+#           the oldest sequenceid is the one that is responsible for creation of the node.
+#@param concretestate: subject node.
+#@return: tuple of 1. the oldest sequenceid  and 2. a list of all the sequenceidslist.
 def getConcreteStateSequenceid(concretestate):
     sequenceid = ''
     neighbors = glob.grh.predecessors(concretestate)
@@ -383,7 +407,11 @@ def getConcreteStateSequenceid(concretestate):
     sequenceid = glob.sortedsequenceids[index]
     return sequenceid,';'.join(sequenceids)
 
-
+##
+#Function:  find the testsequences that updated and created the COncreteAction edge.
+#           the oldest sequenceid is the one that is responsible for creation of the edge.
+#@param concreteaction: subject edge.
+#@return: tuple of 1. the oldest sequenceid  and 2. a list of all the sequenceidslist.
 def getConcreteActionSequenceid(concreteaction):
     sequenceids = set()
     # use the global graph object .. to ensure that TestSequence is always included
@@ -400,10 +428,18 @@ def getConcreteActionSequenceid(concreteaction):
     sequenceid = glob.sortedsequenceids[index]
     return sequenceid,';'.join(sequenceids)
 
-
+##
+#Function:  helper method to compute a node width.
+#@param index: multiplication factor.
+#@param size: size to increase by a factor
+#@return: size of width
 def centralitywidth(index=0, size=settings.centrality_minwidth):
     return  int(size * pow(1.25, index))
 
-
+##
+#Function:  helper method to compute a node height
+#@param index: multiplication factor.
+#@param size: size to increase by a factor
+#@return: size of height
 def centralityheight(index=0, size=settings.centrality_minheight):
     return  int(size * pow(1.25, index))

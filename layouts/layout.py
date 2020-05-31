@@ -1,5 +1,5 @@
 '''
-Provides the Web-Layout and hosts the subsections:
+Provides the structure of the Web-Layout and refers to the subsections:
 '''
 
 
@@ -43,7 +43,7 @@ mainlayout = html.Div(id='main', children=[
                     html.Hr(),
                     html.Div(visualTuning, style=contentstyle),
                     html.Hr(),
-                    html.Div('Legenda',style=headerstyle),
+                    html.Div('Legend',style=headerstyle),
                     html.Hr(),
                     html.Div(cytolegendalayout, style=contentstyle),
                     html.Hr(),
