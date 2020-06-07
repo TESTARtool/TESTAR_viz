@@ -1,5 +1,5 @@
 # Testar_Visualization
-#####Visualization of TESTAR graph databases in a browser.
+##### Visualization of TESTAR graph databases in a browser.
 
 Based on Python, Dash (flask) and Cytoscape.js. Dash and Cytoscape.js are both MIT Licensed.
 
@@ -61,7 +61,7 @@ The following interactive features are at the users' disposal:
     - Show counterexample or witness traces of the selected oracles (LTL only)
 
 
-###Alternative use case:
+### Alternative use case:
 * Generic GraphML files can be rendered
 * Nodes and egdes will appear grey. To make the appearance fancy:
   * nodes must have a key with labelV in GraphML. This determines the node-type
@@ -69,7 +69,7 @@ The following interactive features are at the users' disposal:
   * test-runs & test oracles features will not work due to hardcoded dependencies (ConcreteState,ConcreteAction). 
   * layer selection feature only works when the requirements for labelV and labelE are fulfilled.
  
-###Advanced  use case: 
+### Advanced  use case: 
 * Modifying any variable in settings.py can change the behavior (radically!)
     * Adapt Styling that is not yet customizable via the browser. (oracles,path, centralities) 
     * Override the regular expression that captures the bytearray of the screen-print of the Node.
@@ -78,7 +78,7 @@ The following interactive features are at the users' disposal:
     
     
 
-####Dependencies:
+#### Dependencies:
  * Python 3.7 or later is recommended
  * Python libraries:
    * NetworkX
@@ -87,19 +87,19 @@ The following interactive features are at the users' disposal:
    * Dash-cytoscape
    * Matplotlib
 
-####Installation:
+#### Installation:
  * Install Python interpreter
  * install Package manager (PIP)
  * install dependencies via PIP
  * Clone the GitHub repository
  
-####Starting the Application:
+#### Starting the Application:
  1. Open a Command prompt or Terminal.
  2. Go to the folder that contains the repository.
  3. invoke Python run.py  or  Python run.py \-\-port *pppp*
  4. open browser at localhost:8050 or localhost:*pppp*
 
-####Stopping the Application:
+#### Stopping the Application:
  1. Terminate the server process by:
     * Closing the Command prompt or Terminal or
     * Submit 'localhost:*pppp*/shutdown' from the browser.
