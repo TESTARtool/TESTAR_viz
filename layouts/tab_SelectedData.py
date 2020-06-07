@@ -7,11 +7,13 @@ import dash_html_components as html
 
 
 def seltableblock(ident='idtable'):
+    dummycol = {'id': 'dummy', 'name': 'dummy'}
+    dummydata = {}
     return dt.DataTable(
         id=ident,
         style_table={'overflowX': 'scroll', 'width': '1100', 'minWidth': '100%', 'maxHeight': '100'},
-        columns=[],
-        data=[],
+        columns=[dummycol],
+        data=[dummydata],
         fixed_rows={'headers': True, 'data': 0},
         fixed_columns={'headers': True, 'data': 2},
         style_cell={

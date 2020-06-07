@@ -60,7 +60,7 @@ def edgestyler(edgedata=None,dsp='element',legenda=False):
                       'width': edgedata['line-width'],
                       'opacity': edgedata['opacity'],
                       'label': (edgedata[glob.elementsubtype] if legenda else (
-                          'data(' + edgedata['label'] + ')' if edgedata['label'] != '' else '')),
+                            'data(' + edgedata['label'] + ')' if edgedata['label'] != '' else '')),
                       'line-color': edgedata['color'],
                       'curve-style': edgedata['edgestyle'],
                       'line-style': edgedata['edgefill'],
