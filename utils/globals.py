@@ -9,7 +9,7 @@ import networkx as nx
 import os
 
 ## version of the application
-version = '20200329'
+version = '20200627'
 ## working directory
 scriptfolder = ''
 ## folder for static assets

@@ -6,6 +6,8 @@ Created on Wed Apr  3 18:27:03 2019
 @author: cseng
 """
 import os
+import time
+
 import dash
 from dash.dependencies import Input, Output, State
 import dash_html_components as html
@@ -41,8 +43,8 @@ def update_layout(i_updatelayoutbutton, s_canvasheight, s_layout, s_fenced, s_la
             parenting = (len(s_fenced) > 0)
             tu.setCytoElements(parenting, s_layerview, s_filternodetype, s_filtervalue)
     h = 600 * s_canvasheight
-    return glob.cytoelements, {'name': s_layout, 'animate': False}, {'height': '' + str(h) + 'px'},
 
+    return glob.cytoelements, {'name': s_layout, 'animate': False}, {'height': '' + str(h) + 'px'},
 #############################
 
 @app.callback(
@@ -82,6 +84,7 @@ def updateCytoStyleSheet(i_legenda, i_apply_oracle, i_apply_baselineoracle, i_ap
                          s_selectedbaselineoracles, s_baselineoracledata, s_selectedexecutions, s_executionsdata,
                          s_layerview, s_selectedsimplepath, s_simplepathdata, s_selectedcentralities,
                          s_centralitiesdata, s_selectednodedata, s_createdby_or_updatedby):
+    start_time=time.time()
     ctx = dash.callback_context
     trigger = ctx.triggered[0]['prop_id'].split('.')[0]
     triggervalue=ctx.triggered[0]['value']
@@ -96,7 +99,7 @@ def updateCytoStyleSheet(i_legenda, i_apply_oracle, i_apply_baselineoracle, i_ap
                                         s_selectedsimplepath, s_simplepathdata, s_selectedcentralities,
                                         s_centralitiesdata, s_selectednodedata, s_createdby_or_updatedby)
 
-
+    print('computing styling done',  "--- %.3f seconds ---" % (time.time() - start_time))
     if ('error' in returndata[-1]) and trigger == 'apply-shortestpath-button':  # shortestpatherror
         return dash.no_update, returndata[1], dash.no_update,dash.no_update,dash.no_update, dash.no_update, returndata[-1]
         #return dash.no_update, dash.no_update, dash.no_update, dash.no_update,  returndata[-1]

@@ -100,7 +100,7 @@ def processgraphmlfile(details=True, advanced=False):
     start_time = time.time()
 
 
-    print('start ', "--- %.3f seconds ---" % (time.time() - start_time))
+    print('start validating GraphML ', "--- %.3f seconds ---" % (time.time() - start_time))
     glob.grh = nx.read_graphml(glob.graphmlfile)
     print('importing graphml done', "--- %.3f seconds ---" % (time.time() - start_time))
     setgraphattributes(True, None, '')
@@ -308,6 +308,7 @@ def setcentralitymeasure(graph=None,centralityname='indegree_noselfloops'):
 #@return: list of nodes and edges in cytoscape format
 
 def setCytoElements(parenting=False, layerview=None,filternode=None,filtervalue=None):
+    start_time = time.time()
     if layerview is None:
         layerview = []
     filterlist=[]
@@ -379,6 +380,7 @@ def setCytoElements(parenting=False, layerview=None,filternode=None,filtervalue=
                 #tempdict.update({glob.elementimgurl: app.get_asset_url(fname)})
                 edges.append({'data': tempdict})
             glob.cytoelements = allnodes + edges
+        print('computing nodes+edges','(#=', len(glob.cytoelements), ') for layout done', "--- %.3f seconds ---" % (time.time() - start_time))
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         fname1 = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
