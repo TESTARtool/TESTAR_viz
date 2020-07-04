@@ -89,7 +89,7 @@ def updateCytoStyleSheet( selectedoracles, oracledata, selectedbaselineoracles, 
                     else:
                         condition = '[' + str(row['focus']).replace("&&"," ][ ") + ']'
                     legenda = styler.stylelegenda(row[glob.elementtype], row[glob.elementsubtype],
-                                                  itemstyle, settings.label_nodeelement, condition)
+                                                   itemstyle, settings.label_nodeelement, condition)
                     stylesheet.append(legenda[0])
             if not row['cover'] is None:
                 if row['cover'] != '':
@@ -234,9 +234,26 @@ def updateCytoStyleSheet( selectedoracles, oracledata, selectedbaselineoracles, 
                 stylepropdict = dict()
                 stylepropdict.update({'background-color': row['color_if_terminal']})
                 stylepropdict.update({'shape': row['shape_if_terminal']})
-                # next line is candidate for refactirong, as centralities like outdegree  are calculated at initial load
+                # next line is candidate for refactoring, as centralities like outdegree  are calculated at initial load
                 deadstates = (node for node, out_degree in tmpgrh.out_degree() if out_degree == 0)
                 for stateid in deadstates: stylesheet.extend(style_csvelements(stateid, 'node', stylepropdict))
+    # ######color parent nodes
+    if glob.grh.size() != 0:
+        parentrow=None
+        for row in data:
+            if (row[glob.elementtype] == 'node') & (row[glob.elementsubtype] == glob.parent_subtypeelement):
+                parentrow =row
+                break
+        if not parentrow is None:
+            colorrange= utils.gradient.namedcolor_shift(parentrow['color'], 2, 10)['hex']
+            index=0
+            for c in colorrange:
+                itemstyle = {'background-color': c,}
+                condition = "[parentcounter =  'p_"+str(index)+ "']"
+                legenda = styler.stylelegenda(parentrow[glob.elementtype], parentrow[glob.elementsubtype],
+                                              itemstyle, settings.label_nodeelement,condition)
+                stylesheet.append(legenda[0])
+                index=(index+1) % 10
 
 
     #######  testexecutions

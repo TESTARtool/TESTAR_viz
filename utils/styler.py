@@ -2,6 +2,9 @@ from utils import settings as settings
 import utils.globals as glob
 from utils.graphcomputing import centralitywidth, centralityheight
 
+##
+#Function: apply the styling that is set in the visual tuning table to the Legend items
+
 
 def stylelegenda(elementtype, legendaitem, styling, filteredattribute='id', subselector='', comparator='='):
     cytonodes = []
@@ -24,7 +27,9 @@ def stylelegenda(elementtype, legendaitem, styling, filteredattribute='id', subs
         cytoedges.append({'data': {'source': 's' + legendaitem, 'target': 't' + legendaitem, 'id': legendaitem}})
     return style, cytonodes + cytoedges
 
-
+##
+#helper method: for styling nodes in the Legend
+#
 def nodestyler(nodedata=None, dsp='element', legenda=False):
     itemstyle = {}
     if nodedata is None or nodedata == {}:
@@ -48,6 +53,9 @@ def nodestyler(nodedata=None, dsp='element', legenda=False):
     })
     return itemstyle
 
+##
+#helper method: for styling edges in the Legend
+#
 def edgestyler(edgedata=None,dsp='element',legenda=False):
     if edgedata is None or edgedata == {}:
         return {}
@@ -69,7 +77,9 @@ def edgestyler(edgedata=None,dsp='element',legenda=False):
                       })
     return itemstyle
 
-
+##
+#helper method: set the sizing and color of a node according to centrality bin.
+#
 def set_centrality_style(colour, index):
     cstyle ={'shape': settings.centralitiesshape}
     cstyle.update({'width': centralitywidth(index),
@@ -80,7 +90,9 @@ def set_centrality_style(colour, index):
                    'label': 'data(id)'})
     return cstyle
 
-
+##
+#helper method: styling for UI-tables: minum cell width depending on coliumnheader length.
+#
 def style_dframe(dframe):
     columns = [{'id': c, 'name': c, 'hideable': True} for c in dframe.columns]
     style_cell_conditional = []

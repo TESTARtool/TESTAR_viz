@@ -303,6 +303,7 @@ def setcentralitymeasure(graph=None,centralityname='indegree_noselfloops'):
 ##
 #Function:  converts networkX graph to cytoscape format.
 #           and applies caching and filtering
+#           handles the layout of the network graph.
 #@param parenting: show each layer in a box?. this requires extra parent nodes for each box
 #@param layerview: list of which subtypes to show. e.g. ConcreteState, Widget
 #@return: list of nodes and edges in cytoscape format
@@ -355,13 +356,15 @@ def setCytoElements(parenting=False, layerview=None,filternode=None,filtervalue=
                 tempdict.update({glob.elementimgurl: app.get_asset_url(fname)})  # pointer to the image
                 nodes.append({'data': tempdict, 'position': {'x': 0, 'y': 0}})
             if parenting:
-
+                index=0  #parentcountr is used for a colorshift
                 for k in parentnodeset:
-                    c_parentnode = {'data': {'id': k, settings.label_nodeelement: glob.parent_subtypeelement, 'nodeid': k}}
+                    c_parentnode = {'data': {'id': k, settings.label_nodeelement: glob.parent_subtypeelement, 'nodeid': k, 'parentcounter': 'p_'+str(index)}}
+                    index=(index+1) % 10
                     allnodes.append(c_parentnode)
                 for TestSequenceKey in TestSequencekeyset:
                     t_parentnode = {'data': {'id': TestSequenceKey, settings.label_nodeelement: glob.parent_subtypeelement,
-                                             'nodeid': TestSequenceKey}}
+                                             'nodeid': TestSequenceKey, 'parentcounter': 'p_'+str(index)}}
+                    index=(index+1) % 10
                     allnodes.append(t_parentnode)
             glob.parentingincache = parenting
             allnodes.extend(nodes)

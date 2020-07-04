@@ -2,6 +2,8 @@
 Function: collection of helper methods to make a list of color gradient
 inspired by https://bsou.io/posts/color-gradients-with-python
 '''
+import colorsys
+
 from matplotlib import colors as mplcolors
 
 
@@ -51,6 +53,31 @@ def linear_gradient(start_hex, finish_hex="#FFFFFF", n=10):
 
     return color_dict(RGB_list)
 
+def color_shift(color_hex, shiftpct=2, n=10):
+    ''' returns a gradient list of (n) colors starting with
+      start hex color and the end hex color which is shifted by maxshift.
+     '''
+    # Starting and ending colors in RGB form
+
+    s = hex_to_RGB(color_hex)
+    # Initialize a list of the output colors with the starting color
+
+
+    RGB_list = [s]
+    # Calcuate a color at each evenly spaced value of t from 1 to n
+
+    hlscolor = colorsys.rgb_to_hls(s[0]/255., s[1]/255.,s[2]/255.)
+    for t in range(1, n):
+        # Interpolate RGB vector for color at the current value of t
+        newh = (hlscolor[0]* (1 + (shiftpct / 100)*t)) % 1
+        newl= min(hlscolor[1]*(1+(shiftpct/100)*t),1)
+        news = min(hlscolor[2]*(1+(shiftpct/100)*t),1)
+        rgbcolor =  [round(x*255) for x in colorsys.hls_to_rgb(newh, newl, news)]
+        RGB_list.append(rgbcolor)
+    return color_dict(RGB_list)
+
+def namedcolor_shift(colorname, maxshift=20, n=10):
+    return color_shift(mplcolors.cnames[colorname], maxshift, n)
 
 
 def colorgradient(colornameStart, colornameEnd='dark blue', n=10):

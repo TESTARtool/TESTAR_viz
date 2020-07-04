@@ -48,7 +48,7 @@ def clearassetsfolder():
 ##
 #    Function: extracts the image (as byte array) from the GraphML and save as file to disk.
 #    @param n: nodeid containing the image
-#    @param eldict: data map consisting of all the proprties+data of the node n.
+#    @param eldict: data map consisting of all the properties+data of the node n.
 #    @return string: relative path to the image file.
 def savescreenshottodisk(n, eldict):
 

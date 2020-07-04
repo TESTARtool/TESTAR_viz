@@ -13,18 +13,22 @@ import utils.globals as glob
 import logging
 import os
 #supply the dropzone layout
+##
+#    Function: Send the large-upload form to the browser.
 @app.server.route('/large-upload')
 def display_largehandler_page():
     # Route to serve the upload form
     return send_from_directory('assets', 'large-upload.html')
 
 #process the dropzone request
+##
+#    Function: Processing of the large file Upload request
 @app.server.route('/large-file-upload', methods=['POST'])
 def large_upload_handler():
     file = request.files['file']
     save_path = glob.graphmlfile
     current_chunk = int(request.form['dzchunkindex'])
-    if current_chunk == 1 :
+    if current_chunk == 0 :
         glob.start_timer_upload = time.time()
 
     # If the file already exists it's ok if we are appending to it,
