@@ -38,7 +38,7 @@ from utils.styler import nodestyler, edgestyler
 #    @return 7-tuple =>    '',stylesheet, layervaluefilter,valuefilter,
 #    oracleconditionalstyle,baselineoracleconditionalstyle,shortestpatherror
 #
-def updateCytoStyleSheet( selectedoracles, oracledata, selectedbaselineoracles, baselineoracledata,
+def updatecytostylesheet(selectedoracles, oracledata, selectedbaselineoracles, baselineoracledata,
                          selectedexecutions, executionsdata, layerview, selectedadvancedproperties,
                          advancedpropertiesdata,
                          selectedcentralities, centralitiesdata, selectednodedata, executiondetails):
@@ -246,15 +246,15 @@ def updateCytoStyleSheet( selectedoracles, oracledata, selectedbaselineoracles, 
                 parentrow =row
                 break
         if not parentrow is None:
-            colorrange= utils.gradient.namedcolor_shift(parentrow['color'], 2, 10)['hex']
+            colorrange= utils.gradient.namedcolor_shift(parentrow['color'], settings.parentnodecolorshift, settings.parentnodecolorrange)['hex']
             index=0
             for c in colorrange:
-                itemstyle = {'background-color': c,}
-                condition = "[parentcounter =  'p_"+str(index)+ "']"
+                itemstyle = {'background-color': c}
+                condition = "[parentcounter =  'p_"+str(index) + "']"
                 legenda = styler.stylelegenda(parentrow[glob.elementtype], parentrow[glob.elementsubtype],
                                               itemstyle, settings.label_nodeelement,condition)
                 stylesheet.append(legenda[0])
-                index=(index+1) % 10
+                index = (index+1) % settings.parentnodecolorrange
 
 
     #######  testexecutions
@@ -313,8 +313,8 @@ def updateCytoStyleSheet( selectedoracles, oracledata, selectedbaselineoracles, 
                 if i in selectedcentralitiesrows:
                     selectordict = dict()
                     bins = json.loads(r['binning'])  # convert string back to dict
-                    colorlist = utils.gradient.colorgradient(colornameStart=settings.centrality_colornameStart,
-                                                             colornameEnd=settings.centrality_colornameEnd, n=len(bins))['hex']
+                    colorlist = utils.gradient.colorgradient(colornamestart=settings.centrality_colornameStart,
+                                                             colornameend=settings.centrality_colornameEnd, n=len(bins))['hex']
                     j = 0
                     for k, v in bins.items():
                         nodeselector = "node[" + r['measure'] + " >= " + "'" + str(v) + "'" + "]"

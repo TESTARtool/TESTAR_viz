@@ -28,6 +28,10 @@ label_nodeelement = 'labelV'
 label_edgeelement = 'labelE'
 ## Element in GraphMl that contains meta data and is listed during validation of the GraphML file.
 elementwithmetadata = 'AbstractStateModel'
+## number of different colors of parent nodes
+parentnodecolorrange = 10
+## s percentage colorshift of parentnode to parent node.
+parentnodecolorshift = 2
 
 ## shape size multipler to highlight the selected node
 nodeonselectmultiplier = 3

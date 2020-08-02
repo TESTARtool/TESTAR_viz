@@ -131,8 +131,8 @@ def set_legenda(i_apply_viz_settings, i_loadingcomplete, s_viz_settings_data, s_
     firstrow = glob.centralitiemeasures.to_dict("rows")[0]
     bins = json.loads(firstrow['binning'])  # convert string back to dict
 
-    colorlist = utils.gradient.colorgradient(colornameStart=settings.centrality_colornameStart,
-                                             colornameEnd=settings.centrality_colornameEnd, n=len(bins))['hex']
+    colorlist = utils.gradient.colorgradient(colornamestart=settings.centrality_colornameStart,
+                                             colornameend=settings.centrality_colornameEnd, n=len(bins))['hex']
     j = 0
     tmplist = []
     for k, v in bins.items():
