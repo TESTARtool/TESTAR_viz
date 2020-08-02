@@ -14,6 +14,7 @@ import utils.graphcomputing as tu
 
 ##############################################
 
+
 @app.callback(
     [Output('loading-logtext', 'children'),
      Output('loading-logtext2', 'children'),
@@ -22,7 +23,6 @@ import utils.graphcomputing as tu
     [State('advanced_properties', 'value')])
 def validate_graphml_file(i_validatebutton, s_advanced):
     if i_validatebutton > 0:
-        masterlog = {}
         if os.path.isfile(glob.scriptfolder + glob.graphmlfile):  # fullpath for OS operations
             masterlog = (tu.processgraphmlfile(True, ('Advanced' in s_advanced)))
         else:
@@ -30,6 +30,6 @@ def validate_graphml_file(i_validatebutton, s_advanced):
     else:
         return '', '', ''
     return masterlog['log1'], \
-           (masterlog['log2'] if 'log2' in masterlog.keys() else ''), \
-           (masterlog['log3'] if 'log3' in masterlog.keys() else '')
+        (masterlog['log2'] if 'log2' in masterlog.keys() else ''), \
+        (masterlog['log3'] if 'log3' in masterlog.keys() else '')
 ########################################

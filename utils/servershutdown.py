@@ -6,10 +6,10 @@ Created on Wed Apr  3 18:27:03 2019
 @author: cseng
 """
 
-import flask
 from appy import app
 from flask import request
 ##############################################
+
 
 def raise_shutdown():
     func = request.environ.get('werkzeug.server.shutdown')
