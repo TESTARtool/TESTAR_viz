@@ -21,11 +21,12 @@ from utils.filehandling import save_uitable
      Input('upload-visual-from-file', 'contents')],
     [State('upload-visual-from-file', 'filename'),
      State('upload-visual-from-file', 'last_modified')])
-def update_viz_settings_uitable(i_loadingcompleted, i_load_viz_defaults, i_viz_filecontens, i_viz_filename, i_viz_filelastmodified):
+def update_viz_settings_uitable(i_loadingcompleted, i_load_viz_defaults,
+                                i_viz_filecontens, i_viz_filename, i_viz_filelastmodified):
     ctx = dash.callback_context
     trigger = ctx.triggered[0]['prop_id'].split('.')[0]
     triggervalue = ctx.triggered[0]['value']
-    if (trigger == 'loading-logtext' and triggervalue == ''):# or hitsb0 == 0:
+    if trigger == 'loading-logtext' and triggervalue == '':
         return dash.no_update, dash.no_update
     else:
         if i_viz_filecontens is None:  # load defaults or loading log trigger
@@ -37,7 +38,6 @@ def update_viz_settings_uitable(i_loadingcompleted, i_load_viz_defaults, i_viz_f
         return cols, data  # , csvstr
 
 
-
 @app.callback(
     [Output('executions-table', 'columns'),
      Output('executions-table', 'data')],
@@ -45,12 +45,14 @@ def update_viz_settings_uitable(i_loadingcompleted, i_load_viz_defaults, i_viz_f
 def update_executions_uitable(i_legendacompleted):
     return update_helper_uitable(glob.testexecutions)
 
+
 @app.callback(
     [Output('advancedproperties-table', 'columns'),
      Output('advancedproperties-table', 'data')],
     [Input('cytoscape-legenda', 'elements')],)
 def update_path_uitable(i_legendacompleted):
     return update_helper_uitable(glob.lsptraces)
+
 
 @app.callback(
     [Output('centralities-table', 'columns'),
@@ -60,9 +62,8 @@ def update_centralities_uitable(i_legendacompleted):
     return update_helper_uitable(glob.centralitiemeasures)
 
 
-
 def update_helper_uitable(dframe):
-    if not dframe.empty: #
+    if not dframe.empty:
         cols = [{'id': c, 'name': c} for c in dframe.columns]
         data = dframe.to_dict("rows")
     else:
@@ -88,7 +89,8 @@ def save_testexececutions_table(i_testexecutions_virtdata, i_testexecutions_colu
 
 
 @app.callback(
-    Output('save-advproperties-table', 'href'),# 'save-advancedproperties-table' caused a infinite loop: python name-clash?
+    Output('save-advproperties-table', 'href'),
+    # 'save-advancedproperties-table' caused a infinite loop: python name-clash?
     [Input('advancedproperties-table', 'derived_virtual_data')],
     [State('advancedproperties-table', 'columns')])
 def save_path_table(i_path_virtdata, i_path_columns):
@@ -96,11 +98,8 @@ def save_path_table(i_path_virtdata, i_path_columns):
 
 
 @app.callback(
-    Output('save-centrality-table', 'href'), # 'save-centralities-table' caused a infinite loop: python name-clash?
+    Output('save-centrality-table', 'href'),  # 'save-centralities-table' caused a infinite loop: python name-clash?
     [Input('centralities-table', 'derived_virtual_data')],
     [State('centralities-table', 'columns')])
 def save_centrality_table(i_centralities_virtdata, i_centralities_columns):
     return save_uitable(i_centralities_virtdata, i_centralities_columns)
-
-########################################
-

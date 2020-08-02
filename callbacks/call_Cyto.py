@@ -1,13 +1,7 @@
 ########################################
 # -*- coding: utf-8 -*-
-"""
-Created on Wed Apr  3 18:27:03 2019
 
-@author: cseng
-"""
-'''
-Handling the callbacks that are to be applied to the network graph section.
-'''
+
 import os
 import time
 
@@ -19,8 +13,8 @@ from utils import settings as settings
 import utils.filehandling
 from appy import app
 import utils.globals as glob
-import utils.graphcomputing
-import utils.cytostylemanager
+import utils.graphcomputing as tu
+import utils.cytostylemanager as ch
 import pandas as pd
 from utils.styler import style_dframe
 
@@ -38,17 +32,14 @@ from utils.styler import style_dframe
      State('filter-input', 'value'),
 
      ])
-def update_layout(i_updatelayoutbutton, s_canvasheight, s_layout, s_fenced, s_layerview, s_filternodetype, s_filtervalue):
-    '''
-    Captures the requested changes on the layout.
-    Applies caching, when the there is no actual change layout or which nodes+edges to display
-    '''
+def update_layout(i_updatelayoutbutton, s_canvasheight, s_layout,
+                  s_fenced, s_layerview, s_filternodetype, s_filtervalue):
     ctx = dash.callback_context
     trigger = ctx.triggered[0]['prop_id'].split('.')[0]
     if (trigger == 'submit-button' and i_updatelayoutbutton >= 1):
         if glob.grh.size() != 0:
             parenting = (len(s_fenced) > 0)
-            utils.graphcomputing.setCytoElements(parenting, s_layerview, s_filternodetype, s_filtervalue)
+            utils.graphcomputing.setcytoelements(parenting, s_layerview, s_filternodetype, s_filtervalue)
     h = 600 * s_canvasheight
 
     return glob.cytoelements, {'name': s_layout, 'animate': False}, {'height': '' + str(h) + 'px'},
@@ -86,28 +77,26 @@ def update_layout(i_updatelayoutbutton, s_canvasheight, s_layout, s_fenced, s_la
      State('execution-details', 'value')
      ]
 )
-def updateCytoStyleSheet(i_legenda, i_apply_oracle, i_apply_baselineoracle, i_apply_testexecutions, i_apply_longstsimplepath,  #log, advancedpropertiesbutton,
-                         i_apply_centralities, i_apply_shortestpath, s_visualsdata, s_selectedoracles, s_oracledata,
-                         s_selectedbaselineoracles, s_baselineoracledata, s_selectedexecutions, s_executionsdata,
-                         s_layerview, s_selectedsimplepath, s_simplepathdata, s_selectedcentralities,
-                         s_centralitiesdata, s_selectednodedata, s_createdby_or_updatedby):
+def updatecytostylesheet(i_legenda, i_apply_oracle, i_apply_baselineoracle, i_apply_testexecutions,
+                         i_apply_longstsimplepath, i_apply_centralities, i_apply_shortestpath, s_visualsdata,
+                         s_selectedoracles, s_oracledata, s_selectedbaselineoracles, s_baselineoracledata,
+                         s_selectedexecutions, s_executionsdata, s_layerview, s_selectedsimplepath, s_simplepathdata,
+                         s_selectedcentralities, s_centralitiesdata, s_selectednodedata, s_createdby_or_updatedby):
     '''
     captures the requested style (coloring, shapes and sizes of elements)  to the network graph.
     '''
-    start_time=time.time()
+    start_time = time.time()
     ctx = dash.callback_context
     trigger = ctx.triggered[0]['prop_id'].split('.')[0]
     triggervalue=ctx.triggered[0]['value']
     if trigger == 'cytoscape-legenda' and len(triggervalue) == 0 :
         return dash.no_update, dash.no_update, dash.no_update, \
-               dash.no_update, dash.no_update, dash.no_update,dash.no_update
-    # if trigger == 'cytoscape-legenda' and len(triggervalue) == 0:
-    #     return dash.no_update, dash.no_update, dash.no_update, \
-    #            dash.no_update,  dash.no_update
-    returndata = utils.cytostylemanager.updateCytoStyleSheet(s_selectedoracles, s_oracledata, s_selectedbaselineoracles,
-                                        s_baselineoracledata, s_selectedexecutions, s_executionsdata, s_layerview,
-                                        s_selectedsimplepath, s_simplepathdata, s_selectedcentralities,
-                                        s_centralitiesdata, s_selectednodedata, s_createdby_or_updatedby)
+               dash.no_update, dash.no_update, dash.no_update, dash.no_update
+
+    returndata = utils.cytostylemanager.updatecytostylesheet(s_selectedoracles, s_oracledata, s_selectedbaselineoracles,
+                                         s_baselineoracledata, s_selectedexecutions, s_executionsdata, s_layerview,
+                                         s_selectedsimplepath, s_simplepathdata, s_selectedcentralities,
+                                         s_centralitiesdata, s_selectednodedata, s_createdby_or_updatedby)
 
     print('computing styling done',  "--- %.3f seconds ---" % (time.time() - start_time))
     if ('error' in returndata[-1]) and trigger == 'apply-shortestpath-button':  # shortestpatherror
@@ -127,8 +116,7 @@ def updateCytoStyleSheet(i_legenda, i_apply_oracle, i_apply_baselineoracle, i_ap
 def update_selectednode_uitable(i_selectednodes):
     returndata= helper_selectedtable(i_selectednodes, 'nodeid')
     if returndata is None:
-        #return dash.no_update, dash.no_update, dash.no_update, dash.no_update
-        return  [{'id': 'dummy', 'name': 'dummy'}],  [{}],[],[] # style_dframe(pd.DataFrame)
+        return dash.no_update, dash.no_update, dash.no_update, dash.no_update
     else:
         screens = []
         for c in i_selectednodes:
@@ -149,12 +137,12 @@ def update_selectednode_uitable(i_selectednodes):
 def update_selectededge_uitable(i_selectededges):
     returndata=helper_selectedtable(i_selectededges, 'edgeid')
     if returndata is None:
-        #return dash.no_update, dash.no_update, dash.no_update
-        return  [{'id': 'dummy', 'name': 'dummy'}],  [{}],[]
+        return dash.no_update, dash.no_update, dash.no_update
     else:
         return returndata[0], returndata[1], returndata[2]
 
-def helper_selectedtable(selected_elements, id='edgeid'):
+
+def helper_selectedtable(selected_elements, elementtype='edgeid'):
     if selected_elements is None or len(selected_elements)==0:  # at initial rendering this is None
         return None
     onlyparentNodesSelected=True
@@ -165,7 +153,6 @@ def helper_selectedtable(selected_elements, id='edgeid'):
                 break
     if onlyparentNodesSelected:
         return None
-
     df = pd.DataFrame(selected_elements)
     df = df.reindex(sorted(df.columns), axis=1)
     columns = list(df.columns)

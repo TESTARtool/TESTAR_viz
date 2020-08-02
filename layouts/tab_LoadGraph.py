@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 ##
-#Layout and controls (buttons) of the Loading and File validation component
+# Layout and controls (buttons) of the Loading and File validation component
 # No parameters
 
 import dash_core_components as dcc

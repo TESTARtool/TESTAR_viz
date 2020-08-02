@@ -64,17 +64,17 @@ The following interactive features are at the users' disposal:
 ### Alternative use case:
 * Generic GraphML files can be rendered
 * Nodes and egdes will appear grey. To make the appearance fancy:
-  * nodes must have a key with labelV in GraphML. This determines the node-type
-  * edges must have a key with labelE in GraphML. This determines the edge-type
-  * test-runs & test oracles features will not work due to hardcoded dependencies (ConcreteState,ConcreteAction). 
-  * layer selection feature only works when the requirements for labelV and labelE are fulfilled.
+  * nodes must have a data-key with 'labelV' in GraphML.
+  * edges must have a data-key with 'labelE' in GraphML.
+* test-runs & test oracles features will not work due to hardcoded dependencies (ConcreteState,ConcreteAction). 
+* layer selection feature only works when the requirements for labelV and labelE are fulfilled.
  
 ### Advanced  use case: 
 * Modifying any variable in settings.py can change the behavior (radically!)
     * Adapt Styling that is not yet customizable via the browser. (oracles,path, centralities) 
     * Override the regular expression that captures the bytearray of the screen-print of the Node.
-    * Override the default keying of GraphML nodes (*default_nodeelement='labelV'*) 
-    * Override the default keying of GraphML edges (*default_edgeelement='labelE'*) 
+    * Override the default keying of GraphML nodes (*label_nodeelement='labelV'*) 
+    * Override the default keying of GraphML edges (*label_edgeelement='labelE'*) 
     
     
 
@@ -104,5 +104,5 @@ The following interactive features are at the users' disposal:
     * Closing the Command prompt or Terminal or
     * Submit 'localhost:*pppp*/shutdown' from the browser.
 
-CSS 20200328
+CSS 20200801
 

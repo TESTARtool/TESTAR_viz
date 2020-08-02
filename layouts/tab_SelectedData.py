@@ -32,13 +32,14 @@ def seltableblock(ident='idtable'):
     )
 
 
-def savebutton(ident='save-dataid',buttontitle='Save to File'):
+def savebutton(ident='save-dataid', buttontitle='Save to File'):
     return html.A(html.Button(id='btn-' + ident, n_clicks=0, n_clicks_timestamp=0, children=buttontitle),
                   id=ident,
                   download='testar-viz-' + ident + '.csv',
                   href="",
                   target="_blank", style={'display': 'inline-block'}
                   )
+
 
 selectedData = html.Div([
     html.Div([
@@ -48,17 +49,17 @@ selectedData = html.Div([
                         children='ShortestPath', style={'display': 'inline-block'}),
             html.P(id='shortestpathlog', children='', style={'margin-left': '5px', 'display': 'inline-block'}),
         ]),
-        savebutton('save-nodedata','Save Selected Nodes'),
+        savebutton('save-nodedata', 'Save Selected Nodes'),
         seltableblock('selectednodetable'),
         html.P(),
         html.Div([
-            savebutton('save-edgedata','Save Selected Edges'),
+            savebutton('save-edgedata', 'Save Selected Edges'),
             seltableblock('selectededgetable')
         ])
     ], style={'font-size': 12}),
     html.Div(id='screenimage-coll',
-             children=
-             [html.P(children='Screenprint:'),
-              html.Img(id='screenimage', style={'max-height': '550px'}),  # ,'max-width':'800px'
-              ], style={'font-size': '12', 'border-width': '1', 'border-color': 'teal', 'border-style': 'dashed'})
+             children=[
+                 html.P(children='Screenprint:'),
+                 html.Img(id='screenimage', style={'max-height': '550px'}),  # ,'max-width':'800px'
+                 ], style={'font-size': '12', 'border-width': '1', 'border-color': 'teal', 'border-style': 'dashed'})
 ])

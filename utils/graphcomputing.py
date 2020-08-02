@@ -304,11 +304,13 @@ def setcentralitymeasure(graph=None,centralityname='indegree_noselfloops'):
 #Function:  converts networkX graph to cytoscape format.
 #           and applies caching and filtering
 #           handles the layout of the network graph.
-#@param parenting: show each layer in a box?. this requires extra parent nodes for each box
-#@param layerview: list of which subtypes to show. e.g. ConcreteState, Widget
-#@return: list of nodes and edges in cytoscape format
-
-def setCytoElements(parenting=False, layerview=None,filternode=None,filtervalue=None):
+# @param parenting: show each layer in a box?. this requires extra parent nodes for each box
+# @param layerview: list of which subtypes to show. e.g. ConcreteState, Widget
+# @param filternode: node subtype to remove. e.g. ConcreteState, Widget
+# @param filtervalue: condition on the filternode: cytoscape alike expression. e.g. Role != UIAMenuItem.
+#                     maximum 2 conditions can be or-ed with double pipe (||)
+# @return: list of nodes and edges in cytoscape format
+def setcytoelements(parenting=False, layerview=None, filternode=None, filtervalue=None):
     start_time = time.time()
     if layerview is None:
         layerview = []
@@ -347,24 +349,26 @@ def setCytoElements(parenting=False, layerview=None,filternode=None,filtervalue=
                             tempdict.update({'parent': layer+'Layer'})
                             parentnodeset.add(layer+'Layer')
                         else:
-                            TestSequenceKey = layer+"_" + ndict['sequenceId']+'Layer'
-                            TestSequencekeyset.add(TestSequenceKey)
-                            tempdict.update({'parent': TestSequenceKey})  # sync with nodeid of the child
+                            testsequencekey = layer+"_" + ndict['sequenceId']+'Layer'
+                            test_sequencekeyset.add(testsequencekey)
+                            tempdict.update({'parent': testsequencekey})  # sync with nodeid of the child
 
 
                 fname = glob.outputfolder + savescreenshottodisk(str(n), tempdict)
                 tempdict.update({glob.elementimgurl: app.get_asset_url(fname)})  # pointer to the image
                 nodes.append({'data': tempdict, 'position': {'x': 0, 'y': 0}})
             if parenting:
-                index=0  #parentcountr is used for a colorshift
+
                 for k in parentnodeset:
-                    c_parentnode = {'data': {'id': k, settings.label_nodeelement: glob.parent_subtypeelement, 'nodeid': k, 'parentcounter': 'p_'+str(index)}}
-                    index=(index+1) % 10
+                    c_parentnode = {'data': {'id': k, settings.label_nodeelement: globals.parent_subtypeelement,
+                                             'nodeid': k, 'parentcounter': 'p_'+str(index)}}
+                    index = (index+1) % 10
                     allnodes.append(c_parentnode)
-                for TestSequenceKey in TestSequencekeyset:
-                    t_parentnode = {'data': {'id': TestSequenceKey, settings.label_nodeelement: glob.parent_subtypeelement,
-                                             'nodeid': TestSequenceKey, 'parentcounter': 'p_'+str(index)}}
-                    index=(index+1) % 10
+                for testsequencekey in test_sequencekeyset:
+                    t_parentnode = {'data': {'id': testsequencekey,
+                                             settings.label_nodeelement: globals.parent_subtypeelement,
+                                             'nodeid': testsequencekey, 'parentcounter': 'p_'+str(index)}}
+                    index = (index + 1) % 10
                     allnodes.append(t_parentnode)
             glob.parentingincache = parenting
             allnodes.extend(nodes)

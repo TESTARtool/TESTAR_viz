@@ -89,7 +89,7 @@ def updateCytoStyleSheet( selectedoracles, oracledata, selectedbaselineoracles, 
                     else:
                         condition = '[' + str(row['focus']).replace("&&"," ][ ") + ']'
                     legenda = styler.stylelegenda(row[glob.elementtype], row[glob.elementsubtype],
-                                                   itemstyle, settings.label_nodeelement, condition)
+                                                  itemstyle, settings.label_nodeelement, condition)
                     stylesheet.append(legenda[0])
             if not row['cover'] is None:
                 if row['cover'] != '':
@@ -236,7 +236,8 @@ def updateCytoStyleSheet( selectedoracles, oracledata, selectedbaselineoracles, 
                 stylepropdict.update({'shape': row['shape_if_terminal']})
                 # next line is candidate for refactoring, as centralities like outdegree  are calculated at initial load
                 deadstates = (node for node, out_degree in tmpgrh.out_degree() if out_degree == 0)
-                for stateid in deadstates: stylesheet.extend(style_csvelements(stateid, 'node', stylepropdict))
+                for stateid in deadstates:
+                    stylesheet.extend(style_csvelements(stateid, 'node', stylepropdict))
     # ######color parent nodes
     if glob.grh.size() != 0:
         parentrow=None

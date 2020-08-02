@@ -33,7 +33,7 @@ def spinnertable(ident='baseline-oracletable'):
                 filter_action='native',
                 sort_action='native',
                 sort_mode="multi",
-                #virtualization=True,
+                # virtualization=True,
                 page_action='none'
             ),
         ],
@@ -41,8 +41,9 @@ def spinnertable(ident='baseline-oracletable'):
         style={'font-size': '10', 'width': '100%'},
     )
 
+
 def oracleblock(idblock='baseline-oracle', idtext='BaseLine Oracle'):
-    block=html.Div([
+    block = html.Div([
         html.A(id='collapse-' + idblock + '-link', children='Collapse/Expand ' + idtext + ' table:', n_clicks=0,
                n_clicks_timestamp=0, style={'font-size': 12},
                href="javascript:toggle1(document.getElementById('" + idblock + "-area'))"),
@@ -64,6 +65,7 @@ def oracleblock(idblock='baseline-oracle', idtext='BaseLine Oracle'):
         ], style={'display': 'none'})
     ], style={'border-width': '1', 'border-color': 'grey', 'border-style': 'dashed', 'width': '100%'})
     return block
+
 
 oracles = html.Div([
         oracleblock('oracle', 'Oracle'),

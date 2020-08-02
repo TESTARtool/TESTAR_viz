@@ -7,20 +7,21 @@ Created on Wed Apr  3 18:27:03 2019
 """
 import time
 
-from flask import render_template, Blueprint, request, make_response, send_from_directory
+from flask import request, make_response, send_from_directory
 from appy import app
 import utils.globals as glob
 import logging
 import os
-#supply the dropzone layout
+
+
 ##
 #    Function: Send the large-upload form to the browser.
 @app.server.route('/large-upload')
 def display_largehandler_page():
     # Route to serve the upload form
-    return send_from_directory('assets', 'large-upload.html')
+    return send_from_directory('assets', 'large-upload_modified.html')
 
-#process the dropzone request
+
 ##
 #    Function: Processing of the large file Upload request
 @app.server.route('/large-file-upload', methods=['POST'])
@@ -28,16 +29,16 @@ def large_upload_handler():
     file = request.files['file']
     save_path = glob.graphmlfile
     current_chunk = int(request.form['dzchunkindex'])
-    if current_chunk == 0 :
+    if current_chunk == 0:
         glob.start_timer_upload = time.time()
 
     # If the file already exists it's ok if we are appending to it,
     # but not if it's new file that would overwrite the existing one
     if os.path.exists(save_path) and current_chunk == 0:
-       #(deleting the existing one)
+        # (deleting the existing one)
         os.unlink(save_path)
         # 400 and 500s will tell dropzone that an error occurred and show an error
-      #  return make_response(('File already exists', 400))
+        # return make_response(('File already exists', 400))
 
     try:
         with open(save_path, 'ab') as f:
