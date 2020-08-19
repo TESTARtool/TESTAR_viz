@@ -10,8 +10,14 @@ This application can import the GraphML files and render the content as a node-e
 The following interactive features are at the users' disposal:
  
 01. Run parallel instances (port based)
+    * Copy the scripts and assets folder to a new location
+    * Use option --port to choose a free port
+    * Launch the start script run.py from the new location
 
 02. Import GraphML.xml files up to 1 GB
+    * Estimate is about 20MB/second to load a GraphML file.
+    * Estimate is about 0.7 MB/second to validate a GraphML file.
+    * Estimated is about  50 states/ seconds to render a grid or random layout.
 
 03. Show Meta data  (=AbstractModel info)
 
@@ -80,6 +86,7 @@ The following interactive features are at the users' disposal:
 
 #### Dependencies:
  * Python 3.7 or later is recommended
+ * Use 64 bit version for handling of large input files.
  * Python libraries:
    * NetworkX
    * Pandas
@@ -104,5 +111,5 @@ The following interactive features are at the users' disposal:
     * Closing the Command prompt or Terminal or
     * Submit 'localhost:*pppp*/shutdown' from the browser.
 
-CSS 20200801
+CSS 20200819
 
