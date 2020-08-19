@@ -2,14 +2,22 @@
 Function: Collection of variables used throughout the application
 
 '''
-
+import threading
 
 import pandas as pd
 import networkx as nx
 import os
 
 ## version of the application
-version = '20200802'
+version = '20200819'
+## thread status
+mlvalidationthread=threading.Thread()
+## thread ticker
+mlvalidationtimerticker = 0
+## thread result
+mlthreadmasterlog={}
+## map of elements to screenshot filenames
+screenshotmap={}
 ## working directory
 scriptfolder = ''
 ## folder for static assets

@@ -29,7 +29,7 @@ from utils import styler
      Output('measurements-legenda', 'elements'),
      Output('measurements-legenda', 'stylesheet')],
     [Input('apply-viz_style-button', 'n_clicks'),
-     Input('loading-logtext', 'children')],
+     Input('loading-logtext2', 'children')],
     [State('viz-settings-table', 'data'),
      State('viz-settings-table', 'columns')]
 )
@@ -37,7 +37,10 @@ def set_legenda(i_apply_viz_settings, i_loadingcomplete, s_viz_settings_data, s_
     ctx = dash.callback_context
     trigger = ctx.triggered[0]['prop_id'].split('.')[0]
     triggervalue = ctx.triggered[0]['value']
-    if trigger == 'loading-logtext':
+    if trigger == '':
+        return dash.no_update, dash.no_update, dash.no_update, dash.no_update, \
+               dash.no_update, dash.no_update, dash.no_update, dash.no_update  # prevents unwanted updates
+    if trigger == 'loading-logtext2':
         if triggervalue == '':
             return dash.no_update, dash.no_update, dash.no_update, dash.no_update, \
                    dash.no_update, dash.no_update, dash.no_update, dash.no_update  # prevents unwanted updates

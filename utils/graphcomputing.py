@@ -63,7 +63,7 @@ def Widgetdistri():
         savedftocsv(df, "WidgetDetails.csv")
 
         uniqueslist = df['stringconcat'].unique().tolist()
-        df4 = pd.DataFrame.from_dict({'uniqueWidgets': uniqueslist})
+        df4 = pd.DataFrame.from_dict({'uniqueWidgets': uniqueslist}, orient='columns')
         savedftocsv(df4, "WidgetUniqueness.csv")
 
     else:

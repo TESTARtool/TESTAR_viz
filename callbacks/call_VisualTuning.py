@@ -16,7 +16,7 @@ from utils.filehandling import save_uitable
 @app.callback(
     [Output('viz-settings-table', 'columns'),
      Output('viz-settings-table', 'data')],
-    [Input('loading-logtext', 'children'),
+    [Input('loading-logtext2', 'children'),
      Input('load-visual-defaults-button', 'n_clicks'),
      Input('upload-visual-from-file', 'contents')],
     [State('upload-visual-from-file', 'filename'),
@@ -26,7 +26,9 @@ def update_viz_settings_uitable(i_loadingcompleted, i_load_viz_defaults,
     ctx = dash.callback_context
     trigger = ctx.triggered[0]['prop_id'].split('.')[0]
     triggervalue = ctx.triggered[0]['value']
-    if trigger == 'loading-logtext' and triggervalue == '':
+    if trigger == '':
+        return dash.no_update,dash.no_update,
+    if trigger == 'loading-logtext2' and triggervalue == '':
         return dash.no_update, dash.no_update
     else:
         if i_viz_filecontens is None:  # load defaults or loading log trigger
