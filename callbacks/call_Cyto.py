@@ -1,14 +1,8 @@
-########################################
-# -*- coding: utf-8 -*-
-
-
 import os
 import time
-
 import dash
 from dash.dependencies import Input, Output, State
 import dash_html_components as html
-
 from utils import settings as settings
 import utils.filehandling
 from appy import app
@@ -18,7 +12,16 @@ import utils.cytostylemanager as ch
 import pandas as pd
 from utils.styler import style_dframe
 
-
+##
+#    Function: Rendering of the graph canvas.
+#    @param i_updatelayoutbutton: trigger to start rendering
+#    @param s_canvasheight:
+#    @param s_layout: comon name of the layout
+#    @param s_fenced: box each type of nodes
+#    @param s_layerview: set of node types to view
+#    @param s_filternodetype: filter by node type
+#    @param s_filtervalue: expression to filter the node
+#    @return: cyto-elements that are to be layout+ layout name+ canvas height
 @app.callback(
     [Output('cytoscape-update-layout', 'elements'),
      Output('cytoscape-update-layout', 'layout'),
@@ -30,7 +33,6 @@ from utils.styler import style_dframe
      State('checkbox-layerview-options', 'value'),
      State('dropdown-valuefilter-layout', 'value'),
      State('filter-input', 'value'),
-
      ])
 def update_layout(i_updatelayoutbutton, s_canvasheight, s_layout,
                   s_fenced, s_layerview, s_filternodetype, s_filtervalue):
@@ -43,8 +45,35 @@ def update_layout(i_updatelayoutbutton, s_canvasheight, s_layout,
     h = 600 * s_canvasheight
 
     return glob.cytoelements, {'name': s_layout, 'animate': False}, {'height': '' + str(h) + 'px'},
-#############################
 
+
+##
+#    Function:  captures the requested style (coloring, shapes and sizes of elements)  to the network graph.
+#    complexity of the function is due to the delicate sequencing (combination) of all individual styles)
+#    @param i_updatelayoutbutton: trigger to start rendering
+#    @param i_legenda: cascaded trigger to update styling
+#    @param i_apply_oracle: trigger to update styling
+#    @param i_apply_baselineoracle: trigger to update styling
+#    @param i_apply_testexecutions: trigger to update styling
+#    @param i_apply_longstsimplepath: trigger to update styling
+#    @param i_apply_centralities: trigger to update styling
+#    @param i_apply_shortestpath: trigger to update styling
+#    @param s_visualsdata:
+#    @param s_selectedoracles:
+#    @param s_oracledata:
+#    @param s_selectedbaselineoracles:
+#    @param s_baselineoracledata:
+#    @param s_selectedexecutions:
+#    @param s_executionsdata:
+#    @param s_layerview:
+#    @params_selectedsimplepath:
+#    @params_simplepathdata:
+#    @param s_selectedcentralities:
+#    @param s_centralitiesdata:
+#    @param s_selectednodedata:
+#    @param s_createdby_or_updatedby:
+#    @return: dummycytospinner+cytoscape-stylesheet+layerview-options+dropdown-values for filter+
+#    oracletable_style+baselineoracletable_style+shortestpathlog
 
 @app.callback(
     [Output('dummycytospinner', 'children'),
@@ -83,9 +112,6 @@ def updatecytostylesheet(i_legenda, i_apply_oracle, i_apply_baselineoracle, i_ap
                          s_selectedoracles, s_oracledata, s_selectedbaselineoracles, s_baselineoracledata,
                          s_selectedexecutions, s_executionsdata, s_layerview, s_selectedsimplepath, s_simplepathdata,
                          s_selectedcentralities, s_centralitiesdata, s_selectednodedata, s_createdby_or_updatedby):
-    """
-    captures the requested style (coloring, shapes and sizes of elements)  to the network graph.
-    """
     start_time = time.time()
     ctx = dash.callback_context
     trigger = ctx.triggered[0]['prop_id'].split('.')[0]
@@ -107,6 +133,10 @@ def updatecytostylesheet(i_legenda, i_apply_oracle, i_apply_baselineoracle, i_ap
         return returndata
 
 
+##
+#    Function:  updates the selected node table once the user clicks on a node in the cyto graph.
+#    @param i_selectednodes: trigger and list of selected nodes
+#    @return: selectednode table + screenprints of the selected nodes
 @app.callback(
     [Output('selectednodetable', "columns"),
      Output('selectednodetable', 'data'),
@@ -129,6 +159,10 @@ def update_selectednode_uitable(i_selectednodes):
         return returndata[0], returndata[1], returndata[2], screens
 
 
+##
+#    Function:  updates the selected edge table once the user clicks on an edge in the cyto graph.
+#    @param i_selectededges: trigger and list of selected edges
+#    @return: selectededge table
 @app.callback(
     [Output('selectededgetable', "columns"),
      Output('selectededgetable', "data"),
@@ -141,7 +175,9 @@ def update_selectededge_uitable(i_selectededges):
     else:
         return returndata[0], returndata[1], returndata[2]
 
-
+##
+#    Function:  helper methods to populate the selected node/edge table.
+#    puts the id and label columns always upfront
 def helper_selectedtable(selected_elements, elementlabel='edgeid'):
     if selected_elements is None or len(selected_elements) == 0:  # at initial rendering this is None
         return None

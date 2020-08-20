@@ -1,10 +1,4 @@
-########################################
-# -*- coding: utf-8 -*-
-"""
-Created on Wed Apr  3 18:27:03 2019
 
-@author: cseng
-"""
 import dash
 from dash.dependencies import Input, Output, State
 import utils.gui
@@ -13,6 +7,14 @@ import utils.globals as glob
 from utils.filehandling import save_uitable
 
 
+##
+#    Function:  restires the default appearance propoerties or uploads a user csv file with equiovalent properties
+#    @param i_loadingcompleted: cascaded trigger once a graphML file is validated
+#    @param i_load_viz_defaults: trigger to restore defaults
+#    @parami_viz_filecontens: import a user maointained csv file
+#    @parami_viz_filename: name of the above file
+#    @parami_viz_filelastmodified: timestamp (not effectively used)
+#    @return: viz-settings-table
 @app.callback(
     [Output('viz-settings-table', 'columns'),
      Output('viz-settings-table', 'data')],
@@ -40,6 +42,10 @@ def update_viz_settings_uitable(i_loadingcompleted, i_load_viz_defaults,
         return cols, data  # , csvstr
 
 
+##
+#    Function:  updates the test executions table, once a new graphml file is validated
+#    @param i_legendacompleted: trigger on legend rendering
+#    @return: executions-table
 @app.callback(
     [Output('executions-table', 'columns'),
      Output('executions-table', 'data')],
@@ -48,6 +54,10 @@ def update_executions_uitable(i_legendacompleted):
     return update_helper_uitable(glob.testexecutions)
 
 
+##
+#    Function:  updates the advancedproperties-table (~paths), once a new graphml file is validated
+#    @param i_legendacompleted: trigger on legend rendering
+#    @return: advancedproperties-table
 @app.callback(
     [Output('advancedproperties-table', 'columns'),
      Output('advancedproperties-table', 'data')],
@@ -55,7 +65,10 @@ def update_executions_uitable(i_legendacompleted):
 def update_path_uitable(i_legendacompleted):
     return update_helper_uitable(glob.lsptraces)
 
-
+##
+#    Function:  updates the centralities-table, once a new graphml file is validated
+#    @param i_legendacompleted: trigger on legend rendering
+#    @return: centralities-table
 @app.callback(
     [Output('centralities-table', 'columns'),
      Output('centralities-table', 'data')],
@@ -64,6 +77,10 @@ def update_centralities_uitable(i_legendacompleted):
     return update_helper_uitable(glob.centralitiemeasures)
 
 
+##
+#    Function:  helper method to populate web tables: converts a DataFrame to Dash Table format
+#    @param i_legendacompleted: trigger on legend rendering
+#    @return: centralities-table
 def update_helper_uitable(dframe):
     if not dframe.empty:
         cols = [{'id': c, 'name': c} for c in dframe.columns]
@@ -74,6 +91,11 @@ def update_helper_uitable(dframe):
     return cols, data
 
 
+##
+#    Function:  saves the appearance table on the web page to a csv file
+#    @param  i_viz_settings_virtdata: row data
+#    @param  i_viz_settings_columns: column headers
+#    @return: html response
 @app.callback(
     Output('save-visual-settings', 'href'),
     [Input('viz-settings-table', 'derived_virtual_data')],
@@ -81,7 +103,11 @@ def update_helper_uitable(dframe):
 def save_viz_settings_table(i_viz_settings_virtdata, i_viz_settings_columns):
     return save_uitable(i_viz_settings_virtdata, i_viz_settings_columns)
 
-
+##
+#    Function:  saves the executiuons- table on the web page to a csv file
+#    @param  i_testexecutions_virtdata: row data
+#    @param  i_testexecutions_columns: column headers
+#    @return: html response
 @app.callback(
     Output('save-testexecutions-settings', 'href'),
     [Input('executions-table', 'derived_virtual_data')],
@@ -90,6 +116,11 @@ def save_testexececutions_table(i_testexecutions_virtdata, i_testexecutions_colu
     return save_uitable(i_testexecutions_virtdata, i_testexecutions_columns)
 
 
+##
+#    Function:  saves the advancedproperties- table on the web page to a csv file
+#    @param  i_advancedproperties_virtdata: row data
+#    @param  i_advancedproperties_columns: column headers
+#    @return: html response
 @app.callback(
     Output('save-advproperties-table', 'href'),
     # 'save-advancedproperties-table' caused a infinite loop: python name-clash?
@@ -99,6 +130,11 @@ def save_path_table(i_path_virtdata, i_path_columns):
     return save_uitable(i_path_virtdata, i_path_columns)
 
 
+##
+#    Function:  saves the centralities- table on the web page to a csv file
+#    @param  i_centralities_virtdata: row data
+#    @param  i_centralities_columns: column headers
+#    @return: html response
 @app.callback(
     Output('save-centrality-table', 'href'),  # 'save-centralities-table' caused a infinite loop: python name-clash?
     [Input('centralities-table', 'derived_virtual_data')],

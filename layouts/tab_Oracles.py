@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
-##
-# Layout and controls (buttons) of the Oracle component
-# No parameters
+'''
+Web-Layout and controls (buttons) of the Oracle component
+'''
 import dash_table as dt
 import dash_core_components as dcc
 import dash_html_components as html

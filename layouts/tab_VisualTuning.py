@@ -12,17 +12,6 @@ import dash_html_components as html
 def tableblock(ident='name', mincolumnwidth='30px', edit=False, fixcolumns=False, rowselectable=False,
                tablemaxwidth='70%',
                tablemaxheigth='100px', filter=False):
-    """
-    :param ident: identifier for the table (for linking to callbacks)
-    :param mincolumnwidth:
-    :param edit: boolean whter cells are editable?
-    :param fixcolumns: freeze columsn (excel like)
-    :param rowselectable: boolean: do rows ahve a checkbox
-    :param tablemaxwidth: css type
-    :param tablemaxheigth: css type
-    :param filter: boolean: enable vlue filtering per column
-    :return: Dash Table, wrapped in a spinner
-    """
     dummycol = {'id': 'dummy', 'name': 'dummy'}
     dummydata = {}
     fixedcolumns = {'headers': False, 'data': 0}

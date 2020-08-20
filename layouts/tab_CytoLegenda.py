@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
-##
-# Layout of the Legend component
-# No parameters
+'''
+Web-Layout of the Legend component
+'''
 
 import dash_html_components as html
 import dash_cytoscape as cyto

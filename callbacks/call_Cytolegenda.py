@@ -1,10 +1,11 @@
-########################################
+## ######################################
 # -*- coding: utf-8 -*-
-"""
+'''
 Created on Wed Apr  3 18:27:03 2019
 
 @author: cseng
 """
+'''
 import json
 from dash.dependencies import Input, Output, State
 import dash
@@ -19,6 +20,13 @@ from utils.styler import set_centrality_style
 from utils import styler
 
 
+##
+#    Function:  populates the legend sections with icons matching the edges and nodes
+#    @param i_apply_viz_settings:
+#    @param i_loadingcomplete:
+#    @param s_viz_settings_data:
+#    @param s_viz_settings_columns:
+#    @return: standard nodes/edges legend+executions legend+path legend+centralities legend
 @app.callback(
     [Output('cytoscape-legenda', 'elements'),
      Output('cytoscape-legenda', 'stylesheet'),

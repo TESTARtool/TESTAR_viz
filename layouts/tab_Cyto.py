@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
-##
-# Layout and controls (buttons) of Graph component
-# No parameters
+'''
+Web-Layout and controls (buttons) of Graph component
+'''
 
 #######################################################
 

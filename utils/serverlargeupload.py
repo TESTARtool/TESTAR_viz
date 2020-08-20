@@ -57,18 +57,15 @@ def large_upload_handler():
         # This was the last chunk, the file should be complete and the size we expect
         if os.path.getsize(save_path) != int(request.form['dztotalfilesize']):
             logging.error(f"File {file.filename} was completed, "
-                      f"but has a size mismatch."
-                      f"Was {os.path.getsize(save_path)} but we"
-                      f" expected {request.form['dztotalfilesize']} ")
+                          f"but has a size mismatch."
+                          f"Was {os.path.getsize(save_path)} but we"
+                          f" expected {request.form['dztotalfilesize']} ")
             return make_response(('Size mismatch', 500))
         else:
-           # log=tu.processgraphmlfile()
-            print("large File "+file.filename+" has been uploaded successfully." , "--- %.3f seconds ---"  % (time.time() - glob.start_timer_upload))
+            print("large File "+file.filename+" has been uploaded successfully.",
+                  "--- %.3f seconds ---" % (time.time() - glob.start_timer_upload))
             logging.info(f'File {file.filename} has been uploaded successfully')
     else:
         logging.info(f'Chunk {current_chunk + 1} of {total_chunks} '
-                  f'for file {file.filename} complete'
-                         )
+                     f''f'for file {file.filename} complete')
     return make_response(("Chunk upload successful", 200))
-
-

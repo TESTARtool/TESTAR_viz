@@ -1,7 +1,7 @@
-# -*- coding: utf-8 -*-
-##
-# Layout and controls (buttons) of the Selected data component
-# No parameters
+'''
+Web-Layout and controls (buttons) of the Selected data component
+No parameters
+'''
 import dash_table as dt
 import dash_html_components as html
 
