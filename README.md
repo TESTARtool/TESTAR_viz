@@ -47,7 +47,7 @@ The following interactive features are at the users' disposal:
         * customizable filtering on edges: hide\* , focus or cover (lower opacity) 
         * font size 
      
-     \**the occupied space in the graph is made transparent*   
+     \**the occupied space in the layout is made transparent*   
              
 06. Selecting graph elements
     - Nodes or edges by mouse click or by making a box with CTRL+Left-Click.
@@ -77,7 +77,7 @@ The following interactive features are at the users' disposal:
  
 ### Advanced  use case: 
 * Modifying any variable in settings.py can change the behavior (radically!)
-    * Adapt Styling that is not yet customizable via the browser. (oracles,path, centralities) 
+    * Adapt styling that is not yet customizable via the browser. (oracles,path, centralities) 
     * Override the regular expression that captures the bytearray of the screen-print of the Node.
     * Override the default keying of GraphML nodes (*label_nodeelement='labelV'*) 
     * Override the default keying of GraphML edges (*label_edgeelement='labelE'*) 
