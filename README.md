@@ -1,5 +1,5 @@
 # Testar_Visualization
-#####Visualization of TESTAR graph databases in a browser.
+##### Visualization of TESTAR graph databases in a browser.
 
 Based on Python, Dash (flask) and Cytoscape.js. Dash and Cytoscape.js are both MIT Licensed.
 
@@ -10,8 +10,14 @@ This application can import the GraphML files and render the content as a node-e
 The following interactive features are at the users' disposal:
  
 01. Run parallel instances (port based)
+    * Copy the scripts and assets folder to a new location
+    * Use option --port to choose a free port
+    * Launch the start script run.py from the new location
 
 02. Import GraphML.xml files up to 1 GB
+    * Estimate is about 20MB/second to load a GraphML file.
+    * Estimate is about 0.7 MB/second to validate a GraphML file.
+    * Estimated is about  50 states/ seconds to render a grid or random layout.
 
 03. Show Meta data  (=AbstractModel info)
 
@@ -41,7 +47,7 @@ The following interactive features are at the users' disposal:
         * customizable filtering on edges: hide\* , focus or cover (lower opacity) 
         * font size 
      
-     \**the occupied space in the graph is made transparent*   
+     \**the occupied space in the layout is made transparent*   
              
 06. Selecting graph elements
     - Nodes or edges by mouse click or by making a box with CTRL+Left-Click.
@@ -61,25 +67,26 @@ The following interactive features are at the users' disposal:
     - Show counterexample or witness traces of the selected oracles (LTL only)
 
 
-###Alternative use case:
+### Alternative use case:
 * Generic GraphML files can be rendered
 * Nodes and egdes will appear grey. To make the appearance fancy:
-  * nodes must have a key with labelV in GraphML. This determines the node-type
-  * edges must have a key with labelE in GraphML. This determines the edge-type
-  * test-runs & test oracles features will not work due to hardcoded dependencies (ConcreteState,ConcreteAction). 
-  * layer selection feature only works when the requirements for labelV and labelE are fulfilled.
+  * nodes must have a data-key with 'labelV' in GraphML.
+  * edges must have a data-key with 'labelE' in GraphML.
+* test-runs & test oracles features will not work due to hardcoded dependencies (ConcreteState,ConcreteAction). 
+* layer selection feature only works when the requirements for labelV and labelE are fulfilled.
  
-###Advanced  use case: 
+### Advanced  use case: 
 * Modifying any variable in settings.py can change the behavior (radically!)
-    * Adapt Styling that is not yet customizable via the browser. (oracles,path, centralities) 
+    * Adapt styling that is not yet customizable via the browser. (oracles,path, centralities) 
     * Override the regular expression that captures the bytearray of the screen-print of the Node.
-    * Override the default keying of GraphML nodes (*default_nodeelement='labelV'*) 
-    * Override the default keying of GraphML edges (*default_edgeelement='labelE'*) 
+    * Override the default keying of GraphML nodes (*label_nodeelement='labelV'*) 
+    * Override the default keying of GraphML edges (*label_edgeelement='labelE'*) 
     
     
 
-####Dependencies:
+#### Dependencies:
  * Python 3.7 or later is recommended
+ * Use 64 bit version for handling of large input files.
  * Python libraries:
    * NetworkX
    * Pandas
@@ -87,22 +94,22 @@ The following interactive features are at the users' disposal:
    * Dash-cytoscape
    * Matplotlib
 
-####Installation:
+#### Installation:
  * Install Python interpreter
  * install Package manager (PIP)
  * install dependencies via PIP
  * Clone the GitHub repository
  
-####Starting the Application:
+#### Starting the Application:
  1. Open a Command prompt or Terminal.
  2. Go to the folder that contains the repository.
  3. invoke Python run.py  or  Python run.py \-\-port *pppp*
  4. open browser at localhost:8050 or localhost:*pppp*
 
-####Stopping the Application:
+#### Stopping the Application:
  1. Terminate the server process by:
     * Closing the Command prompt or Terminal or
     * Submit 'localhost:*pppp*/shutdown' from the browser.
 
-CSS 20200328
+CSS 20200819
 

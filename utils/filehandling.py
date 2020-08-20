@@ -48,7 +48,7 @@ def clearassetsfolder():
 ##
 #    Function: extracts the image (as byte array) from the GraphML and save as file to disk.
 #    @param n: nodeid containing the image
-#    @param eldict: data map consisting of all the proprties+data of the node n.
+#    @param eldict: data map consisting of all the properties+data of the node n.
 #    @return string: relative path to the image file.
 def savescreenshottodisk(n, eldict):
 
@@ -60,15 +60,17 @@ def savescreenshottodisk(n, eldict):
     fname = '_no_image_for_' + n
     try:
         if not (eldict.get(settings.image_element) is None):
-            fname = set_imagefilename(n)
-            found = re.search(settings.screenshotregex, eldict[settings.image_element]).group(1)
-            if not found:       # or   eldict[glob.image_element]=='' ?
-                return fname
-            else:
-                pngintarr = [(int(x) + 256) % 256 for x in found.split(",")]
-                f = open(glob.scriptfolder + glob.assetfolder + glob.outputfolder + fname, 'wb')
-                f.write(bytearray(pngintarr))
-                f.close()
+            if not (n in glob.screenshotmap.keys()):
+                glob.screenshotmap[n] =set_imagefilename(n)
+                fname = set_imagefilename(n)
+                found = re.search(settings.screenshotregex, eldict[settings.image_element]).group(1)
+                if found:
+                    pngintarr = [(int(x) + 256) % 256 for x in found.split(",")]
+                    f = open(glob.scriptfolder + glob.assetfolder + glob.outputfolder + fname, 'wb')
+                    f.write(bytearray(pngintarr))
+                    f.close()
+                    eldict[settings.image_element]=glob.screenshotmap.get(n) # override with filename: preserve memory
+            return glob.screenshotmap.get(n)
         else:
             return settings.no_image_file
     except Exception as e:  # AttributeError:	# [ ] not found in the original string
@@ -77,7 +79,7 @@ def savescreenshottodisk(n, eldict):
         print(exc_type, fname, exc_tb.tb_lineno)
         print('*  There was an error processing : ' + str(e))
         return settings.no_image_file
-    return fname
+
 
 
 ##

@@ -17,7 +17,7 @@ import utils.globals as glob
 import utils.gradient
 from utils.styler import set_centrality_style
 from utils import styler
-from utils.graphcomputing import centralitywidth, centralityheight
+
 
 @app.callback(
     [Output('cytoscape-legenda', 'elements'),
@@ -28,19 +28,22 @@ from utils.graphcomputing import centralitywidth, centralityheight
      Output('path-legenda', 'stylesheet'),
      Output('measurements-legenda', 'elements'),
      Output('measurements-legenda', 'stylesheet')],
-     [Input('apply-viz_style-button', 'n_clicks'),
-     Input('loading-logtext', 'children')],
-     [State('viz-settings-table', 'data'),
+    [Input('apply-viz_style-button', 'n_clicks'),
+     Input('loading-logtext2', 'children')],
+    [State('viz-settings-table', 'data'),
      State('viz-settings-table', 'columns')]
 )
 def set_legenda(i_apply_viz_settings, i_loadingcomplete, s_viz_settings_data, s_viz_settings_columns):
     ctx = dash.callback_context
     trigger = ctx.triggered[0]['prop_id'].split('.')[0]
     triggervalue = ctx.triggered[0]['value']
-    if trigger == 'loading-logtext':
+    if trigger == '':
+        return dash.no_update, dash.no_update, dash.no_update, dash.no_update, \
+               dash.no_update, dash.no_update, dash.no_update, dash.no_update  # prevents unwanted updates
+    if trigger == 'loading-logtext2':
         if triggervalue == '':
             return dash.no_update, dash.no_update, dash.no_update, dash.no_update, \
-                   dash.no_update, dash.no_update, dash.no_update, dash.no_update #prevents unwanted updates
+                   dash.no_update, dash.no_update, dash.no_update, dash.no_update  # prevents unwanted updates
     else:
         pdcol = [i['id'] for i in s_viz_settings_columns]
         glob.dfdisplayprops = pd.DataFrame(s_viz_settings_data, columns=pdcol)
@@ -131,24 +134,22 @@ def set_legenda(i_apply_viz_settings, i_loadingcomplete, s_viz_settings_data, s_
     firstrow = glob.centralitiemeasures.to_dict("rows")[0]
     bins = json.loads(firstrow['binning'])  # convert string back to dict
 
-    colorlist = utils.gradient.colorgradient(colornameStart=settings.centrality_colornameStart,
-                                             colornameEnd=settings.centrality_colornameEnd, n=len(bins))['hex']
+    colorlist = utils.gradient.colorgradient(colornamestart=settings.centrality_colornameStart,
+                                             colornameend=settings.centrality_colornameEnd, n=len(bins))['hex']
     j = 0
-    tmplist=[]
+    tmplist = []
     for k, v in bins.items():
         cytonodes = []
-        selectorfilter = '[' + 'id'+ ' ' + '=' + ' ' + '\'' + 'bin'+k + '\'' + ']'    #  [id = 'bins_0']
+        selectorfilter = '[' + 'id' + ' ' + '=' + ' ' + '\'' + 'bin'+k + '\'' + ']'  # [id = 'bins_0']
         selectordict = {'selector': 'node' + selectorfilter}
-        styling=set_centrality_style(colorlist[j], j)
+        styling = set_centrality_style(colorlist[j], j)
         styledict = {'style': styling}
         style = selectordict
         style.update(styledict)
         cytonodes.append({'data': {'id': 'bin'+k}})
-        innerlegenda0=style
+        innerlegenda0 = style
         mstylesheet.append(innerlegenda0)
         melements.extend(cytonodes)
         j = j + 1
     mstylesheet.extend(tmplist)
     return celements, cstylesheet, trelements, trstylesheet, pelements, pstylesheet, melements, mstylesheet
-
-

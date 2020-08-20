@@ -1,3 +1,5 @@
+// 2020 CSS modified 2 comments to suppress Doxygen warning.
+//changed slash-asterix to slash-bracket-asterix-bracket
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -332,7 +334,7 @@ var Dropzone = function (_Emitter) {
          * extension against this list. This is a comma separated list of mime
          * types or file extensions.
          *
-         * Eg.: `image/*,application/pdf,.psd`
+         * Eg.: `image/<*>,application/pdf,.psd`
          *
          * If the Dropzone is `clickable` this option will also be used as
          * [`accept`](https://developer.mozilla.org/en-US/docs/HTML/Element/input#attr-accept)
@@ -3183,7 +3185,7 @@ Dropzone.isValidFile = function (file, acceptedFiles) {
         return true;
       }
     } else if (/\/\*$/.test(validType)) {
-      // This is something like a image/* mime type
+      // This is something like a image/<*> mime type
       if (baseMimeType === validType.replace(/\/.*$/, "")) {
         return true;
       }

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 ##
-#Layout and controls (buttons) of the Loading and File validation component
+# Layout and controls (buttons) of the Loading and File validation component
 # No parameters
 
 import dash_core_components as dcc
@@ -16,11 +16,19 @@ loadGraph = html.Div([
     html.Div(id='loadgraph-area', children=[
         html.Iframe(id='luarea', src=f'large-upload', style={'height': '150px', 'vertical-align': 'top'}),
         html.Div([
+            html.Div([
             html.Button(
-                id='validate-graph-file',
+                id='validate-graph-file2',
                 n_clicks=0,
                 children='Validate GraphML File',
                 style={'display': 'inline-block', 'vertical-align': 'top'}),
+            dcc.Interval(
+                    id='interval-component',
+                    interval=1 * 1000,  # in milliseconds
+                    disabled=True,
+                    max_intervals=-1,
+                    n_intervals=0,
+            ),
             dcc.Checklist(
                 id='advanced_properties',
                 options=[
@@ -28,7 +36,9 @@ loadGraph = html.Div([
                 value=['Advanced'],  # hidden and default  is set
                 style={'width': '75', 'color': 'black', 'display': 'inline-block', 'fontSize': 12},
             ),
-            dcc.Loading(id="loading-log-spinner",
+            ],style={'display': 'inline-block', 'vertical-align': 'top'}),
+            html.Div(
+            #dcc.Loading(id="loading-log-spinner",
                         children=[
                             dcc.Markdown(id='loading-logtext', children='',
                                          style={'display': 'inline-block', 'vertical-align': 'top', 'font-size': 12}),
@@ -36,10 +46,10 @@ loadGraph = html.Div([
                                          style={'display': 'inline-block', 'vertical-align': 'top', 'font-size': 12}),
                             dcc.Markdown(id='loading-logtext3', children='',
                                          style={'display': 'inline-block', 'vertical-align': 'top', 'font-size': 12})],
-                        type="circle",
-                        style={'display': 'inline-block', 'vertical-align': 'top'}
+                        #  type="circle",
+                        #  style={'display': 'inline-block', 'vertical-align': 'top'}
                         ),
-        ], style={'display': 'inline-block', 'vertical-align': 'top'}),
+        ],  style={'display': 'inline-block', 'vertical-align': 'top'}),
     ], style={'display': 'block', 'margin': '5px'})
 ], style={'border-width': '1', 'border-color': 'grey', 'border-style': 'dashed',
           'display': 'inline-block', 'vertical-align': 'top'}

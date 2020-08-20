@@ -26,5 +26,3 @@ def save_node_table(i_selectednodetable_virtdata, i_selectednodetable_columns):
     [State('selectededgetable', 'columns')])
 def save_edge_table(i_selectededgetable_virtdata, i_selectededgetable_columns):
     return save_uitable(i_selectededgetable_virtdata, i_selectededgetable_columns)
-
-

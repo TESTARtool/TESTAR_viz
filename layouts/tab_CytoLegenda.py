@@ -25,7 +25,7 @@ def cytolegendablock(title='legenda', id='id-legenda:', width='300px', height='1
 #width of tables is hardcoded in px . :-(
 cytolegendalayout = html.Div([
     html.Div([
-        html.A(id='collapse-legenda-link', children='Collapse/Expand Legenda:', n_clicks=0,
+        html.A(id='collapse-legenda-link', children='Collapse/Expand Legend:', n_clicks=0,
                n_clicks_timestamp=0, style={'font-size': 12},
                href="javascript:toggle1(document.getElementById('legenda-area'))"),
         html.Div(id='legenda-area', children=[

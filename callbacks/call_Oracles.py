@@ -33,20 +33,21 @@ def update_oracles_uitable(i_oracle_filecontents, i_oracle_filename, i_oraclefil
     [Input('upload-baseline-oracles-from-file', 'contents')],
     [State('upload-baseline-oracles-from-file', 'filename'),
      State('upload-baseline-oracles-from-file', 'last_modified')])
-def update_oracles_baseline_uitable(i_baselineoracle_filecontents, i_baselineoracle_filename, i_oracle_file_lastmodified):
+def update_oracles_baseline_uitable(i_baselineoracle_filecontents, i_baselineoracle_filename,
+                                    i_oracle_file_lastmodified):
     ret = oracles_from_file_to_dframe(i_baselineoracle_filecontents, i_baselineoracle_filename, glob.dfbaselineoracles)
     return ret[0], ret[1], ret[2]
 
 
 def oracles_from_file_to_dframe(filecontents, filename, dframe):
     ctx = dash.callback_context
-    if ctx.triggered:
+    trigger = ctx.triggered[0]['prop_id'].split('.')[0]
+    triggervalue = ctx.triggered[0]['value']  # after update to dash-table 4.12
+    if trigger != '':  # ctx.triggered:
         if filecontents is not None:
             print('set data for  oracle table')
             dframe = utils.filehandling.read_file_in_dataframe(filecontents, filename)
-        else:
-            return [{'id': 'dummy', 'name': 'dummy'}], [{'dummy': ''}],dash.no_update #None
-        returndata = style_dframe(dframe)
-        return returndata[0],returndata[1],returndata[2]
-
-
+            returndata = style_dframe(dframe)
+            return returndata[0], returndata[1], returndata[2]
+    else:
+        return [{'id': 'dummy', 'name': 'dummy'}], [{'dummy': ''}], dash.no_update  # None
