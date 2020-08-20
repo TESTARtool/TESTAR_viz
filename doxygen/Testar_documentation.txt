@@ -64,19 +64,6 @@ To show the entire web page, the screen prints slightly overlapping.
 
 - - -
 
-
-To show the entire web page, the screen prints slightly overlapping.
-- - -
-  \image html "20200314 screenprint_upper.png" "screenprint upper part"
-   \image latex "20200314 screenprint_upper.png" "screenprint upper part"
-  - - -
-   \image html "20200314 screenprint_middle.png" "screenprint middle part"
-   \image latex "20200314 screenprint_middle.png" "screenprint middle part"
-   - - -
- \image html "20200314 screenprint_lower.png" "screenprint lower part"
-  \image latex "20200314 screenprint_lower.png" "screenprint lower part"
-
-- - -
 */
 
 /** \page disclaim !! Disclaimer on content.
