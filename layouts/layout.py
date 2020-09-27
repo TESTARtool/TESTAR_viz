@@ -34,8 +34,6 @@ mainlayout = html.Div(id='main', children=[
                     html.Hr(),
                     html.Div('Run date: '+prettytime(None, 'seconds')+'  System version: ' + version,
                              style={'font-size': 10}),
-                    html.Div('Data folder: ' + assetfolder + outputfolder, style={'font-size': 10}),
-                    html.Hr(),
                     html.Div('Model Input', style=headerstyle),
                     html.Hr(),
                     html.Div(loadGraph, style=contentstyle),

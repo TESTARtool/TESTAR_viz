@@ -48,7 +48,7 @@ def setup():
         port = settings.port
     else:  # (len(sys.argv) >1 and sys.argv[1]=='--port'):
         port = int(sys.argv[2])
-    glob.outputfolder = 'content_on_port_' + str(port) + os.sep
+    glob.outputfolder = 'content_port_' + str(port) + os.sep
     utils.filehandling.clearassetsfolder()
     app.layout = mainlayout
     app.config['suppress_callback_exceptions'] = True
