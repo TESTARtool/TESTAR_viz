@@ -40,10 +40,8 @@ def setup():
     print('dash cytoscape package version: ', cyto.__version__)
     print('networkx package version: ', networkxversion)
     print('pandas package version: ', pandasversion)
-    print('Running instances parallel:')
-    print('1. Copy the scripts and assets folder to a new location')
-    print('2. Use option --port to choose a free port')
-    print('3  Launch this script ('+os.path.basename(__file__)+') in the new location')
+    print('Parallel instances?: Launch script ('+os.path.basename(__file__)+') with option --port <free port>')
+    print('')
     print('************  TESTAR graph visualizer  Starts now  ************')
 
     if len(sys.argv) == 1 or (len(sys.argv) > 1 and sys.argv[1] != '--port'):

@@ -9,7 +9,7 @@ import networkx as nx
 import os
 
 ## version of the application
-version = '20200819'
+version = '20200927'
 ## thread status
 mlvalidationthread=threading.Thread()
 ## thread ticker
