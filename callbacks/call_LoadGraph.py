@@ -47,7 +47,7 @@ def validate_graphml_file(i_interval, i_validatebutton, s_advanced):
             if glob.mlvalidationthread.is_alive():
                 return dash.no_update, dash.no_update, dash.no_update, dash.no_update
             else:
-                if os.path.isfile(glob.scriptfolder + glob.graphmlfile):  # fullpath for OS operations
+                if os.path.isfile(glob.scriptfolder + glob.assetfolder + glob.outputfolder + glob.graphmlfile):  # fullpath for OS operations
                     x = threading.Thread(target=processgraphmlfile, args=s_advanced)
                     x.start()
                     glob.mlvalidationthread = x

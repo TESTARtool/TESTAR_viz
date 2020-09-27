@@ -45,12 +45,13 @@ def setup():
     print('2. Use option --port to choose a free port')
     print('3  Launch this script ('+os.path.basename(__file__)+') in the new location')
     print('************  TESTAR graph visualizer  Starts now  ************')
-    utils.filehandling.clearassetsfolder()
+
     if len(sys.argv) == 1 or (len(sys.argv) > 1 and sys.argv[1] != '--port'):
         port = settings.port
     else:  # (len(sys.argv) >1 and sys.argv[1]=='--port'):
         port = int(sys.argv[2])
-
+    glob.outputfolder = 'content_on_port_' + str(port) + os.sep
+    utils.filehandling.clearassetsfolder()
     app.layout = mainlayout
     app.config['suppress_callback_exceptions'] = True
     cyto.load_extra_layouts()  # Load extra layouts

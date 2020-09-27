@@ -92,7 +92,7 @@ def processgraphmlfile(details=True, advanced=False):
 
     start_time = time.time()
     print('start validating GraphML ', "--- %.3f seconds ---" % (time.time() - start_time))
-    globals.grh = nx.read_graphml(globals.graphmlfile)
+    globals.grh = nx.read_graphml(globals.assetfolder + globals.outputfolder + globals.graphmlfile)
     print('importing graphml done', "--- %.3f seconds ---" % (time.time() - start_time))
     setgraphattributes(True, None, '')
     setvizproperties(True, None, '')

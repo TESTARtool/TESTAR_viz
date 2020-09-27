@@ -27,7 +27,7 @@ def display_largehandler_page():
 @app.server.route('/large-file-upload', methods=['POST'])
 def large_upload_handler():
     file = request.files['file']
-    save_path = glob.graphmlfile
+    save_path = glob.assetfolder + glob.outputfolder + glob.graphmlfile
     current_chunk = int(request.form['dzchunkindex'])
     if current_chunk == 0:
         glob.start_timer_upload = time.time()

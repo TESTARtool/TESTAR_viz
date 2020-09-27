@@ -13,6 +13,9 @@ from layouts.tab_CytoLegenda import cytolegendalayout
 from layouts.tab_SelectedData import selectedData
 from layouts.tab_Oracles import oracles
 from utils.gui import prettytime
+from utils.globals import outputfolder
+from utils.globals import assetfolder
+
 
 headerstyle = {'width': '100%',
                'padding': '2',
@@ -31,6 +34,7 @@ mainlayout = html.Div(id='main', children=[
                     html.Hr(),
                     html.Div('Run date: '+prettytime(None, 'seconds')+'  System version: ' + version,
                              style={'font-size': 10}),
+                    html.Div('Data folder: ' + assetfolder + outputfolder, style={'font-size': 10}),
                     html.Hr(),
                     html.Div('Model Input', style=headerstyle),
                     html.Hr(),

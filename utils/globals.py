@@ -22,7 +22,7 @@ screenshotmap={}
 scriptfolder = ''
 ## folder for static assets
 assetfolder = 'assets' + os.sep  # 20190428 there is a dependency with app.get_asset_url
-## folder for dynamic assets. this is a subfoler of 'assets'
+## folder for dynamic assets. this is a subfolder of 'assets'
 outputfolder = 'content' + os.sep
 ## title of the webpage
 title = 'TESTAR Temporal Visualizer'
@@ -32,7 +32,7 @@ grh = nx.DiGraph()
 # The part is determined by the layerview
 subgraph = nx.DiGraph()
 ## static filename of the import graphML file.
-graphmlfile = os.path.join(assetfolder + outputfolder, 'GraphML.xml')
+graphmlfile = 'GraphML.xml'
 ## timer for the large fileupload comp[onenet
 start_timer_upload = 0
 ## regex for the nodefilter in the cytograph: allow a disjunct of 2 valuefilters
