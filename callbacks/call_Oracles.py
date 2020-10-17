@@ -9,8 +9,8 @@ Created on Wed Apr  3 18:27:03 2019
 import dash
 from dash.dependencies import Input, Output, State
 import utils.filehandling
-from appy import app
-import utils.globals as glob
+from controller import app
+import settings.applicationsettings as glob
 from utils.styler import style_dframe
 
 

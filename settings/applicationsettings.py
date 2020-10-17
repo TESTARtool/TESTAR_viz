@@ -6,10 +6,17 @@ import threading
 
 import pandas as pd
 import networkx as nx
+import dash
+import dash_cytoscape as cyto
 import os
 
 ## version of the application
 version = '20200927'
+dashversion= dash.__version__
+cytoscapeversion= cyto.__version__
+networkxversion= nx.__version__
+pandasversion= pd.__version__
+
 ## thread status
 mlvalidationthread=threading.Thread()
 ## thread ticker

@@ -3,9 +3,9 @@ import re
 import time
 import networkx as nx
 import pandas as pd
-from utils import settings as settings
+from settings import usersettings as settings
 from utils.filehandling import read_file_in_dataframe
-from utils import globals as glob
+from settings import applicationsettings as glob
 
 
 def getsubgraph(layerview, filternode=None, filtervalue=None):

@@ -9,8 +9,8 @@ import urllib
 
 import pandas as pd
 
-from utils import settings as settings
-from utils import globals as glob
+from settings import usersettings as settings
+from settings import applicationsettings as glob
 
 ##
 #@param s: node id which contains an image.

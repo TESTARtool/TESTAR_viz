@@ -3,10 +3,10 @@ import time
 import dash
 from dash.dependencies import Input, Output, State
 import dash_html_components as html
-from utils import settings as settings
+from settings import usersettings as settings
 import utils.filehandling
-from appy import app
-import utils.globals as glob
+from controller import app
+import settings.applicationsettings as glob
 import utils.graphcomputing as tu
 import utils.cytostylemanager as ch
 import pandas as pd

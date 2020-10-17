@@ -1,12 +1,10 @@
 import os
 import dash
 from dash.dependencies import Input, Output, State
-from appy import app
-import utils.globals as glob
+from controller import app
+import settings.applicationsettings as glob
 import utils.graphcomputing as tu
 import threading
-import utils.globals
-import utils.gui
 
 
 ##
@@ -63,7 +61,7 @@ def validate_graphml_file(i_interval, i_validatebutton, s_advanced):
         glob.mlvalidationtimerticker = glob.mlvalidationtimerticker + 1
         return dash.no_update, '*  processing since ' + str(glob.mlvalidationtimerticker) + ' seconds', '', ''
     else:
-        masterlog = utils.globals.mlthreadmasterlog
+        masterlog = glob.mlthreadmasterlog
         return True, \
             (masterlog['log1'] if 'log1' in masterlog.keys() else ''), \
             (masterlog['log2'] if 'log2' in masterlog.keys() else ''), \

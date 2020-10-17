@@ -7,12 +7,12 @@ import os
 import sys
 import dateutil
 
-from utils import settings as settings
-from appy import app
+from settings import usersettings as settings
+from controller import app
 import networkx as nx
 import pandas as pd
 import time
-from utils import globals
+from settings import applicationsettings
 from utils.filehandling import savescreenshottodisk, copydefaultimagetoasset
 from utils.gui import getsubgraph, setgraphattributes, setvizproperties
 
@@ -24,7 +24,7 @@ from utils.gui import getsubgraph, setgraphattributes, setvizproperties
 def Widgetdistri():
     widget_nodescnt = dict()
     widget_nodes = dict()
-    for n, ndict in globals.grh.nodes(data=True):
+    for n, ndict in applicationsettings.grh.nodes(data=True):
         if ndict[settings.label_nodeelement] == 'Widget':
             widget_nodes[n] = ndict
             if ndict["ConcreteID"] in widget_nodescnt:
@@ -77,7 +77,7 @@ def Widgetdistri():
 # return:  exports csv files to analyze the redundancy
 def savedftocsv(dframe, csvfilename):
     csvstr = dframe.to_csv(index=True, encoding='utf-8', sep=';')
-    directory = (globals.scriptfolder + globals.assetfolder + globals.outputfolder);
+    directory = (applicationsettings.scriptfolder + applicationsettings.assetfolder + applicationsettings.outputfolder);
     fout = open(directory + csvfilename, encoding='utf-8', mode='w', newline='')
     fout.write(csvstr)
     fout.close()
@@ -92,12 +92,12 @@ def processgraphmlfile(details=True, advanced=False):
 
     start_time = time.time()
     print('start validating GraphML ', "--- %.3f seconds ---" % (time.time() - start_time))
-    globals.grh = nx.read_graphml(globals.assetfolder + globals.outputfolder + globals.graphmlfile)
+    applicationsettings.grh = nx.read_graphml(applicationsettings.assetfolder + applicationsettings.outputfolder + applicationsettings.graphmlfile)
     print('importing graphml done', "--- %.3f seconds ---" % (time.time() - start_time))
     setgraphattributes(True, None, '')
     setvizproperties(True, None, '')
     if 'All' in settings.centralitynodes:
-        subgraph = globals.grh
+        subgraph = applicationsettings.grh
     else:
         subgraph = getsubgraph(settings.centralitynodes)  # regard only items: NOT in ABSTRACT, WIDGET nor TEST
     noselfloopssubgraph = subgraph.copy()
@@ -115,7 +115,7 @@ def processgraphmlfile(details=True, advanced=False):
     ######## part 1
     sequencetuples = []
 
-    testsequence_nodes = {n: d for n, d in globals.grh.nodes(data=True)
+    testsequence_nodes = {n: d for n, d in applicationsettings.grh.nodes(data=True)
                           if d[settings.label_nodeelement] == 'TestSequence'}
     for n, d in testsequence_nodes.items():
         date_time_obj = dateutil.parser.parse(d['startDateTime'],
@@ -123,37 +123,37 @@ def processgraphmlfile(details=True, advanced=False):
         # date_time_obj=datetime.datetime.strptime(d['startDateTime'],'%a %b %d %H:%M:%S CET %Y')#fragile
         i = 0
         initialnode = ''
-        for tn, tndict in globals.grh.nodes(data=True):
+        for tn, tndict in applicationsettings.grh.nodes(data=True):
             if tndict[settings.label_nodeelement] == 'SequenceNode' and tndict['sequenceId'] == d['sequenceId']:
                 i = i + 1
                 if initialnode == '':
-                    neighbors = globals.grh.predecessors(tn)
+                    neighbors = applicationsettings.grh.predecessors(tn)
                     for predec in neighbors:  # should be only 1 entry. :-)
                         if predec == n:  # this node is successor of the testsequence, thus pointer to firstnode
-                            initialnode = [x for x, y in globals.grh.nodes(data=True) if
+                            initialnode = [x for x, y in applicationsettings.grh.nodes(data=True) if
                                            y[settings.label_nodeelement] == 'ConcreteState' and
                                            y['ConcreteIDCustom'] == tndict['concreteStateId']]  # case sentitive !!
 
         testlength = i-1  # len(ts)-1 # substrct testsequencenode
         sequencetuples.append((d['sequenceId'], date_time_obj,  testlength, initialnode[0]))
-    globals.sortedsequencetuples = sorted(sequencetuples, key=lambda x: x[1])
-    globals.sortedsequenceids = [s for s, d, l, i in globals.sortedsequencetuples]
+    applicationsettings.sortedsequencetuples = sorted(sequencetuples, key=lambda x: x[1])
+    applicationsettings.sortedsequenceids = [s for s, d, l, i in applicationsettings.sortedsequencetuples]
 
     print('determining the initial ConcreteState for all test sequences done',
           "--- %.3f seconds ---" % (time.time() - start_time))
     if advanced:
-        for n, ndict in globals.grh.nodes(data=True):
+        for n, ndict in applicationsettings.grh.nodes(data=True):
             if ndict[settings.label_nodeelement] == 'ConcreteState':
                 sequenceid,allsequenceids = getConcreteStateSequenceid(n)
-                globals.grh.nodes[n][globals.createdby] = sequenceid
-                globals.grh.nodes[n][globals.updatedby] = allsequenceids
+                applicationsettings.grh.nodes[n][applicationsettings.createdby] = sequenceid
+                applicationsettings.grh.nodes[n][applicationsettings.updatedby] = allsequenceids
 
-        for source, target, n, edict in globals.grh.edges(data=True, keys=True):
+        for source, target, n, edict in applicationsettings.grh.edges(data=True, keys=True):
             if edict[settings.label_edgeelement] == 'ConcreteAction':
                 sequenceid, allsequenceids = getConcreteActionSequenceid(edict['actionId'])
-                globals.grh[source][target][n][globals.createdby] = sequenceid  # is syntax for multidi graph edges
-                globals.grh[source][target][n][globals.updatedby] = allsequenceids
-        print('updating all ConcreteStates & Actions with "' + globals.createdby + '" done',
+                applicationsettings.grh[source][target][n][applicationsettings.createdby] = sequenceid  # is syntax for multidi graph edges
+                applicationsettings.grh[source][target][n][applicationsettings.updatedby] = allsequenceids
+        print('updating all ConcreteStates & Actions with "' + applicationsettings.createdby + '" done',
               "--- %.3f seconds ---" % (time.time() - start_time))
 
     centralitymeasure = [setcentralitymeasure(None, 'N/A')]
@@ -172,15 +172,15 @@ def processgraphmlfile(details=True, advanced=False):
         print('graph centralities not calculated. graph consisting of nodes in ' + str(
             settings.centralitynodes) + ' is too big V * E = ' + str(V) + ' * ' + str(E) + ' exceeds ' + str(
             settings.Threshold_V * settings.Threshold_E))
-    globals.centralitiemeasures = pd.DataFrame(centralitymeasure)
+    applicationsettings.centralitiemeasures = pd.DataFrame(centralitymeasure)
     print('updating graph centralities attributes  done', "--- %.3f seconds ---" % (time.time() - start_time))
 
     ######## part 2
-    globals.elementcreationdistri = []
+    applicationsettings.elementcreationdistri = []
     if advanced:
-        for tup in globals.sortedsequencetuples:
+        for tup in applicationsettings.sortedsequencetuples:
             createdbylist = []
-            for n1, d1 in globals.grh.nodes(data=True):
+            for n1, d1 in applicationsettings.grh.nodes(data=True):
                 if d1[settings.label_nodeelement] == 'ConcreteState':
                     if 'createdby_sequenceid' in d1:
                         if d1['createdby_sequenceid'] == tup[0]:
@@ -188,23 +188,23 @@ def processgraphmlfile(details=True, advanced=False):
             nodecount = len(createdbylist)
 
             createdbylist = []
-            for s1, t1, n1, d1 in globals.grh.edges(data=True, keys=True):
+            for s1, t1, n1, d1 in applicationsettings.grh.edges(data=True, keys=True):
                 if d1[settings.label_edgeelement] == 'ConcreteAction':
                     if 'createdby_sequenceid' in d1:
                         if d1['createdby_sequenceid'] == tup[0]:
                             createdbylist.append(n1)
             edgecount = len(createdbylist)
-            globals.elementcreationdistri.append(
+            applicationsettings.elementcreationdistri.append(
                 {'sequenceId': tup[0], 'startDateTime': tup[1], 'statescreated': nodecount,
                  'initialNode': tup[3], 'actionsperformed': edgecount, 'nrofteststeps': tup[2]})
         print('updating execution statistics  done', "--- %.3f seconds ---" % (time.time() - start_time))
-    globals.testexecutions = pd.DataFrame(globals.elementcreationdistri)
+    applicationsettings.testexecutions = pd.DataFrame(applicationsettings.elementcreationdistri)
 
     ########## shortest simple path to farest node
 
     lspbyinitial = [{'initialNode': 'N/A', 'LSP length': '-1', 'LSP': 'N/A'}]
     if advanced:
-        traces = globals.sortedsequencetuples  # concreteStateId
+        traces = applicationsettings.sortedsequencetuples  # concreteStateId
         initialnodes = [initialnode for traceid, daterun, length, initialnode in traces]
         initialnodes = list(dict.fromkeys(initialnodes))  # remove duplicates
         lspbyinitial = []
@@ -221,16 +221,16 @@ def processgraphmlfile(details=True, advanced=False):
                 {'initialNode': inode, 'LSP length': str(len(longestshortestpath)), 'LSP': csvlspallnodes})
         pass
         print('updating shortestpaths from initalnodes  done', "--- %.3f seconds ---" % (time.time() - start_time))
-    globals.lsptraces = pd.DataFrame(lspbyinitial)
+    applicationsettings.lsptraces = pd.DataFrame(lspbyinitial)
     ########## shortest simple path to farest node
 
     masterlog = {}
     log = []
     metadata = []
-    log.append('* Node count in ' + globals.graphmlfile + " is: " + str(globals.grh.number_of_nodes()))
+    log.append('* Node count in ' + applicationsettings.graphmlfile + " is: " + str(applicationsettings.grh.number_of_nodes()))
     if details:
         labels = {}
-        for n, d in globals.grh.nodes(data=True):
+        for n, d in applicationsettings.grh.nodes(data=True):
             lvalue = d[settings.label_nodeelement]
             labels[lvalue] = 1 + labels.get(lvalue, 0)
             if lvalue == settings.elementwithmetadata:
@@ -242,9 +242,9 @@ def processgraphmlfile(details=True, advanced=False):
         masterlog.update({'log1': log})
         log = []
     if details:
-        log.append('* Edge count in ' + globals.graphmlfile + " is: " + str(globals.grh.number_of_edges()))
+        log.append('* Edge count in ' + applicationsettings.graphmlfile + " is: " + str(applicationsettings.grh.number_of_edges()))
         labels = {}
-        for s, t, d in globals.grh.edges(data=True):
+        for s, t, d in applicationsettings.grh.edges(data=True):
             lvalue = d[settings.label_edgeelement]
             labels[lvalue] = 1 + labels.get(lvalue, 0)
         detaillog = [('  * ' + k + ' : ' + str(v)) for k, v in labels.items()]
@@ -285,7 +285,7 @@ def setcentralitymeasure(graph=None, centralityname='indegree_noselfloops'):
         cut_bins.append(-1)  # zero has to fall in the first bin/bucket.
         cut_bins.sort()
         cut_labels = [str(i + 1) for i in range(len(cut_bins) - 1)]
-        nx.set_node_attributes(globals.grh, d, centralityname)
+        nx.set_node_attributes(applicationsettings.grh, d, centralityname)
         dicy = dict(zip(cut_labels, cut_bins))
         return {'measure': centralityname, 'binning': json.dumps(dicy)}
 
@@ -315,14 +315,14 @@ def setcytoelements(parenting=False, layerview=None, filternode=None, filtervalu
     test_sequencekeyset = set()
     try:
         copydefaultimagetoasset()  # optimize: do only once:-)
-        if (globals.layerviewincache == layerview and globals.parentingincache == parenting and
-                globals.filternodeincache == filternode and globals.filtervalueincache == filtervalue):
+        if (applicationsettings.layerviewincache == layerview and applicationsettings.parentingincache == parenting and
+                applicationsettings.filternodeincache == filternode and applicationsettings.filtervalueincache == filtervalue):
             pass
         else:
 
             grh = getsubgraph(layerview, filternode, filtervalue)
-            globals.filtervalueincache = filtervalue
-            globals.filternodeincache = filternode
+            applicationsettings.filtervalueincache = filtervalue
+            applicationsettings.filternodeincache = filternode
             for n, ndict in grh.nodes(data=True):
 
                 tempdict = dict(ndict)
@@ -341,23 +341,23 @@ def setcytoelements(parenting=False, layerview=None, filternode=None, filtervalu
                             testsequencekey = layer+"_" + ndict['sequenceId']+'Layer'
                             test_sequencekeyset.add(testsequencekey)
                             tempdict.update({'parent': testsequencekey})  # sync with nodeid of the child
-                fname = globals.outputfolder + savescreenshottodisk(str(n), tempdict)
-                tempdict.update({globals.elementimgurl: app.get_asset_url(fname)})  # pointer to the image
+                fname = applicationsettings.outputfolder + savescreenshottodisk(str(n), tempdict)
+                tempdict.update({applicationsettings.elementimgurl: app.get_asset_url(fname)})  # pointer to the image
                 nodes.append({'data': tempdict, 'position': {'x': 0, 'y': 0}})
             if parenting:
                 index = 0
                 for k in parentnodeset:
-                    c_parentnode = {'data': {'id': k, settings.label_nodeelement: globals.parent_subtypeelement,
+                    c_parentnode = {'data': {'id': k, settings.label_nodeelement: applicationsettings.parent_subtypeelement,
                                              'nodeid': k, 'parentcounter': 'p_'+str(index)}}
                     index = (index+1) % settings.parentnodecolorrange
                     allnodes.append(c_parentnode)
                 for testsequencekey in test_sequencekeyset:
                     t_parentnode = {'data': {'id': testsequencekey,
-                                             settings.label_nodeelement: globals.parent_subtypeelement,
+                                             settings.label_nodeelement: applicationsettings.parent_subtypeelement,
                                              'nodeid': testsequencekey, 'parentcounter': 'p_'+str(index)}}
                     index = (index + 1) % settings.parentnodecolorrange
                     allnodes.append(t_parentnode)
-            globals.parentingincache = parenting
+            applicationsettings.parentingincache = parenting
             allnodes.extend(nodes)
             for source, target, n, edict in grh.edges(data=True, keys=True):
                 tempdict = dict(edict)
@@ -367,8 +367,8 @@ def setcytoelements(parenting=False, layerview=None, filternode=None, filtervalu
                 tempdict.update({'id': n})
                 tempdict.update({'edgeid': n})
                 edges.append({'data': tempdict})
-            globals.cytoelements = allnodes + edges
-        print('computing nodes+edges', '(#=', len(globals.cytoelements), ') for layout done',
+            applicationsettings.cytoelements = allnodes + edges
+        print('computing nodes+edges', '(#=', len(applicationsettings.cytoelements), ') for layout done',
               "--- %.3f seconds ---" % (time.time() - start_time))
     except Exception as e:
         exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -384,20 +384,20 @@ def setcytoelements(parenting=False, layerview=None, filternode=None, filtervalu
 # @return: tuple of 1. the oldest sequenceid  and 2. a list of all the sequenceidslist.
 def getConcreteStateSequenceid(concretestate):
     sequenceid = ''
-    neighbors = globals.grh.predecessors(concretestate)
+    neighbors = applicationsettings.grh.predecessors(concretestate)
     # use the global graph object .. to ensure that TestSequence is always included
     sequenceids = set()
     for n in neighbors:
-        d = globals.grh.nodes[n]
+        d = applicationsettings.grh.nodes[n]
         if d[settings.label_nodeelement] == 'SequenceNode':
             sequenceids.add(d['sequenceId'])
 
-    index = len(globals.sortedsequencetuples) - 1
+    index = len(applicationsettings.sortedsequencetuples) - 1
     for s in sequenceids:
-        index = min(index, globals.sortedsequenceids.index(s))
+        index = min(index, applicationsettings.sortedsequenceids.index(s))
         if index == 0:
             break
-    sequenceid = globals.sortedsequenceids[index]
+    sequenceid = applicationsettings.sortedsequenceids[index]
     return sequenceid, ';'.join(sequenceids)
 
 ##
@@ -408,18 +408,18 @@ def getConcreteStateSequenceid(concretestate):
 def getConcreteActionSequenceid(concreteaction):
     sequenceids = set()
     # use the global graph object .. to ensure that TestSequence is always included
-    for source, target, n, edict in globals.grh.edges(data=True, keys=True):
+    for source, target, n, edict in applicationsettings.grh.edges(data=True, keys=True):
         if edict[settings.label_edgeelement] == 'SequenceStep':
             if edict['concreteActionId'] == concreteaction:
-                d = globals.grh.nodes[source]  # lookup the TestStep
+                d = applicationsettings.grh.nodes[source]  # lookup the TestStep
                 sequenceids.add(d['sequenceId'])
 
-    index = len(globals.sortedsequencetuples) - 1
+    index = len(applicationsettings.sortedsequencetuples) - 1
     for s in sequenceids:
-        index = min(index, globals.sortedsequenceids.index(s))
+        index = min(index, applicationsettings.sortedsequenceids.index(s))
         if index == 0:
             break
-    sequenceid = globals.sortedsequenceids[index]
+    sequenceid = applicationsettings.sortedsequenceids[index]
     return sequenceid, ';'.join(sequenceids)
 
 

@@ -8,8 +8,8 @@ Created on Wed Apr  3 18:27:03 2019
 import time
 
 from flask import request, make_response, send_from_directory
-from appy import app
-import utils.globals as glob
+from controller import app
+import settings.applicationsettings as glob
 import logging
 import os
 

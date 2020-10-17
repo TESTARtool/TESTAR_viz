@@ -8,7 +8,7 @@ Created on Wed Apr  3 18:27:03 2019
 
 
 from dash.dependencies import Input, Output, State
-from appy import app
+from controller import app
 from utils.filehandling import save_uitable
 
 

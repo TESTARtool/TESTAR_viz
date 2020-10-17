@@ -2,8 +2,8 @@
 import dash
 from dash.dependencies import Input, Output, State
 import utils.gui
-from appy import app
-import utils.globals as glob
+from controller import app
+import settings.applicationsettings as glob
 from utils.filehandling import save_uitable
 
 

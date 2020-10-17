@@ -11,10 +11,10 @@ from dash.dependencies import Input, Output, State
 import dash
 import pandas as pd
 
-from utils import settings as settings
+from settings import usersettings as settings
 import utils
-from appy import app
-import utils.globals as glob
+from controller import app
+import settings.applicationsettings as glob
 import utils.gradient
 from utils.styler import set_centrality_style
 from utils import styler

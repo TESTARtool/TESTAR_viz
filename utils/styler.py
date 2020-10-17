@@ -1,5 +1,5 @@
-from utils import settings as settings
-import utils.globals as glob
+from settings import usersettings as settings
+import settings.applicationsettings as glob
 from utils.graphcomputing import centralitywidth, centralityheight
 
 ##

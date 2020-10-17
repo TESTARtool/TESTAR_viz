@@ -3,7 +3,7 @@ Provides the structure of the Web-Layout and refers to the subsections:
 '''
 
 
-from utils.globals import version
+from settings.applicationsettings import version
 import dash_html_components as html
 import dash_core_components as dcc
 from layouts.tab_LoadGraph import loadGraph
@@ -13,8 +13,6 @@ from layouts.tab_CytoLegenda import cytolegendalayout
 from layouts.tab_SelectedData import selectedData
 from layouts.tab_Oracles import oracles
 from utils.gui import prettytime
-from utils.globals import outputfolder
-from utils.globals import assetfolder
 
 
 headerstyle = {'width': '100%',

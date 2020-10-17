@@ -6,7 +6,7 @@ Created on Wed Apr  3 18:27:03 2019
 @author: cseng
 """
 
-from appy import app
+from controller import app
 from flask import request
 ##############################################
 

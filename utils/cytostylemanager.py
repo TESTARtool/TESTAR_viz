@@ -1,14 +1,10 @@
 import json
-
-import dash
 import networkx as nx
-
-#import utils.globals
-from utils import settings as settings
+from settings import usersettings as settings
 import utils.gradient
 import utils.gui
 import utils.graphcomputing as tu
-import utils.globals as glob
+import settings.applicationsettings as glob
 from utils import styler
 from utils.styler import nodestyler, edgestyler
 
