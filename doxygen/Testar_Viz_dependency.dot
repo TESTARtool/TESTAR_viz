@@ -4,7 +4,7 @@ digraph G {
 
     rankdir = TB;
     node [shape = "folder",fontcolor = "#000000",fontname = Helvetica,fontsize = 10];
-    nodesep = 0.5;
+    nodesep = 0.4;
     ranksep = 0.8;
     edge [fillcolor = black];
 
@@ -31,14 +31,16 @@ digraph G {
     }
 
     subgraph cluster_otherlibs {
-    node [];
+     node [shape = "folder"];
     label = "3rd party libraries";
     networkx;
-    numpy;
+    matplotlib;
+    dateutil;
     pandas;
     dash;
-    flask;
-
+{rank = sink; pandas;networkx;dash}
+ {rank = same; dateutil;matplotlib }
+  //{rank= sink;dash}
     };
     run -> controller [lhead = cluster_Controller];
     controller -> networkx [lhead = cluster_otherlibs];
@@ -47,7 +49,9 @@ digraph G {
     controller -> settings [ltail = cluster_Controller];
     layouts -> settings [headport = n; ltail = cluster_testar];
     layouts -> Utils [headport = n; ltail = cluster_testar];
-    callbacks -> dash [headport = n; ltail = cluster_testar,lhead = cluster_otherlibs];
+    callbacks -> networkx [headport = n; ltail = cluster_testar,lhead = cluster_otherlibs];
+    Utils -> networkx [ lhead = cluster_otherlibs];
+
     networkx -> pandas;
-    dash -> flask;
+
 }
