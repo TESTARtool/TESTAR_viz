@@ -93,6 +93,8 @@ The following interactive features are at the users' disposal:
    * Dash
    * Dash-cytoscape
    * Matplotlib
+   * Python-dateutil
+   
 
 #### Installation:
  * Install Python interpreter

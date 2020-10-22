@@ -66,11 +66,183 @@ To show the entire web page, the screen prints slightly overlapping.
 
 */
 
+
+
+/** \page dependency Dependency diagrams.
+
+Shows the Module dependency diagrams as an abstracted diagram and as a collection of diagrams created by PyDeps
+- - -
+\dot Abstracted dependency diagram
+//==============================
+digraph G {
+    compound = true;
+
+
+    rankdir = TB;
+    node [shape = "folder",fontcolor = "#000000",fontname = Helvetica,fontsize = 10];
+    nodesep = 0.4;
+    ranksep = 0.8;
+    edge [fillcolor = black];
+
+    subgraph cluster_T {
+    label = "TESTAR application";
+    label = "TESTAR Specific";
+    run [shape = ellipse];
+    controller [shape = ellipse];
+
+    {rank = same; run}
+    {rank = same; controller}
+
+    subgraph cluster_testar {
+
+    label = "dash glue";
+    callbacks;
+    layouts;
+    {rank = same; callbacks}
+    {rank = same; layouts}
+    };
+    {rank = sink; settings; Utils}
+    settings;
+    Utils;
+    }
+
+    subgraph cluster_otherlibs {
+     node [shape = "folder"];
+    label = "3rd party libraries";
+    networkx;
+    matplotlib;
+    dateutil;
+    pandas;
+    dash;
+{rank = sink; pandas;networkx;dash}
+ {rank = same; dateutil;matplotlib }
+  //{rank= sink;dash}
+    };
+    run -> controller [lhead = cluster_Controller];
+    controller -> networkx [lhead = cluster_otherlibs];
+    controller -> callbacks [ltail = cluster_controller; lhead = cluster_testar];
+    controller -> Utils [ltail = cluster_Controller];
+    controller -> settings [ltail = cluster_Controller];
+    layouts -> settings [headport = n; ltail = cluster_testar];
+    layouts -> Utils [headport = n; ltail = cluster_testar];
+    callbacks -> networkx [headport = n; ltail = cluster_testar,lhead = cluster_otherlibs];
+    Utils -> networkx [ lhead = cluster_otherlibs];
+
+    networkx -> pandas;
+
+}
+
+//==============================
+
+
+\enddot
+
+  - - -
+
+\dot Dependency diagram  for RUN created via PyDeps
+digraph G {
+    //concentrate = true;
+
+    rankdir = TB;
+    node [shape="folder",fontname=Helvetica,fontsize=10];
+
+    run [shape=ellipse];
+    callbacks ;
+    controller [shape=ellipse];
+    hide1 [style=invis];
+    dash ;
+    dashcorecomponents ;
+    dashcytoscape ;
+    dashhtmlcomponents ;
+    dashrenderer ;
+    dashtable ;
+    dateutil ;
+    flask ;
+    flaskcompress ;
+    future ;
+    jinja2 ;
+    layouts ;
+    main ;
+    matplotlib ;
+    networkx ;
+    numpy ;
+    pandas ;
+    pkgresources ;
+    plotly ;
+    settings ;
+    utils ;
+    werkzeug ;
+    {rank=same;run;}
+    {rank=same;controller}
+
+
+    controller -> callbacks ;
+    callbacks -> controller ;
+    run -> controller ;
+    utils -> controller ;
+    callbacks -> dash ;
+    controller -> dash ;
+    dashcorecomponents -> dash ;
+    dashcytoscape -> dash ;
+    dashhtmlcomponents -> dash ;
+    dashtable -> dash ;
+    settings -> dash ;
+    layouts -> dashcorecomponents ;
+    controller -> dashcytoscape ;
+    layouts -> dashcytoscape ;
+    settings -> dashcytoscape ;
+    callbacks -> dashhtmlcomponents ;
+    layouts -> dashhtmlcomponents ;
+    dash -> dashrenderer ;
+    layouts -> dashtable ;
+    pandas -> dateutil ;
+    utils -> dateutil ;
+    dash -> flask ;
+    flaskcompress -> flask ;
+    utils -> flask ;
+    dash -> flaskcompress ;
+    dash -> future ;
+    flask -> jinja2 ;
+    controller -> layouts ;
+    pkgresources -> main ;
+    networkx -> matplotlib ;
+    pandas -> matplotlib ;
+    utils -> matplotlib ;
+    settings -> networkx ;
+    utils -> networkx ;
+    matplotlib -> numpy ;
+    networkx -> numpy ;
+    pandas -> numpy ;
+    callbacks -> pandas ;
+    networkx -> pandas ;
+    settings -> pandas ;
+    utils -> pandas ;
+    dash -> pkgresources ;
+    pandas -> pkgresources ;
+    dash -> plotly ;
+    callbacks -> settings ;
+    controller -> settings ;
+    layouts -> settings ;
+    run -> settings ;
+    utils -> settings ;
+    callbacks -> utils ;
+    controller -> utils ;
+    layouts -> utils ;
+    dash -> werkzeug ;
+    flask -> werkzeug ;
+}
+
+\enddot
+
+- - -
+*/
 /** \page disclaim !! Disclaimer on content.
 This auto generated HTML documentation cannot be guaranteed to be precise.\n
 For example the call- and caller-graphs that are generated might not be complete, due to inspection depth limitations.\n
 Some call- and caller-graphs might appear to be missing. This can be due to the fact that generic import statements, ( * ), cannot be followed through.\n
 */
+
+
 
 /** \dir assets
 The assets folder hosts:\n
