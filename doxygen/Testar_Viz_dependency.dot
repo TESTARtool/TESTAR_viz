@@ -35,11 +35,11 @@ digraph G {
     label = "3rd party libraries";
     networkx;
     matplotlib;
-    dateutil;
+    wheel;
     pandas;
     dash;
-{rank = sink; pandas;networkx;dash}
- {rank = same; dateutil;matplotlib }
+{rank = same; matplotlib;pandas;dash}
+ {rank = same;wheel  }
   //{rank= sink;dash}
     };
     run -> controller [lhead = cluster_Controller];
@@ -49,9 +49,11 @@ digraph G {
     controller -> settings [ltail = cluster_Controller];
     layouts -> settings [headport = n; ltail = cluster_testar];
     layouts -> Utils [headport = n; ltail = cluster_testar];
-    callbacks -> networkx [headport = n; ltail = cluster_testar,lhead = cluster_otherlibs];
-    Utils -> networkx [ lhead = cluster_otherlibs];
-
-    networkx -> pandas;
-
+    callbacks -> pandas [headport = n; ltail = cluster_testar,lhead = cluster_otherlibs];
+    Utils -> dash [ lhead = cluster_otherlibs];
+    networkx -> pandas[ style=dashed  ];
+    networkx -> matplotlib[ style=dashed  ];
+    pandas->wheel;
+    dash->wheel;
+    matplotlib->wheel;
 }
